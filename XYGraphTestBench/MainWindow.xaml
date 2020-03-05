@@ -1,0 +1,28 @@
+﻿<Window x:Class="XYGraphLib.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:WpfControlTestbenchLib="clr-namespace:WpfTestbench;assembly=WpfControlTestbenchLib"
+        WindowState="Maximized"
+        Title="XYGraph Visual Test MainWindow">
+  <StackPanel HorizontalAlignment="Left" Margin="6">
+    <StackPanel.Resources>
+      <Style TargetType="Button">
+        <Setter Property="Margin" Value="2"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      </Style>
+    </StackPanel.Resources>
+
+    <Button Name="LegendXButton" Content="LegendX" HorizontalContentAlignment="Left"/>
+    <Button Name="LegendXDateButton" Content="LegendXDate" HorizontalContentAlignment="Left"/>
+    <Button Name="LegendScrollerXButton" Content="LegendXScroller"/>
+    <Button Name="LegendYButton" Content="LegendY"/>
+    <Button Name="LegendScrollerYButton" Content="LegendScrollerY"/>
+    <Button Name="Chart1Plot1X1YLegendButton" Content="Chart1Plot1X1YLegend"/>
+    <Button Name="Chart2Plots1X2YLegendsButton" Content="Chart2Plots1X2YLegends"/>
+    <Button Visibility="Hidden" Content="Hidden"/>
+    <Button Name="CustomControlSampleButton" Content="Custom Control Sample"/>
+    <Button Name="SizeBindingButton" Content="SizeBinding"/>
+    <Button Name="TestButton" Content="Test"/>
+    <Button Name="XControlButton" Content="XControl"/>
+  </StackPanel>
+</Window>
