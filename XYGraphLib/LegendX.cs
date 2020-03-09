@@ -1,14 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Media;
+﻿/**************************************************************************************
+
+XYGraphLib.LegendX
+==================
+
+Horizontal Legend
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Windows;
+using System.Windows.Media;
 
 
 namespace XYGraphLib {
 
-
+  /// <summary>
+  /// /// Displays the legend below the PlotArea (time axis).
+  /// </summary>
   public class LegendX: Legend {
 
     #region Constructor
@@ -88,10 +104,7 @@ namespace XYGraphLib {
     }
 
 
-    const double freeSpaceFactor = 1.3;
-
-
-    protected override void OnRecalculate(ref double[] labelValues, ref string[] labelStrings, ref Point[] labelPoints) {
+    protected override void OnRecalculate(ref double[]? labelValues, ref string?[]? labelStrings, ref Point[]? labelPoints) {
       //find first which label will need the most digits. Use MinValue or MaxValue, not DisplayValue and range, because the format
       //should stay the same for all values between min to max.
       double lowestValue;
@@ -115,7 +128,7 @@ namespace XYGraphLib {
         throw new Exception(string.Format("Legend: Normalised stepValue should be between 1.0 and 9.999, but was '{0}'.", stepDigitsExponent.Digits));
       }
 #endif
-      //the first digits of a step (=value difference between 2 lables) can be 1, 2 or 5. All other digits of a step are 0.
+      //the first digits of a step (=value difference between 2 labels) can be 1, 2 or 5. All other digits of a step are 0.
       //chose a first step which is smaller than DisplayValueRange
       StepStruct step;
       if (stepDigitsExponent.Digits<1.00) {
@@ -149,7 +162,7 @@ namespace XYGraphLib {
       //DisplayRange provides a first estimate for the distance between 2 labels (=step)
       //step gets made smaller and smaller, until the space needed to display the label is bigger than the space available between
       //2 labels
-      string numberFormat = null;
+      string? numberFormat = null;
       double labelWidth = double.NaN;
       double pixelPerValue = RenderWidthTracked / DisplayValueRange;
       StepStruct previousStep = step;
@@ -162,7 +175,7 @@ namespace XYGraphLib {
         if (labelWidth>step.Value*pixelPerValue) {
           //not enough space for new format. Use previous step and its format.
           //if there is not enough space for even 1 label: we come here first time going through the loop. step is already
-          //equal to previousStep. Assigning it agin doesn't hurt. Even step is in this case not a meaningful value,
+          //equal to previousStep. Assigning it again doesn't hurt. Even step is in this case not a meaningful value,
           //it is ok, because the dingle label displayed will not use step for formatting.
           step = previousStep;
           break;
@@ -206,14 +219,13 @@ namespace XYGraphLib {
           labelPoints = new Point[1];
         }
         labelValues[0] = DisplayValue;
-        labelStrings[0] = DisplayValue.ToString();
-        labelPoints[0] = new Point(0, 0);
+        labelStrings![0] = DisplayValue.ToString();
+        labelPoints![0] = new Point(0, 0);
         return;
       }
 
 
-      double labelValue;
-      FindFirstLastLabel(ref labelValues, ref labelStrings, ref labelPoints, step, out labelValue);
+      FindFirstLastLabel(ref labelValues, ref labelStrings, ref labelPoints, step, out var labelValue);
       if (labelValues.Length==1) {
         //only 1 or even only the part of a label can be displayed. In this case it is better to just display the 
         //very first value and not trying to find the first nicely rounded step-number
@@ -275,181 +287,19 @@ namespace XYGraphLib {
     }
 
 
-//protected  void OnRecalculateOld(ref double[] labelValues, ref string[] labelStrings, ref Point[] labelPoints) {
-//      double smallestValue;
-//      double largestValue;
-//      double range;
-//      if (double.IsNaN(MinValue) || double.IsNaN(MaxValue)) {
-//        //Min- and MaxValue are not defined. Use DisplayValue and DisplayValueRange instead
-//        smallestValue = DisplayValue;
-//        largestValue = smallestValue + DisplayValueRange; //DisplayValueRange is guaranteed to be greater 0
-//        range = DisplayValueRange;
-//      } else {
-//        //Min- and MaxValue are defined, use them.
-//        smallestValue = MinValue;
-//        largestValue = MaxValue;
-//        range = MaxValue - MinValue;//MaxValue is guaranteed to be greater than MinValue
-//      }
+    //private string calculateNumberFormat(double range) {
 
-//      string numberFormat = calculateNumberFormat(range);
-//      //find first which label will need the most digits. It is MinValue or MaxValue. MinValue might need more digits, because it
-//      // can be negative (-10000) and Max might be a small number (0).
-//      //convert smallest and highest value to string
-//      string smallestValueString = smallestValue.ToString(numberFormat);
-//      string largestValueString = largestValue.ToString(numberFormat);
-
-//      //select longer string. Sometimes the smallest label needs more digits than the highest, for example when the numbers are negative
-//      string longestValueString;
-//      double longestStringValue;
-//      if (smallestValueString.Length>largestValueString.Length) {
-//        longestValueString = smallestValueString;
-//        longestStringValue = smallestValue;
-//      } else {
-//        longestValueString = largestValueString;
-//        longestStringValue = largestValue;
-//      }
-
-//      //pixel length of longest label
-//      double maxLabelWidth = LegendGlyphDrawer.GetLength(longestValueString, FontSize) * freeSpaceFactor;
-
-//      //from here on all calculations are based on available pixel and DisplayRange, not MinMax
-//      //pixel width and DisplayRange provide a first estimate for the distance between 2 labels (=step)
-//      //step gets made smaller and smaller, until the space needed to display the label is bigger than the space available
-//      //---------------------------------------------------------------------------------------
-
-//      //maximum labels that can be displayed in window
-//      int maxLabelCount = (int)(RenderWidthTracked / maxLabelWidth);
-
-//      if (maxLabelCount>1) {
-//        //if there is more than one label, even more digits after the decimal point might need to be displayed.
-//        double estimatedDifferenceBetweenLabels = DisplayValueRange / maxLabelCount;
-//        numberFormat = calculateNumberFormat(estimatedDifferenceBetweenLabels);
-//        longestValueString = longestStringValue.ToString(numberFormat); //still use MinMax to find widest label
-//        maxLabelWidth = LegendGlyphDrawer.GetLength(longestValueString, FontSize) * freeSpaceFactor;
-//        maxLabelCount = (int)(RenderWidthTracked / maxLabelWidth);
-//      }
-
-//      double estimatedStepValue;
-//      if (maxLabelCount<=1) {
-//        //only 1 or even only the part of a label can be displayed. In this case it is better to just display the 
-//        //very first value and not trying to find the first nicely rounded number
-//        if (labelValues==null || labelValues.Length!=1) {
-//          labelValues = new double[1];
-//          labelStrings = new string[1];
-//          labelPoints = new Point[1];
-//        }
-//        labelValues[0] = DisplayValue;
-//        labelStrings[0] = DisplayValue.ToString();
-//        labelPoints[0] = new Point(0, 0);
-//        return;
-//      }
-
-//      estimatedStepValue = DisplayValueRange / maxLabelCount;
-
-//      //normalise amplitude between 1.0 and 10.0
-//      DoubleDigitsExponent stepDigitsExponent = new DoubleDigitsExponent(estimatedStepValue);
-//      if (stepDigitsExponent.Digits<1.00 || stepDigitsExponent.Digits>=10.00) {
-//        throw new ApplicationException(string.Format("Legend: Normalised stepValue should be between 1.0 and 9.999, but was '{0}'.", stepDigitsExponent.Digits));
-//      }
-
-//      StepStruct step;
-//      if (stepDigitsExponent.Digits<1.00) {
-//        step = new StepStruct(1, stepDigitsExponent.Exponent);
-//      } else if (stepDigitsExponent.Digits<2.00) {
-//        step = new StepStruct(2, stepDigitsExponent.Exponent);
-//      } else if (stepDigitsExponent.Digits<5.00) {
-//        step = new StepStruct(5, stepDigitsExponent.Exponent);
-//      } else {
-//        step = new StepStruct(1, stepDigitsExponent.Exponent+1);
-//      }
-
-//      numberFormat = "#,0";
-//      if (step.Exponent<0) {
-//        //add required digits after decimal point
-//        numberFormat += '.' + new string('0', -step.Exponent);
-//      }
-
-//      double labelValue;
-//      FindFirstLastLabel(ref labelValues, ref labelStrings, ref labelPoints, step, out labelValue);
-
-//      //calculate labels
-//      double pixelPerValue = RenderWidthTracked / DisplayValueRange;
-//      for (int labelIndex = 0; labelIndex < labelValues.Length; labelIndex++) {
-//        //write label value
-//        labelValues[labelIndex] = labelValue;
-
-//        //calculate position
-//        double xPosition = (labelValue-DisplayValue) * pixelPerValue;
-//#if DEBUG
-//        if (labelIndex>0) {
-//          if (xPosition-labelPoints[labelIndex-1].X<LegendGlyphDrawer.GetLength(labelValue.ToString(numberFormat), FontSize)) {
-//            System.Diagnostics.Debugger.Break();
-//            throw new Exception("label " + labelValue.ToString(numberFormat) + " needs " + LegendGlyphDrawer.GetLength(labelValue.ToString(numberFormat), FontSize) +
-//            " pixels, but there are only " + (xPosition-labelPoints[labelIndex-1].X) + " pixels distance between 2 labels.");
-//          }
-//        }
-//#endif
-//        if (xPosition> RenderWidthTracked) {
-//          if (xPosition<1.0001*RenderWidthTracked) {
-//            //probably rounding error
-//            xPosition = RenderWidthTracked;
-//          } else {
-//            //should not happen
-//            throw new Exception();
-//          }
-//        }
-//        labelPoints[labelIndex] = new Point(xPosition, 0);
-
-//        //calculate label string
-//        labelStrings[labelIndex] = labelValue.ToString(numberFormat);
-
-//        //calculate next label
-//        labelValue += step.Value;
-//      }
-//    }
-
-
-    private string calculateNumberFormat(double range) {
-      //DoubleDigitsExponent maxValueDigitsExponent = new DoubleDigitsExponent(maxValue);
-      ////calculate number of digits before decimal point
-      //int leadingDigits; 
-      //if (maxValueDigitsExponent.Exponent<0){
-      //  leadingDigits = 1;
-      //}else{
-      //  leadingDigits = maxValueDigitsExponent.Exponent + 1;
-      //}
-
-      //calculate number of digits after decimal point
-      //int afterDigits;
-      //if (maxValueDigitsExponent.Exponent>=0) {
-      //  afterDigits = 0;
-      //} else {
-      //  afterDigits = -maxValueDigitsExponent.Exponent;
-      //}
-      //DoubleDigitsExponent rangeDigitsExponent = new DoubleDigitsExponent(range);
-      //if (rangeDigitsExponent.Exponent<0) {
-      //  //range needs some digits after the comma
-      //  if (maxValueDigitsExponent.Exponent>rangeDigitsExponent.Exponent) {
-      //    afterDigits = -rangeDigitsExponent.Exponent;
-      //  }
-      //}
-      //string numberFormat = "#,0";
-      //if (afterDigits>0) {
-      //  //add required digits after decimal point
-      //  numberFormat += '.' + new string('0', afterDigits);
-      //}
-
-      //calculate number of digits after decimal point. double.ToString() generates digits as needed in front of decimal 
-      //point, but will not display zeros after the decimal point. However, the legend looks nicer is every label has
-      //the same number of digits after the decimal point.
-      DoubleDigitsExponent rangeDigitsExponent = new DoubleDigitsExponent(range);
-      string numberFormat = "#,0";
-      if (rangeDigitsExponent.Exponent<0) {
-        //add required digits after decimal point
-        numberFormat += '.' + new string('0', -rangeDigitsExponent.Exponent);
-      }
-      return numberFormat;
-    }
+    //  //calculate number of digits after decimal point. double.ToString() generates digits as needed in front of decimal 
+    //  //point, but will not display zeros after the decimal point. However, the legend looks nicer is every label has
+    //  //the same number of digits after the decimal point.
+    //  DoubleDigitsExponent rangeDigitsExponent = new DoubleDigitsExponent(range);
+    //  string numberFormat = "#,0";
+    //  if (rangeDigitsExponent.Exponent<0) {
+    //    //add required digits after decimal point
+    //    numberFormat += '.' + new string('0', -rangeDigitsExponent.Exponent);
+    //  }
+    //  return numberFormat;
+    //}
 
 
     protected override Point OnContentAlignment(Size renderContentSize) {

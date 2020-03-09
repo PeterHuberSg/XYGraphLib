@@ -1,11 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Media;
+﻿/**************************************************************************************
+
+XYGraphLib.Renderer
+===================
+
+Creates a Visual for the PlotArea to display.
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Windows;
+using System.Windows.Media;
+
 
 namespace XYGraphLib {
+
 
   /// <summary>
   /// Creates a Visual for the PlotArea to display. Inherit from this class if no dataserie is linked to this Renderer. Rendering something on the
@@ -34,12 +50,12 @@ namespace XYGraphLib {
     //Dimensions
     //----------
     //A dataSerie consists of dataPoints. A dataPoint has usually at least 2 values. In a time serie, each dataPoint has a date and double for that date. A 
-    //dataPoint can bave more than 2 values. In a bubble chart, showing circles for region and products, there are 3 values per dataPoint (region, product, double).
-    //There could be more data assined to a dataPoint, like colour, tooltip and more. Each value of a dataPoint is a dimension. Usually the first value (index: 0) is the 
+    //dataPoint can have more than 2 values. In a bubble chart, showing circles for region and products, there are 3 values per dataPoint (region, product, double).
+    //There could be more data assigned to a dataPoint, like colour, tooltip and more. Each value of a dataPoint is a dimension. Usually the first value (index: 0) is the 
     //x-coordinate and the second value (index: 1) is the y-coordinate.
     //
     //It would be nice to use an enumeration for dimensions, but that would make it difficult for inheritors to add more dimensions. Therefore, they are defined
-    //as interger const. Inheritors should use negative numbers for their dimensions to avoid conflicts with future versions of Renderer.
+    //as integer constant. Inheritors should use negative numbers for their dimensions to avoid conflicts with future versions of Renderer.
 
     /// <summary>
     /// First value in a DataPoint, usually x-axis
@@ -76,7 +92,7 @@ namespace XYGraphLib {
     /// <summary>
     /// A Dimension indicates which value of a DataPoint should be used. A LegendScroller controls which value range for a particular
     /// Dimension the Renderer should display. The mapping between Legend Dimension and the Min/Max-values of the Renderer is not
-    /// 1 to 1. Example: A y-gridline renderer needs only 1 Min/Max pair, which has the index 0, but the dimension of the x-axis legend
+    /// 1 to 1. Example: A y-grid-line renderer needs only 1 Min/Max pair, which has the index 0, but the dimension of the x-axis legend
     /// is 1 (DimensionY). To find the proper Min/Max pair, one has to search in the DimensionMap the legend's Dimension value. The index 
     /// of the legend's Dimension value entry in the DimensionMap is the index to be used to access Min- and Max-Values.
     public readonly int[] DimensionMap;
@@ -131,9 +147,7 @@ namespace XYGraphLib {
 
       MinDisplayValues[dimensionMapIndex] = min;
       MaxDisplayValues[dimensionMapIndex] = max;
-      if (RenderingRequested!=null) {
-        RenderingRequested(this);
-      }
+      RenderingRequested?.Invoke(this);
     }
 
 
@@ -148,13 +162,13 @@ namespace XYGraphLib {
     /// <summary>
     /// Raised if rendering is needed
     /// </summary>
-    public event Action<Renderer> RenderingRequested;
+    public event Action<Renderer>? RenderingRequested;
 
     
     /// <summary>
     /// Rendering completed. Used for WPF event tracing
     /// </summary>
-    public event Action<Renderer> Rendered;
+    public event Action<Renderer>? Rendered;
     #endregion
     #endregion
 
@@ -166,7 +180,7 @@ namespace XYGraphLib {
     protected Pen StrokePen;
 
 
-    public Renderer(System.Windows.Media.Brush strokeBrush, double strokeThickness, int[] dimensionMap) {
+    public Renderer(System.Windows.Media.Brush? strokeBrush, double strokeThickness, int[] dimensionMap) {
       RendererId = nextRendererId++;
       StrokePen = new Pen(strokeBrush, strokeThickness);
       DimensionMap = dimensionMap;
@@ -204,7 +218,7 @@ namespace XYGraphLib {
 
     /// <summary>
     /// Renders the chart graph to a Visual. The graphic gets scaled to the available height and width displaying only 
-    /// values between minValueDisplayX and minValueDisplayX. The actual values get croped between minDisplayValueY 
+    /// values between minValueDisplayX and minValueDisplayX. The actual values get cropped between minDisplayValueY 
     /// and maxDisplayValueY.
     /// </summary>
     public Visual CreateVisual(double width, double height) {
@@ -262,10 +276,10 @@ namespace XYGraphLib {
       }
 
       using (DrawingContext drawingContext = drawingVisual.RenderOpen()) {
-        OnCreateVisual(drawingContext, width, height);
+        OnCreateVisual(drawingContext, width, height, drawingVisual);
       }
 
-      if (Rendered!=null) Rendered(this);
+      Rendered?.Invoke(this);
       return drawingVisual;
     }
 
@@ -273,13 +287,13 @@ namespace XYGraphLib {
     /// <summary>
     /// Overwritten by inheritor to generate the actual graphic.
     /// </summary>
-    protected abstract void OnCreateVisual(DrawingContext drawingContext, double width, double height);
+    protected abstract void OnCreateVisual(DrawingContext drawingContext, double width, double height, DrawingVisual drawingVisual);
 
 
     /// <summary>
-    /// Translate the x and y value of a datapoint into screen pixel. The x and y values get scaled according to
-    /// displayRange and available pixel width or height. The y-pixel is inverted (yPixel = height-yPixel) to accomodate for
-    /// screen coordinates. The values get limitted to plus/minus 10 times the width or height
+    /// Translate the x and y value of a data-point into screen pixel. The x and y values get scaled according to
+    /// displayRange and available pixel width or height. The y-pixel is inverted (yPixel = height-yPixel) to accommodate for
+    /// screen coordinates. The values get limited to plus/minus 10 times the width or height
     /// </summary>
     protected Point TranslateValueXYToPoint(double[,] dataSerie, int dataPointIndex, double width, double height) {
       return TranslateValueXYToPoint(dataSerie[dataPointIndex, DimensionX], dataSerie[dataPointIndex, DimensionY], width, height);

@@ -1,9 +1,29 @@
-﻿using System;
+﻿/**************************************************************************************
+
+XYGraphLib.TimeSpanUnit
+=======================
+
+Time resolutions of time axis values from 1 second to 1000 years 
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
+using CustomControlBaseLib;
 
 
 namespace XYGraphLib {
 
-
+  /// <summary>
+  /// list of time resolutions of time axis values from 1 second to 1000 years
+  /// </summary>
   public enum TimeSpanUnitEnum {
     none,
     second,  //31.Dec 99 23:00:59 |00     |01     |02     |03   
@@ -26,16 +46,19 @@ namespace XYGraphLib {
   }
 
 
+  /// <summary>
+  /// Some TimeSpanUnitEnum parameters for actual values
+  /// </summary>
   public struct TimeSpanUnitMask {
     public readonly TimeSpanUnitEnum TimeSpanUnit;
-    public readonly string FirstLabelMask;
-    public readonly string FirstLabelToString;
-    public readonly string FollowLabelMask;
-    public readonly string FollowLabelToString;
+    public readonly string? FirstLabelMask;
+    public readonly string? FirstLabelToString;
+    public readonly string? FollowLabelMask;
+    public readonly string? FollowLabelToString;
     public readonly long Ticks;
 
-    public TimeSpanUnitMask(TimeSpanUnitEnum timeSpanUnit, string firstLabelMask, string firstLabelToString, 
-      string followLabelMask, string followLabelToString, long ticks) {
+    public TimeSpanUnitMask(TimeSpanUnitEnum timeSpanUnit, string? firstLabelMask, string? firstLabelToString, 
+      string? followLabelMask, string? followLabelToString, long ticks) {
       TimeSpanUnit = timeSpanUnit;
       FirstLabelMask = firstLabelMask;
       FirstLabelToString = firstLabelToString;
@@ -52,6 +75,9 @@ namespace XYGraphLib {
   }
 
 
+  /// <summary>
+  /// Some TimeSpanUnitEnum configuration parameters
+  /// </summary>
   public struct TimeSpanUnitConfig {
     public readonly TimeSpanUnitEnum TimeSpanUnit;
     public readonly double FirstLabelWidth;
@@ -87,7 +113,7 @@ namespace XYGraphLib {
                          //TimeSpanUnit              FirstLabelMask        FirstLabelToString    FollowLabelMask     Ticks
                          //                                                                                FollowLabelToString
       new TimeSpanUnitMask(TimeSpanUnitEnum.none,    null,                 null,                 null,     null,     long.MaxValue),
-      new TimeSpanUnitMask(TimeSpanUnitEnum.second,  "31.WWW 99 23:00:59", "dd.MMM yy HH:mm:ss", "00",     "ss",     SecondTicks), 
+      new TimeSpanUnitMask(TimeSpanUnitEnum.second,  "31.WWW 99 23:00:59", "dd.MMM yy HH:mm:tis", "00",     "ss",     SecondTicks), 
       new TimeSpanUnitMask(TimeSpanUnitEnum.second10,"31.WWW 99 23:00:50", "dd.MMM yy HH:mm:ss", "00",     "ss",     10*SecondTicks), 
       new TimeSpanUnitMask(TimeSpanUnitEnum.minute,  "31.WWW 99 23:00",    "dd.MMM yy HH:mm",    "23:01",  "HH:mm",  MinuteTicks),
       new TimeSpanUnitMask(TimeSpanUnitEnum.minute10,"31.WWW 99 23:00",    "dd.MMM yy HH:mm",    "23:10",  "HH:mm",  10*MinuteTicks),
@@ -117,23 +143,17 @@ namespace XYGraphLib {
 
 
     public static int GetYearMultiplier(this TimeSpanUnitEnum timeSpanUnit) {
-      switch (timeSpanUnit) {
-      case TimeSpanUnitEnum.year:
-        return 1;
-      case TimeSpanUnitEnum.year5:
-        return 5;
-      case TimeSpanUnitEnum.year10:
-        return 10;
-      case TimeSpanUnitEnum.year50:
-        return 50;
-      case TimeSpanUnitEnum.year100:
-        return 100; 
-      case TimeSpanUnitEnum.year500:
-        return 500; 
-      case TimeSpanUnitEnum.year1000:
-        return 1000; 
-      }
-      throw new NotSupportedException();
+      return timeSpanUnit switch
+      {
+        TimeSpanUnitEnum.year => 1,
+        TimeSpanUnitEnum.year5 => 5,
+        TimeSpanUnitEnum.year10 => 10,
+        TimeSpanUnitEnum.year50 => 50,
+        TimeSpanUnitEnum.year100 => 100,
+        TimeSpanUnitEnum.year500 => 500,
+        TimeSpanUnitEnum.year1000 => 1000,
+        _ => throw new NotSupportedException(),
+      };
     }
 
     public static string ToFirstLabel(this DateTime date, TimeSpanUnitEnum timeSpanUnit) {
@@ -149,9 +169,9 @@ namespace XYGraphLib {
 
   public class TimeSpanUnitFormatter {
 
-    GlyphDrawer glyphDrawer;
+    GlyphDrawer? glyphDrawer;
     double fontSize;
-    TimeSpanUnitConfig[] TimeSpanUnitConfigs;
+    TimeSpanUnitConfig[]? timeSpanUnitConfigs;
     double maxFollowLabelWidth;
  
 
@@ -161,21 +181,21 @@ namespace XYGraphLib {
       this.glyphDrawer = glyphDrawer;
       this.fontSize = fontSize;
 
-      if (TimeSpanUnitConfigs==null) TimeSpanUnitConfigs = new TimeSpanUnitConfig[(int)TimeSpanUnitEnum.max+1];
+      if (timeSpanUnitConfigs==null) timeSpanUnitConfigs = new TimeSpanUnitConfig[(int)TimeSpanUnitEnum.max+1];
 
       maxFollowLabelWidth = double.MinValue;
       for (TimeSpanUnitEnum timeSpanUnitIndex = TimeSpanUnitEnum.none+1; timeSpanUnitIndex <= TimeSpanUnitEnum.max; timeSpanUnitIndex++) {
         TimeSpanUnitMask mask = timeSpanUnitIndex.GetMask();
-        double firstLabelWidth = glyphDrawer.GetLength(mask.FirstLabelMask, fontSize);
-        double followLabelWidth = glyphDrawer.GetLength(mask.FollowLabelMask, fontSize);
+        double firstLabelWidth = glyphDrawer.GetLength(mask.FirstLabelMask!, fontSize);
+        double followLabelWidth = glyphDrawer.GetLength(mask.FollowLabelMask!, fontSize);
         maxFollowLabelWidth = Math.Max(followLabelWidth, maxFollowLabelWidth);
-        TimeSpanUnitConfigs[(int)timeSpanUnitIndex] = new TimeSpanUnitConfig(timeSpanUnitIndex, firstLabelWidth, followLabelWidth);
+        timeSpanUnitConfigs[(int)timeSpanUnitIndex] = new TimeSpanUnitConfig(timeSpanUnitIndex, firstLabelWidth, followLabelWidth);
       }
     }
 
 
     public TimeSpanUnitConfig GetWidths(TimeSpanUnitEnum timeSpanUnit) {
-      return TimeSpanUnitConfigs[(int)timeSpanUnit];
+      return timeSpanUnitConfigs![(int)timeSpanUnit];
     }
 
 

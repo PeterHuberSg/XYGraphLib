@@ -1,7 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.StepStruct
+=====================
+
+Gives easy access to FirstDigit and Exponent of numerical values in Legend 
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
+
 
 namespace XYGraphLib {
   /// <summary>
@@ -13,19 +28,19 @@ namespace XYGraphLib {
     public int FirstDigit {
       get { return firstDigit; }
     }
-    private int firstDigit;
+    readonly int firstDigit;
 
     public int Exponent {
       get { return exponent; }
     }
-    private int exponent;
+    readonly int exponent;
 
     public double Value {
       get { return value; }
     }
-    private double value;
+    readonly double value;
 
-    static int maxExponent = (int)Math.Floor(Math.Log10(double.MaxValue)) - 1;
+    static readonly int maxExponent = (int)Math.Floor(Math.Log10(double.MaxValue)) - 1;
 
     public StepStruct(int newFirstDigit, int newExponent) {
       if (newExponent<-maxExponent || newExponent>maxExponent) {

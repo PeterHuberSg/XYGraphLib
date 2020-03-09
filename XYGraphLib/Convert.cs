@@ -1,9 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.Convert
+==================
+
+Helper class for data conversion and rounding
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
+
 
 namespace XYGraphLib {
+
+
+  /// <summary>
+  /// Helper class for data conversion and rounding
+  /// </summary>
   public static class  Convert {
     /// <summary>
     /// maximal numbers supported
@@ -13,7 +33,7 @@ namespace XYGraphLib {
     /// <summary>
     /// converts a double into a string, showing the value in exponential format. DigitCount
     /// indicates how many characters can be used. if the number is negative, the returned
-    /// string is one chatracter longer then DigitCount
+    /// string is one character longer then DigitCount
     /// 
     /// <example>
     /// digitCount = 14, Value = 1                           : 1.00000000E+00
@@ -148,7 +168,7 @@ namespace XYGraphLib {
         throw new ApplicationException(string.Format("ALib: FixedPoint to string, at least 1 significant digit needed, but was {0}.", significantDigitsCount));
       }
       if (significantDigitsCount>DoubleToString_maxDigitsSupported) {
-        throw new ApplicationException(string.Format("ALib: FixedPoint to string, at most {0} digits supported, but before was {1} and after was {2}.", DoubleToString_maxDigitsSupported, significantDigitsCount));
+        throw new ApplicationException(string.Format("ALib: FixedPoint to string, at most {0} digits supported, but there were {1} digits.", DoubleToString_maxDigitsSupported, significantDigitsCount));
       }
       //find most significant digit
       int digitIndex;
@@ -164,13 +184,13 @@ namespace XYGraphLib {
       } else {
         digitIndex = 0;
         decimalFactor = 0.1;
-        while (decimalFactor>positiveValue && digitIndex>=-PowerOf10ArrayOffset) {
+        while (decimalFactor>positiveValue && digitIndex>=-powerOf10ArrayOffset) {
           digitIndex--;
           decimalFactor /= 10;
         }
       };
 
-      if (digitIndex<=-PowerOf10ArrayOffset) {
+      if (digitIndex<=-powerOf10ArrayOffset) {
         //value is considered to be zero
         return FixedPointToString(0, significantDigitsCount);
       } else {
@@ -251,7 +271,7 @@ namespace XYGraphLib {
 
     /// <summary>
     /// converts a double into a string, showing the value in fixed point format. If necessary,
-    /// blanks are insterted in front of leading digits to align decimal points without using
+    /// blanks are inserted in front of leading digits to align decimal points without using
     /// tabs.
     /// 
     /// <example>
@@ -280,7 +300,7 @@ namespace XYGraphLib {
     /// <param name="Value">numeric value to be converted</param>
     /// <param name="DigitCountBeforePoint">number of digits before the decimal point. can be 0, but not negative</param>
     /// <param name="DigitCountAfterPoint">number of digits after the decimal point. can be 0, but not negative</param>
-    /// <returns>converted string. if not enough leading digit, 2 blanks wil be added for each missing digit.</returns>
+    /// <returns>converted string. if not enough leading digit, 2 blanks will be added for each missing digit.</returns>
     public static string FixedPointToStringColumn(this double Value, int DigitCountBeforePoint, int DigitCountAfterPoint) {
       //check validity of parameters
       if (DigitCountBeforePoint<0) {
@@ -407,7 +427,7 @@ namespace XYGraphLib {
         if (value==powerOfTwo) {
           return bitIndex;
         }
-        powerOfTwo = powerOfTwo<<1;  // same as powerOfTwo*2, but shouldn't generate an overflow for (2^31) * 2
+        powerOfTwo <<= 1;  // same as powerOfTwo*2, but shouldn't generate an overflow for (2^31) * 2
         bitIndex++;
       } while (value>=powerOfTwo && bitIndex<32);
       throw new ApplicationException(string.Format("Converting Flag Enum to Index: Cannot convert '{0}', it is not 2^x", value));
@@ -420,7 +440,7 @@ namespace XYGraphLib {
     /// </summary>
     public static int GetDoubleExponent(this double value) {
       if (double.IsNaN(value) || double.IsNegativeInfinity(value) || double.IsPositiveInfinity(value)){
-        throw new ApplicationException(string.Format("Convert.GetDoubleExponent({0}: Cannot calculate exponent."));
+        throw new ApplicationException(string.Format("Convert.GetDoubleExponent({0}: Cannot calculate exponent.", value));
       }else if (value==0) {
         //value is 0 and exponent could be any number. We just return 0
         return 0;
@@ -436,7 +456,7 @@ namespace XYGraphLib {
     }
 
 
-    private static readonly int[] PowerOf10ArrayInt = { 
+    private static readonly int[] powerOf10ArrayInt = { 
                                   1, 
                                  10,
                                 100,
@@ -457,11 +477,11 @@ namespace XYGraphLib {
       if (Exponent<0) {
         throw new ApplicationException(string.Format("PowerOf10Int(): Exponent cannot be smaller than 0, but was: {0}.", Exponent));
       }
-      return PowerOf10ArrayInt[Exponent];
+      return powerOf10ArrayInt[Exponent];
     }
 
 
-    private static readonly double[] PowerOf10ArrayDouble = { 
+    private static readonly double[] powerOf10ArrayDouble = { 
                                   0.0000000000000000000000000001,
                                   0.000000000000000000000000001,
                                   0.00000000000000000000000001,
@@ -527,25 +547,25 @@ namespace XYGraphLib {
        1000000000000000000000000000.0,
       10000000000000000000000000000.0};
 
-    const int PowerOf10ArrayOffset = 28;  //index of 1.0M
+    const int powerOf10ArrayOffset = 28;  //index of 1.0M
 
 
     /// <summary>
     /// Returns 10 to the power of the Exponent as double
     /// </summary>
     public static double PowerOf10Double(int Exponent) {
-      if (Exponent<-PowerOf10ArrayOffset) {
+      if (Exponent<-powerOf10ArrayOffset) {
         return Math.Pow(10.0, Exponent);
       }
-      int PowerOf10ArrayIndex = Exponent + PowerOf10ArrayOffset;
-      if (PowerOf10ArrayIndex>=PowerOf10ArrayDouble.Length) {
+      int PowerOf10ArrayIndex = Exponent + powerOf10ArrayOffset;
+      if (PowerOf10ArrayIndex>=powerOf10ArrayDouble.Length) {
         return Math.Pow(10.0, Exponent);
       }
-      return PowerOf10ArrayDouble[PowerOf10ArrayIndex];
+      return powerOf10ArrayDouble[PowerOf10ArrayIndex];
     }
     
 
-    private static readonly decimal[] PowerOf10ArrayDecimal = { 
+    private static readonly decimal[] powerOf10ArrayDecimal = { 
                                   0.0000000000000000000000000001M,
                                   0.000000000000000000000000001M,
                                   0.00000000000000000000000001M,
@@ -616,25 +636,25 @@ namespace XYGraphLib {
     /// Returns 10 to the power of the Exponent as decimal
     /// </summary>
     public static decimal PowerOf10Decimal(int Exponent) {
-      if (Exponent<-PowerOf10ArrayOffset) {
+      if (Exponent<-powerOf10ArrayOffset) {
         return (decimal)Math.Pow(10.0, Exponent);
       }
-      int PowerOf10ArrayIndex = Exponent + PowerOf10ArrayOffset;
-      if (PowerOf10ArrayIndex>=PowerOf10ArrayDecimal.Length) {
+      int PowerOf10ArrayIndex = Exponent + powerOf10ArrayOffset;
+      if (PowerOf10ArrayIndex>=powerOf10ArrayDecimal.Length) {
         return (decimal)Math.Pow(10.0, Exponent);
       }
-      return PowerOf10ArrayDecimal[PowerOf10ArrayIndex];
+      return powerOf10ArrayDecimal[PowerOf10ArrayIndex];
     }
 
 
     /// <summary>
     /// biggest double number Convert can round
     /// </summary>
-    public static readonly double MaxDoubleRound = PowerOf10Double(Convert.PowerOf10ArrayOffset-1);
+    public static readonly double MaxDoubleRound = PowerOf10Double(Convert.powerOf10ArrayOffset-1);
     /// <summary>
     /// "smallest" number close to zero Convert can round
     /// </summary>
-    public static readonly double DoubleRoundEpsilon = PowerOf10Double(-Convert.PowerOf10ArrayOffset);
+    public static readonly double DoubleRoundEpsilon = PowerOf10Double(-Convert.powerOf10ArrayOffset);
 
     /// <summary>
     /// supports rounding before (digits positive) and after the decimal point (digits negative)
@@ -683,19 +703,11 @@ namespace XYGraphLib {
     public static DateTime Round(this DateTime RoundDateTime, int RoundingMillisec) {
       //if ((24*60*60*1000)%RoundingMillisec != 0) {
       //  Tracer.Warning(
-      //    "Time rounding: A day ({0} millisecondes) cannot be divided by RoundingMillisec '{1}' without reminder '{2}'.",
+      //    "Time rounding: A day ({0} milliseconds) cannot be divided by RoundingMillisec '{1}' without reminder '{2}'.",
       //    24*60*60*1000, RoundingMillisec, (24*60*60*1000)%RoundingMillisec);
       //}
       long roundingTicks = RoundingMillisec * TimeSpan.TicksPerMillisecond;
       long roundDateTimeTicks = RoundDateTime.Ticks + (roundingTicks / 2);
-
-      TimeSpan TimeSpan1 = new TimeSpan(roundingTicks);
-      DateTime DateTime1 = new DateTime(roundDateTimeTicks);
-      long reminder = roundDateTimeTicks % roundingTicks;
-      TimeSpan TimeSpan2 = new TimeSpan(reminder);
-      long rounded = roundDateTimeTicks - (roundDateTimeTicks % roundingTicks);
-      DateTime DateTime2 = new DateTime(rounded);
-
       return new DateTime(roundDateTimeTicks - (roundDateTimeTicks % roundingTicks));
     }
 
@@ -760,14 +772,14 @@ namespace XYGraphLib {
       return (byteSize /1024.0/1024.0/1024.0).ToString("0.###") + " GByte";
     }
 
-    public static readonly long ticksPerMillisecond = TimeSpan.FromMilliseconds(1).Ticks;
+    public static readonly long TicksPerMillisecond = TimeSpan.FromMilliseconds(1).Ticks;
 
 
     /// <summary>
     /// Converts DateTime to double. Precision: 1 millisecond
     /// </summary>
     public static double ToDouble(this DateTime time) {
-      return (double)(time.Ticks / ticksPerMillisecond);
+      return (double)(time.Ticks / TicksPerMillisecond);
     }
 
 
@@ -775,7 +787,7 @@ namespace XYGraphLib {
     /// Converts double to DateTime. Precision: 1 millisecond
     /// </summary>
     public static DateTime ToDateTime(this double ticksDouble) {
-      return new DateTime((long)ticksDouble*ticksPerMillisecond);
+      return new DateTime((long)ticksDouble*TicksPerMillisecond);
     }
 
 
@@ -783,7 +795,7 @@ namespace XYGraphLib {
     /// Converts TimeSpan to double. Precision: 1 millisecond
     /// </summary>
     public static double ToDouble(this TimeSpan timeSpan) {
-      return (double)(timeSpan.Ticks / ticksPerMillisecond);
+      return (double)(timeSpan.Ticks / TicksPerMillisecond);
     }
 
 
@@ -791,7 +803,7 @@ namespace XYGraphLib {
     /// Converts double to TimeSpan. Precision: 1 millisecond
     /// </summary>
     public static TimeSpan ToTimeSpan(this double ticksDouble) {
-      return new TimeSpan((long)ticksDouble*ticksPerMillisecond);
+      return new TimeSpan((long)ticksDouble*TicksPerMillisecond);
     }
 
 

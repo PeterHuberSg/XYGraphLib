@@ -1,12 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.SerieSetting
+=======================
+
+Stores the parameters of a LineGraph data serie 
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Windows.Media;
 
 
 namespace XYGraphLib {
-  
+
   /// <summary>
   /// How serie should get displayed in the graph
   /// </summary>
@@ -27,7 +41,7 @@ namespace XYGraphLib {
     public Brush StrokeBrush { get; set; }
     public double StrokeThickness { get{return strokeThickness;} set{strokeThickness = value;} }
       double strokeThickness = 1;
-    public Brush FillBrush { get; set; }
+    public Brush? FillBrush { get; set; }
 
 
     /// <summary>
@@ -74,7 +88,7 @@ namespace XYGraphLib {
       int newGroup,
       Brush newStrokeBrush,
       double newStrokeThickness,
-      Brush newFillBrush) 
+      Brush? newFillBrush) 
     {
       Getter = newGetter;
       SerieStyle = newSerieStyle;
@@ -95,11 +109,10 @@ namespace XYGraphLib {
     }
 
 
-    private string toString(Brush brush) {
+    private string toString(Brush? brush) {
       if (brush==null) return "null";
 
-      SolidColorBrush solidColorBrush = brush as SolidColorBrush;
-      if (solidColorBrush==null) return brush.ToString();
+      if (!(brush is SolidColorBrush solidColorBrush)) return brush.ToString();
 
       return solidColorBrush.Color.ToString();
     }

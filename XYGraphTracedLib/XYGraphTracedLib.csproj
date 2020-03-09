@@ -3,6 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\CustomControlBaseLib\CustomControlSampleLib\CustomControlSampleLib.csproj" />
+    <ProjectReference Include="..\..\WpfControlTestbench\WpfControlTestbenchLib\WpfControlTestbenchLib.csproj" />
+    <ProjectReference Include="..\XYGraphLib\XYGraphLib.csproj" />
+  </ItemGroup>
 
 </Project>

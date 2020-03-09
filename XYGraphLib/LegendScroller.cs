@@ -1,15 +1,31 @@
-﻿using System;
+﻿/**************************************************************************************
+
+XYGraphLib.LegendScroller
+=========================
+
+Base class for LegendScrollerX and LegendScrollerY
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Windows;
-using System.Windows.Media;
-using System.ComponentModel;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
+using CustomControlBaseLib;
 
 
 namespace XYGraphLib {
   /// <summary>
-  /// Displays an x axis legend (time), scrollbar and 2 zoombuttons. It can be used to select which datasamples should be displayed in a 
+  /// Displays an x axis legend (time), scrollbar and 2 zoom-buttons. It can be used to select which data-samples should be displayed in a 
   /// Renderer and to display the dates. The user choses with the scrollbar which is the first sample to display (DisplayIndex) and with 
   /// the zoom buttons how many samples should be displayed (DisplayRangeIndex). LegendScroller calculates DisplayDate and DisplayDateRange 
   /// based on MinDate and MaxDate and sets the Legend accordingly.
@@ -42,7 +58,7 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Lowest value stored in the datarecords
+    /// Lowest value stored in the data-records
     /// Default: double.MaxValue
     /// </summary>
     public double MinValue {
@@ -123,7 +139,7 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Highest value stored in the datarecords
+    /// Highest value stored in the data-records
     /// Default: double.MaxValue
     /// </summary>
     public double MaxValue {
@@ -188,7 +204,7 @@ namespace XYGraphLib {
 
     /// <summary>
     /// Zoom can zoom in until highest resolution is reached. In theory this could be the precision of double, but
-    /// in practice it is better to restrict zomming in to a factor like 1 million
+    /// in practice it is better to restrict zooming in to a factor like 1 million
     /// </summary>
     public bool CanZoomIn { get; private set; }
 
@@ -226,7 +242,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Raised when IsZoomActive changes
     /// </summary>
-    public event Action<IZoom> ZoomStateChanged;
+    public event Action<IZoom>? ZoomStateChanged;
 
 
     /// <summary>
@@ -246,18 +262,18 @@ namespace XYGraphLib {
     /// </summary>
     public void ZoomIn() {
       if (CanZoomIn) {
-        DisplayValueRange = DisplayValueRange / ZoomFactor;
+        DisplayValueRange /= ZoomFactor;
       }
     }
 
 
     /// <summary>
     /// Shrinks the value range displayed by square root of 10. Zooming out twice makes the range 10 times bigger. Once 
-    /// all datarecords are displayed, no further zooming out is possible.
+    /// all data-records are displayed, no further zooming out is possible.
     /// </summary>
     public void ZoomOut() {
       if (CanZoomOut) {
-        DisplayValueRange = DisplayValueRange * ZoomFactor;
+        DisplayValueRange *= ZoomFactor;
       }
     }
 
@@ -315,7 +331,7 @@ namespace XYGraphLib {
     /// Max or DisplayRange should invoke Measure().
     /// </summary>
     public LegendScroller(Legend newLegend) {
-      Reset(); //resetting before adding the legend prevents legend.Reset() to be called here and in the legend on initialisiation
+      Reset(); //resetting before adding the legend prevents legend.Reset() to be called here and in the legend on initialisation
 
       legend = Legend = newLegend;
       legend.Background = Brushes.WhiteSmoke;
@@ -343,26 +359,25 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// inheritor should set dockingposition for the zoom buttons
+    /// inheritor should set docking-position for the zoom buttons
     /// </summary>
     protected abstract void OnButtonScrollbarCreated();
 
 
     /// <summary>
     /// Installs event handler for Renderer's DisplayRangeChanged and updates its own MinDate and MaxDate if the Renderer is a
-    /// RendererDataSeries and if the values from the Renderer are outsite the present range.
+    /// RendererDataSeries and if the values from the Renderer are outside the present range.
     /// </summary>
     public void AddRenderer(Renderer renderer) {
       Legend.DisplayValueChanged += renderer.DisplayValueChanged;
-      RendererDataSeries rendererDataSeries = renderer as RendererDataSeries;
-      if (rendererDataSeries!=null) {
+      if (renderer is RendererDataSeries rendererDataSeries) {
         if (MinValue > rendererDataSeries.MinValues[Dimension]) {
           MinValue = rendererDataSeries.MinValues[Dimension];
-TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MinValue: " + MinValue.ToDateTime());
+          TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MinValue: " + MinValue.ToDateTime());
         }
         if (MaxValue < rendererDataSeries.MaxValues[Dimension]) {
           MaxValue = rendererDataSeries.MaxValues[Dimension];
-TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MaxValue: " + MaxValue.ToDateTime());
+          TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MaxValue: " + MaxValue.ToDateTime());
         }
       }
     }
@@ -373,7 +388,7 @@ TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MaxValue: " + MaxValue.ToDate
     //      ------
 
     //Scrollbar event execution is stopped while arrange changes index values
-    bool isArranging = false; // prevents that scrollbar event does anything when it gets raised due to changed suring Arrange()
+    bool isArranging = false; // prevents that scrollbar event does anything when it gets raised due to changed during Arrange()
     //    bool isScrollBarEvent = false; // prevents properties from activating Arrange() when they get changed by the scrollbar
 
 
@@ -457,7 +472,7 @@ TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MaxValue: " + MaxValue.ToDate
           MaxValue = MinValue * 2;
           MinValue = 0;
         } else {
-          MinValue = MinValue * 2;
+          MinValue *= 2;
           MaxValue = 0;
         }
         maxValueRange = MaxValue - MinValue;

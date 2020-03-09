@@ -1,4 +1,21 @@
-﻿/***************************************************************************************************************************
+﻿/**************************************************************************************
+
+XYGraphLib.LegendY
+==================
+
+Vertical Legend
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+/***************************************************************************************************************************
  * LegendY
  * =======
  * 
@@ -46,7 +63,7 @@ namespace XYGraphLib {
 
 
   /// <summary>
-  /// Displays the the right or left legend for a PlotArea. The legend has labels displaying the value a pixel at this location corresponds to.  DisplayValue and 
+  /// Displays the right or left legend for a PlotArea. The legend has labels displaying the value a pixel at this location corresponds to.  DisplayValue and 
   /// DisplayValueRange control the value range displayed. MinValue and MaxValue indicate the largest values the legend might have to display after scrolling. This
   /// information is needed to chose a number formating which is correct from Min- to MaxValue.
   /// </summary>
@@ -116,7 +133,7 @@ namespace XYGraphLib {
     double heightTracked;
     double requiredWidth;
     StepStruct step;
-    string numberFormat;
+    string? numberFormat;
     bool isNewWidthCalculated;
 
 
@@ -129,7 +146,7 @@ namespace XYGraphLib {
 
     /// <summary>
     /// 1) Calculate the step value based on MinValue, MaxValue, DisplayRange and availableHeight. 
-    /// 2) Width is calculated based on fontSize and number of didgits needed to display MinValue & MaxValue.
+    /// 2) Width is calculated based on fontSize and number of digits needed to display MinValue & MaxValue.
     /// </summary>
     private double calculateLegendWidth(double availableHeight) {
       //calculateLegendWidth() is called from within Measure and Arrange. Legend guarantees that MinValue, DisplayValue, DisplayValueRange and
@@ -182,25 +199,25 @@ namespace XYGraphLib {
       }else{
         minValue = MinValue;
       }
-      DoubleDigitsExponent minValueDigitsExponent = new DoubleDigitsExponent(minValue);
+      //DoubleDigitsExponent minValueDigitsExponent = new DoubleDigitsExponent(minValue);
       double maxValue;
       if (double.IsNaN(MaxValue)) {
         maxValue = DisplayValue + DisplayValueRange;
       } else {
         maxValue = MaxValue;
       }
-      DoubleDigitsExponent maxValueDigitsExponent = new DoubleDigitsExponent(maxValue);
-      int minExponent;
-      int maxExponent;
-      if (minValueDigitsExponent.Exponent<=maxValueDigitsExponent.Exponent) {
-        //Example: Min=0.1, Max = 10000
-        minExponent = minValueDigitsExponent.Exponent;
-        maxExponent = maxValueDigitsExponent.Exponent;
-      } else {
-        //Example: Min=-10000, Max = 0.1
-        minExponent = maxValueDigitsExponent.Exponent;
-        maxExponent = minValueDigitsExponent.Exponent;
-      }
+      //DoubleDigitsExponent maxValueDigitsExponent = new DoubleDigitsExponent(maxValue);
+      //int minExponent;
+      //int maxExponent;
+      //if (minValueDigitsExponent.Exponent<=maxValueDigitsExponent.Exponent) {
+      //  //Example: Min=0.1, Max = 10000
+      //  minExponent = minValueDigitsExponent.Exponent;
+      //  maxExponent = maxValueDigitsExponent.Exponent;
+      //} else {
+      //  //Example: Min=-10000, Max = 0.1
+      //  minExponent = maxValueDigitsExponent.Exponent;
+      //  maxExponent = minValueDigitsExponent.Exponent;
+      //}
       numberFormat = "#,0";
 
       if (step.Exponent<0) {
@@ -244,10 +261,9 @@ namespace XYGraphLib {
     }
 
 
-    protected override void OnRecalculate(ref double[] labelValues, ref string[] labelStrings, ref Point[] labelPoints) {
+    protected override void OnRecalculate(ref double[]? labelValues, ref string?[]? labelStrings, ref Point[]? labelPoints) {
       isNewWidthCalculated = false; //prevents OnRecalculate to be called again
-      double labelValue;
-      FindFirstLastLabel(ref labelValues, ref labelStrings, ref labelPoints, step, out labelValue);
+      FindFirstLastLabel(ref labelValues, ref labelStrings, ref labelPoints, step, out var labelValue);
 
       //calculate label values
       double pixelPerValue = heightTracked / DisplayValueRange;

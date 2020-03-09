@@ -1,4 +1,21 @@
-﻿// Chart2Plots1X2YLegends displays 2 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).
+﻿/**************************************************************************************
+
+XYGraphLib.Chart2Plots1X2YLegends
+=================================
+
+Chart with 2 PlotArea, 1 XLegendScroller and 2 LegendScrollerY
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+// Chart2Plots1X2YLegends displays 2 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).
 // 
 // +-------------------------+-------------------+
 // | PlotArea0               | LegendScrollerY0  |
@@ -23,9 +40,8 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
-
+using CustomControlBaseLib;
 
 namespace XYGraphLib {
   /// <summary>
@@ -44,7 +60,7 @@ namespace XYGraphLib {
       get { return (PlotArea)GetValue(PlotAreaUpperProperty); }
       private set { SetValue(PlotAreaUpperProperty, value); }
     }
-    readonly PlotArea plotAreaUpper; //local copy for faster acces
+    readonly PlotArea plotAreaUpper; //local copy for faster access
 
     // DependencyProperty definition for PlotAreaUpper
     public static readonly DependencyProperty PlotAreaUpperProperty = 
@@ -58,7 +74,7 @@ namespace XYGraphLib {
       get { return (PlotArea)GetValue(PlotAreaLowerProperty); }
       private set { SetValue(PlotAreaLowerProperty, value); }
     }
-    readonly PlotArea plotAreaLower; //local copy for faster acces
+    readonly PlotArea plotAreaLower; //local copy for faster access
 
     // DependencyProperty definition for PlotAreaLower
     public static readonly DependencyProperty PlotAreaLowerProperty = 
@@ -72,7 +88,7 @@ namespace XYGraphLib {
       get { return (LegendScrollerY)GetValue(LegendScrollerYUpperProperty); }
       private set { SetValue(LegendScrollerYUpperProperty, value); }
     }
-    readonly LegendScrollerY legendScrollerYUpper; //local copy for faster acces
+    readonly LegendScrollerY legendScrollerYUpper; //local copy for faster access
 
     // DependencyProperty definition for LegendScrollerYUpper
     public static readonly DependencyProperty LegendScrollerYUpperProperty = 
@@ -86,7 +102,7 @@ namespace XYGraphLib {
       get { return (LegendScrollerY)GetValue(LegendScrollerYLowerProperty); }
       private set { SetValue(LegendScrollerYLowerProperty, value); }
     }
-    readonly LegendScrollerY legendScrollerYLower; //local copy for faster acces
+    readonly LegendScrollerY legendScrollerYLower; //local copy for faster access
 
     // DependencyProperty definition for LegendScrollerYLower
     public static readonly DependencyProperty LegendScrollerYLowerProperty = 
@@ -100,7 +116,7 @@ namespace XYGraphLib {
       get { return (LegendScrollerX)GetValue(LegendScrollerXProperty); }
       private set { SetValue(LegendScrollerXProperty, value); }
     }
-    readonly LegendScrollerX legendScrollerX; //local copy for faster acces
+    readonly LegendScrollerX legendScrollerX; //local copy for faster access
 
     // DependencyProperty definition for XLegendScroller
     public static readonly DependencyProperty LegendScrollerXProperty = 
@@ -115,14 +131,14 @@ namespace XYGraphLib {
     /// Default Constructor
     /// </summary>
     public Chart2Plots1X2YLegends(): 
-      this(new PlotArea(), new PlotArea(), new LegendScrollerX(), new LegendScrollerY(), new LegendScrollerY(), new Grid()) { }
+      this(new PlotArea(), new PlotArea(), new LegendScrollerX(), new LegendScrollerY(), new LegendScrollerY()) { }
 
 
     /// <summary>
     /// Constructor supporting XYGraph with plugged in components
     /// </summary>
     public Chart2Plots1X2YLegends(PlotArea newPlotAreaUpper, PlotArea newPlotAreaLower, LegendScrollerX newLegendScrollerX,
-      LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower, Grid newZoomGrid) 
+      LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower) 
     {
       PlotAreaUpper = plotAreaUpper = Add(newPlotAreaUpper);
       PlotAreaLower = plotAreaLower = Add(newPlotAreaLower);
@@ -191,11 +207,11 @@ namespace XYGraphLib {
       //}
 
       //graphPolylines = new Polyline[newSerieSettings.Length];
-      //highLowPolygons = new Polygon[newSerieSettings.Length];//half would be neough, but easier for programming, only few bytes waisted
+      //highLowPolygons = new Polygon[newSerieSettings.Length];//half would be enough, but easier for programming, only few bytes waisted
       //closePoints = new List<Point>[newSerieSettings.Length];//to draw line back for Polygon
 
       for (int serieIndex = 0; serieIndex < newSerieSettings.Length; serieIndex++) {
-        Renderer renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);
+        Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);
         if (renderer!=null) {
           if (newSerieSettings[serieIndex].Group==0) {
             AddRenderer(renderer, plotAreaUpper, legendScrollerX, legendScrollerYUpper);
@@ -214,7 +230,7 @@ namespace XYGraphLib {
     /// </summary>
     /// <param name="chartNotes">string to be displayed, font formatting and links to lists.</param>
     /// <param name="fontDefinitions">if null, chartNotes.FontDefinitionId must be 0. The Font information from this chart will be used </param>
-    /// <param name="IsAddToUpper">if false, the notes will be added to to lower plotarea</param>
+    /// <param name="IsAddToUpper">if false, the notes will be added to lower plot-area</param>
     public void AddNotes(IEnumerable<ChartNote> chartNotes, FontDefinition[] fontDefinitions, bool IsAddToUpper) {
       RendererNotes rendererNotes = CreateNotesRenderer(chartNotes, fontDefinitions);
       if (IsAddToUpper) {
@@ -226,7 +242,7 @@ namespace XYGraphLib {
 
 
     private void addGridLineRenderers() {
-      //x-gridlines are controlled by y-legends and y-gridlines are controll by x-legends
+      //x-grid-lines are controlled by y-legends and y-grid-lines are controlled by x-legends
 
       //link RendererGridLineXUpper with legendScrollerYUpper
       AddRenderer(new RendererGridLineX(legendScrollerYUpper, Brushes.DarkGray, 1), plotAreaUpper, null, legendScrollerYUpper);
@@ -240,8 +256,8 @@ namespace XYGraphLib {
     #endregion
 
     
-    #region Layouting
-    //      ---------
+    #region Layout
+    //      ------
 
     //double xLegendHeight = double.NegativeInfinity;
     //double zoomButtonSize = double.NegativeInfinity;
@@ -254,20 +270,20 @@ namespace XYGraphLib {
        if (plotAreaUpper.RendererCount==0) {
 #if DEBUG
          if (plotAreaLower.RendererCount!=0) {
-           throw new Exception("plotArea1 is supposed to be in sunch with plotArea0");
+           throw new Exception("plotArea1 is supposed to be in sync with plotArea0");
          }
 #endif
         //empty graphic. Add at least the grid lines
         addGridLineRenderers();
       }
 
-      TotalZoom100Button.Measure(new Size(constraint.Width, constraint.Height));
+      TotalZoom100Button!.Measure(new Size(constraint.Width, constraint.Height));
       double totalZoom100ButtonWidth = TotalZoom100Button.DesiredSize.Width;
       double totalZoom100ButtonHeight = TotalZoom100Button.DesiredSize.Height;
       legendScrollerX.Legend.MinHeight = totalZoom100ButtonHeight;
 
       legendScrollerX.Measure(constraint);
-      double zoomButtonDimension = TotalZoomOutButton.Width = TotalZoomOutButton.Height = TotalZoomInButton.Height = TotalZoomInButton.Width = 
+      double zoomButtonDimension = TotalZoomOutButton!.Width = TotalZoomOutButton.Height = TotalZoomInButton!.Height = TotalZoomInButton.Width = 
         legendScrollerX.ScrollBarHeight;
 
       double legendHeight = Math.Min(constraint.Height, Math.Max(legendScrollerX.DesiredSize.Height, totalZoom100ButtonHeight + zoomButtonDimension));
@@ -302,17 +318,17 @@ namespace XYGraphLib {
 
     protected override Size ArrangeContentOverride(Rect arrangeRect) {
       double legendWidth = Math.Min(arrangeRect.Width, 
-        Math.Max(Math.Max(legendScrollerYUpper.DesiredSize.Width, legendScrollerYLower.DesiredSize.Width), TotalZoom100Button.DesiredSize.Width));
+        Math.Max(Math.Max(legendScrollerYUpper.DesiredSize.Width, legendScrollerYLower.DesiredSize.Width), TotalZoom100Button!.DesiredSize.Width));
       double remainingWidth = arrangeRect.Width - legendWidth;
       double legendHeight = Math.Min(arrangeRect.Height, 
-        Math.Max(legendScrollerX.DesiredSize.Height, TotalZoom100Button.DesiredSize.Height + TotalZoomOutButton.DesiredSize.Height));
+        Math.Max(legendScrollerX.DesiredSize.Height, TotalZoom100Button.DesiredSize.Height + TotalZoomOutButton!.DesiredSize.Height));
       double remainingHeight = arrangeRect.Height - legendHeight;
       double plotArea0Height = remainingHeight * plotAreaRatio;
       double plotArea1Height = remainingHeight * (1-plotAreaRatio);
       legendScrollerYUpper.ArrangeBorderPadding(arrangeRect, remainingWidth, 0,               legendWidth, plotArea0Height);
       legendScrollerYLower.ArrangeBorderPadding(arrangeRect, remainingWidth, plotArea0Height, legendWidth, plotArea1Height);
       legendScrollerX.ArrangeBorderPadding(arrangeRect, 0, remainingHeight, remainingWidth, legendHeight);
-      //arrange plotarea after scrollers, which might change the values plotarea has to display
+      //arrange plot-area after scrollers, which might change the values plot-area has to display
       plotAreaUpper.ArrangeBorderPadding(arrangeRect, 0, 0,               remainingWidth, plotArea0Height);
       plotAreaLower.ArrangeBorderPadding(arrangeRect, 0, plotArea0Height, remainingWidth, plotArea1Height);
       TotalZoom100Button.ArrangeBorderPadding(arrangeRect, remainingWidth, remainingHeight, legendWidth, TotalZoom100Button.DesiredSize.Height);
@@ -320,7 +336,7 @@ namespace XYGraphLib {
       double zoomInOutY = remainingHeight + TotalZoom100Button.DesiredSize.Height;
       TotalZoomOutButton.ArrangeBorderPadding(arrangeRect, remainingWidth, zoomInOutY, 
         TotalZoomOutButton.DesiredSize.Width, TotalZoomOutButton.DesiredSize.Height);
-      TotalZoomInButton.ArrangeBorderPadding(arrangeRect, arrangeRect.Width - TotalZoomInButton.DesiredSize.Width, zoomInOutY, TotalZoomInButton.DesiredSize.Width, TotalZoomInButton.DesiredSize.Height);
+      TotalZoomInButton!.ArrangeBorderPadding(arrangeRect, arrangeRect.Width - TotalZoomInButton!.DesiredSize.Width, zoomInOutY, TotalZoomInButton.DesiredSize.Width, TotalZoomInButton.DesiredSize.Height);
       return arrangeRect.Size;
     }
     #endregion

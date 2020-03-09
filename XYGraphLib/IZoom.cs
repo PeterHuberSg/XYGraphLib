@@ -1,9 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.IZoom
+================
+
+Inheritor supports zooming in/out and raises an event when CanZoomIn or CanZoomOut changes
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
+
 
 namespace XYGraphLib {
+
+
   /// <summary>
   /// Inheritor supports zooming in/out and raises an event when CanZoomIn or CanZoomOut changes
   /// </summary>
@@ -24,8 +41,8 @@ namespace XYGraphLib {
     #endregion
 
 
-    #region Eventhandler
-    //      ------------
+    #region Events
+    //      ------
 
     /// <summary>
     /// Raised when CanZoomIn or CanZoomOut have changed

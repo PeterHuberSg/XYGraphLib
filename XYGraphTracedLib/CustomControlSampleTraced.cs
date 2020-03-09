@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using WpfTestbench;
 using System.Windows;
-
+using CustomControlSampleLib;
 
 namespace XYGraphLib {
 

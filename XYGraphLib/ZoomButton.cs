@@ -1,16 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.VisualsPanel
+=======================
+
+WPF Button displaying a plus or minus sign for zooming in or out  
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 
 namespace XYGraphLib {
   /// <summary>
-  /// WPF Button displaying a plus or minus sign. ZoomButton uses all available space. Therefore it is good if its height and width is set explictely.
+  /// WPF Button displaying a plus or minus sign. ZoomButton uses all available space. Therefore it is good if its height and width is 
+  /// set explicitly.
   /// </summary>
   public class ZoomButton: Button {
 
@@ -66,31 +80,33 @@ namespace XYGraphLib {
       StrokeBrush = strokeBrush;
     }
 
-
-    Grid grid;
-    Line xLine;
-    Line yLine;
+    readonly Grid grid;
+    readonly Line xLine;
+    readonly Line yLine;
 
     
     public ZoomButton() {
-      grid = new Grid();
-      grid.HorizontalAlignment = HorizontalAlignment.Stretch;
-      grid.VerticalAlignment = VerticalAlignment.Stretch;
+      grid = new Grid {
+        HorizontalAlignment = HorizontalAlignment.Stretch,
+        VerticalAlignment = VerticalAlignment.Stretch
+      };
       Content = grid;
 
-      xLine = new Line();
-      xLine.HorizontalAlignment = HorizontalAlignment.Left;
-      xLine.VerticalAlignment = VerticalAlignment.Top;
-      xLine.Stretch = Stretch.None;
+      xLine = new Line {
+        HorizontalAlignment = HorizontalAlignment.Left,
+        VerticalAlignment = VerticalAlignment.Top,
+        Stretch = Stretch.None
+      };
       grid.Children.Add(xLine);
-      
-      yLine = new Line();
-      yLine.HorizontalAlignment = HorizontalAlignment.Left;
-      yLine.VerticalAlignment = VerticalAlignment.Top;
-      yLine.Stretch = Stretch.None;
+
+      yLine = new Line {
+        HorizontalAlignment = HorizontalAlignment.Left,
+        VerticalAlignment = VerticalAlignment.Top,
+        Stretch = Stretch.None
+      };
       grid.Children.Add(yLine);
       
-      IsEnabledChanged += ZoomButton_IsEnabledChanged;
+      IsEnabledChanged += zoomButton_IsEnabledChanged;
     }
     #endregion
 
@@ -114,14 +130,14 @@ namespace XYGraphLib {
     }
 
 
-    void ZoomButton_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e) {
+    void zoomButton_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e) {
       reConstruct(RenderSize);
     }
 
     
     private void reConstruct(Size size) {
       //somehow the Button ContentPresenter doesn't give the grid all the space available, but only what the grid needs. It then centers
-      //the grid which spoils the positioning. By assigning explicitely the grid all the space available, there will be not positioning porblem.
+      //the grid which spoils the positioning. By assigning explicitly the grid all the space available, there will be not positioning problem.
       grid.Width = size.Width;
       grid.Height = size.Height;
 

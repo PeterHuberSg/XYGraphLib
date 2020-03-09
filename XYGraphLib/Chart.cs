@@ -1,9 +1,27 @@
-﻿using System;
+﻿/**************************************************************************************
+
+XYGraphLib.Chart
+================
+
+Base class for all Chart classes, which display the dataPoints of some DataSeries in a graphic together with legends.
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CustomControlBaseLib;
 
 
 namespace XYGraphLib {
@@ -19,13 +37,16 @@ namespace XYGraphLib {
     /// <summary>
     /// Called when a renderer gets created. Useful for tracing WPF events
     /// </summary>
-    public event Action<Renderer> RendererCreated;
+    public event Action<Renderer>? RendererCreated;
     #endregion
 
 
     #region Constructor
     //      -----------
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
     public Chart() {
       IsEnabled = false;
     }
@@ -77,9 +98,9 @@ namespace XYGraphLib {
     }
 
 
-    protected ZoomButton TotalZoomInButton;
-    protected ZoomButton TotalZoomOutButton;
-    protected Button TotalZoom100Button;
+    protected ZoomButton? TotalZoomInButton;
+    protected ZoomButton? TotalZoomOutButton;
+    protected Button? TotalZoom100Button;
 
 
     /// <summary>
@@ -87,22 +108,25 @@ namespace XYGraphLib {
     /// </summary>
     protected void AddZoomButtons() {
       Brush strokeBrush = Brushes.DarkSlateGray;
-      TotalZoomInButton = new ZoomButton(true, strokeBrush);
-      TotalZoomInButton.HorizontalAlignment = HorizontalAlignment.Center;
-      TotalZoomInButton.VerticalAlignment = VerticalAlignment.Center;
+      TotalZoomInButton = new ZoomButton(true, strokeBrush) {
+        HorizontalAlignment = HorizontalAlignment.Center,
+        VerticalAlignment = VerticalAlignment.Center
+      };
       TotalZoomInButton.Click += totalZoomInButton_Click;
       AddChild(TotalZoomInButton);
 
-      TotalZoomOutButton = new ZoomButton(false, strokeBrush); ;
-      TotalZoomOutButton.IsEnabled = false;
-      TotalZoomOutButton.HorizontalAlignment = HorizontalAlignment.Center;
-      TotalZoomOutButton.VerticalAlignment = VerticalAlignment.Center;
+      TotalZoomOutButton = new ZoomButton(false, strokeBrush) {
+        IsEnabled = false,
+        HorizontalAlignment = HorizontalAlignment.Center,
+        VerticalAlignment = VerticalAlignment.Center
+      };
       TotalZoomOutButton.Click += totalZoomOutButton_Click;
       AddChild(TotalZoomOutButton);
 
-      TotalZoom100Button = new Button();
-      TotalZoom100Button.Content = "100%";
-      TotalZoom100Button.IsEnabled = false;
+      TotalZoom100Button = new Button {
+        Content = "100%",
+        IsEnabled = false
+      };
       TotalZoom100Button.Click += totalZoom100Button_Click;
       AddChild(TotalZoom100Button);
     }
@@ -112,9 +136,9 @@ namespace XYGraphLib {
     #region Fill Data
     //      ---------
 
-    protected double[][,] DataSeries;
-    SerieStyleEnum[] serieStyle;
-    int[] Groups;
+    protected double[][,]? DataSeries;
+    SerieStyleEnum[]? serieStyle;
+    //int[] Groups;
 
 
     /// <summary>
@@ -123,25 +147,25 @@ namespace XYGraphLib {
     public virtual void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] newSerieSettings) {
       DataSeries = new double[newSerieSettings.Length][,];
       serieStyle = new SerieStyleEnum[newSerieSettings.Length];
-      Groups = new int[newSerieSettings.Length];
+      //Groups = new int[newSerieSettings.Length];
       int recordsCount = newRecords.Count();
       double[] firstDataPoint = newSerieSettings[0].Getter(newRecords.First());
       int dimensionCount = firstDataPoint.Length;
       for (int dataSeriesIndex = 0; dataSeriesIndex < DataSeries.Length; dataSeriesIndex++) {
         DataSeries[dataSeriesIndex] = new double[recordsCount, dimensionCount];
         serieStyle[dataSeriesIndex] = newSerieSettings[dataSeriesIndex].SerieStyle;
-        Groups[dataSeriesIndex] = newSerieSettings[dataSeriesIndex].Group;
+        //Groups[dataSeriesIndex] = newSerieSettings[dataSeriesIndex].Group;
       }
 
       int recordIndex = 0;
       foreach (TRecord record in newRecords) {
         for (int dataSerieIndex = 0; dataSerieIndex < newSerieSettings.Length; dataSerieIndex++) {
           SerieSetting<TRecord> serieSetting = newSerieSettings[dataSerieIndex];
-//          double[] dataPoint = serieSetting.Getter(record);
-double[] dataPoint = null;
-try{
-          dataPoint = serieSetting.Getter(record);
-} catch (Exception ex) { System.Diagnostics.Debugger.Break(); }
+          double[] dataPoint = serieSetting.Getter(record);
+          //double[] dataPoint;
+          //try{
+          //          dataPoint = serieSetting.Getter(record);
+          //} catch (Exception ex) { System.Diagnostics.Debugger.Break(); }
           for (int dimensionIndex = 0; dimensionIndex < dataPoint.Length; dimensionIndex++) {
             DataSeries[dataSerieIndex][recordIndex, dimensionIndex] = dataPoint[dimensionIndex];
           }
@@ -160,19 +184,19 @@ try{
     //      ---------
 
     bool isArea2Expected = false;
-    Brush areaLinestrokeBrush;
+    Brush? areaLinestrokeBrush;
     double areaLineStrokeThickness;
-    Brush areaLinefillBrush;
-    double[,] areaLine1DataSerie;
+    Brush? areaLinefillBrush;
+    double[,]? areaLine1DataSerie;
 
 
     /// <summary>
     /// returns a new renderer based on serieSetting
     /// </summary>
-    protected Renderer CreateGraphRenderer<TRecord>(int serieIndex, SerieSetting<TRecord> serieSetting) {
+    protected Renderer? CreateGraphRenderer<TRecord>(int serieIndex, SerieSetting<TRecord> serieSetting) {
 
       if (isArea2Expected && serieSetting.SerieStyle!=SerieStyleEnum.area2) {
-        throw new Exception(string.Format("SerieStyle[{0}] '{1}, {2}' should be area2 because the previous serie had style aera1.", serieIndex, serieSetting.SerieStyle, (int)serieSetting.SerieStyle));
+        throw new Exception(string.Format("SerieStyle[{0}] '{1}, {2}' should be area2 because the previous data series had style aera1.", serieIndex, serieSetting.SerieStyle, (int)serieSetting.SerieStyle));
       }
 
       //get stroke brush or default brush
@@ -196,13 +220,12 @@ try{
         }
       }
       //get fill brush or use transparent version of stroke brush
-      Brush fillBrush = null;
+      Brush? fillBrush = null;
       if (serieSetting.SerieStyle==SerieStyleEnum.line) {
         fillBrush = serieSetting.FillBrush;
       } else if (serieSetting.SerieStyle==SerieStyleEnum.area1) {
         if (serieSetting.FillBrush==null) {
-          SolidColorBrush strokeSolidColorBrush = strokeBrush as SolidColorBrush;
-          if (strokeSolidColorBrush==null) {
+          if (!(strokeBrush is SolidColorBrush strokeSolidColorBrush)) {
             fillBrush = new SolidColorBrush(Color.FromArgb(128, 240, 240, 240));
           } else {
             Color strokeColor = strokeSolidColorBrush.Color;
@@ -215,7 +238,7 @@ try{
 
       switch (serieSetting.SerieStyle) {
       case SerieStyleEnum.line:
-        double[][,] lineDataSeries = {DataSeries[serieIndex] };
+        double[][,] lineDataSeries = {DataSeries![serieIndex] };
         return new Renderer1Line(strokeBrush, serieSetting.StrokeThickness, fillBrush, lineDataSeries);
 
       case SerieStyleEnum.area1:
@@ -223,17 +246,17 @@ try{
         areaLinestrokeBrush = strokeBrush;
         areaLineStrokeThickness = serieSetting.StrokeThickness;
         areaLinefillBrush = fillBrush;
-        areaLine1DataSerie = DataSeries[serieIndex];
+        areaLine1DataSerie = DataSeries![serieIndex];
         return null;
 
       case SerieStyleEnum.area2:
         if (!isArea2Expected) {
-          throw new Exception(string.Format("SerieStyle[{0}] '{1}, {2}' should be preceeded by serie with style aera1.", serieIndex, serieSetting.SerieStyle, (int)serieSetting.SerieStyle));
+          throw new Exception(string.Format("SerieStyle[{0}] '{1}, {2}' should be preceded by serie with style aera1.", serieIndex, serieSetting.SerieStyle, (int)serieSetting.SerieStyle));
         }
         isArea2Expected = false;
         //double[][,]()
-        double[][,] areaLineDataSeries = { areaLine1DataSerie, DataSeries[serieIndex] };
-        return new Renderer2Lines(areaLinestrokeBrush, areaLineStrokeThickness, areaLinefillBrush, areaLineDataSeries);
+        double[][,] areaLineDataSeries = { areaLine1DataSerie!, DataSeries![serieIndex] };
+        return new Renderer2Lines(areaLinestrokeBrush!, areaLineStrokeThickness, areaLinefillBrush!, areaLineDataSeries);
 
       default:
         throw new Exception(string.Format("SerieStyle[{0}] '{1}, {2}' not supported.", serieIndex, serieSetting.SerieStyle, (int)serieSetting.SerieStyle));
@@ -247,7 +270,7 @@ try{
     }
 
     
-    protected void AddRenderer(Renderer renderer, PlotArea plotArea, LegendScrollerX legendScrollerX, LegendScrollerY legendScrollery) {
+    protected void AddRenderer(Renderer renderer, PlotArea plotArea, LegendScrollerX? legendScrollerX, LegendScrollerY? legendScrollery) {
       plotArea.AddRenderer(renderer);
       if (legendScrollerX!=null) {
         legendScrollerX.AddRenderer(renderer);
@@ -255,9 +278,7 @@ try{
       if (legendScrollery!=null) {
         legendScrollery.AddRenderer(renderer);
       }
-      if (RendererCreated!=null) {
-        RendererCreated(renderer);
-      }
+      RendererCreated?.Invoke(renderer);
     }
     #endregion
 
@@ -280,11 +301,11 @@ try{
     /// <summary>
     /// Raised when CanZoomIn or CanZoomOut have changed
     /// </summary>
-    public event Action<IZoom> ZoomStateChanged;
+    public event Action<IZoom>? ZoomStateChanged;
 
 
     /// <summary>
-    /// Zooms in one step (showing more details) in all directions for all plotareas
+    /// Zooms in one step (showing more details) in all directions for all plot areas
     /// </summary>
     public void ZoomIn(){
       if (CanZoomIn) {
@@ -296,7 +317,7 @@ try{
 
 
     /// <summary>
-    /// Zooms in one step out (showing less details) all directions for all plotareas
+    /// Zooms in one step out (showing less details) all directions for all plot areas
     /// </summary>
     public void ZoomOut(){
       if (CanZoomOut) {
@@ -333,11 +354,9 @@ try{
       if (CanZoomIn!=canZoomIn || CanZoomOut!=canZoomOut) {
         CanZoomIn = canZoomIn;
         CanZoomOut = canZoomOut;
-        TotalZoom100Button.IsEnabled = TotalZoomOutButton.IsEnabled =  canZoomOut;
-        TotalZoomInButton.IsEnabled =  canZoomIn;
-        if (ZoomStateChanged!=null) {
-          ZoomStateChanged(this);
-        }
+        TotalZoom100Button!.IsEnabled = TotalZoomOutButton!.IsEnabled =  canZoomOut;
+        TotalZoomInButton!.IsEnabled =  canZoomIn;
+        ZoomStateChanged?.Invoke(this);
       }
     }
 

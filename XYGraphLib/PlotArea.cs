@@ -1,4 +1,20 @@
-﻿//Todo: Check if Actual width is used properly or RenderSize.Width should be used ?
+﻿/**************************************************************************************
+
+XYGraphLib.PlotArea
+===================
+
+Controls area where the graphics get drawn.
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
 
 using System;
 using System.Windows;
@@ -62,9 +78,9 @@ namespace XYGraphLib {
 
     
     /// <summary>
-    /// Raised when renderer gets added to PlotArea. Is used to adde WPF tracing to renderer.
+    /// Raised when renderer gets added to PlotArea. Is used to added WPF tracing to renderer.
     /// </summary>
-    public event Action<Renderer> RendererAdded;
+    public event Action<Renderer>? RendererAdded;
 
 
     #endregion
@@ -82,7 +98,7 @@ namespace XYGraphLib {
     /// <summary>
     /// This constructor allows to give the PlotArea a name straight away. This is helpful for WPF event tracing.
     /// </summary>
-    public PlotArea(string plotAreaName) {
+    public PlotArea(string? plotAreaName) {
       if (plotAreaName!=null) {
         Name = plotAreaName;
       }
@@ -96,7 +112,7 @@ namespace XYGraphLib {
     //      -------
 
 
-    List<Renderer> renderers = new List<Renderer>();
+    readonly List<Renderer> renderers = new List<Renderer>();
 
 
     /// <summary>
@@ -123,7 +139,7 @@ namespace XYGraphLib {
       renderers.Add(renderer);
       renderer.RenderingRequested += renderer_RenderingRequested;
       //When a new renderer gets added, first the legends has to be calculated again, which might change the width of the legend and
-      //in consequence also the width of the Plotarea
+      //in consequence also the width of the Plot-area
       isRenderingNeeded = true;
       InvalidateVisual();
       //////if (Visuals.Count<firstRendererVisual) {
@@ -134,7 +150,7 @@ namespace XYGraphLib {
       //////  Visuals.Add(renderer.Render(ActualWidth, ActualHeight));
       //////}
 
-      if (RendererAdded!=null) RendererAdded(renderer);
+      RendererAdded?.Invoke(renderer);
     }
 
 
@@ -163,7 +179,7 @@ namespace XYGraphLib {
     //      ---------
 
     protected override Size MeasureOverride(Size availableSize) {
-      //use all available size, unless size is infinit, then use 0
+      //use all available size, unless size is infinite, then use 0
       Size desiredSize = availableSize;
       if (double.IsInfinity(desiredSize.Width)) desiredSize.Width=0;
       if (double.IsInfinity(desiredSize.Height)) desiredSize.Height=0;

@@ -1,13 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.TraceWpf
+==================
+
+Supports using TraceWPFEvents  
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Windows;
+
 
 namespace XYGraphLib {
 
   /// <summary>
-  /// Supports using TraceWPFEvents without linking XYGraphLibTraced.DLL. This is usefull during development
+  /// Supports using TraceWPFEvents. This is useful during development
   /// to add more information to TraceWPFEvents. During production, there should be no tracing.
   /// </summary>
   public static class TraceWpf {
@@ -20,7 +35,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Action to execute for tracing
     /// </summary>
-    static public event Action<FrameworkElement, string> LineAdded;
+    static public event Action<FrameworkElement?, string>? LineAdded;
 
 
     /// <summary>
@@ -34,10 +49,8 @@ namespace XYGraphLib {
     /// <summary>
     /// Trace a line, add Name of FrameworkElement
     /// </summary>
-    static public void Line(FrameworkElement frameworkElement, string traceLine) {
-      if (LineAdded!=null) {
-        LineAdded(frameworkElement, traceLine);
-      }
+    static public void Line(FrameworkElement? frameworkElement, string traceLine) {
+      LineAdded?.Invoke(frameworkElement, traceLine);
     }
   }
 }

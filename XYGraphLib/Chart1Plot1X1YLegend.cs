@@ -1,4 +1,21 @@
-﻿// Chart1Plot1X1YLegend displays some line graphics in the PlotArea with legends and scroll bars for eadh X and Y axis:
+﻿/**************************************************************************************
+
+XYGraphLib.Chart1Plot1X1YLegend
+===============================
+
+Chart with 1 PlotArea, 1 XLegendScroller and 1 LegendScrollerY
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+// Chart1Plot1X1YLegend displays some line graphics in the PlotArea with legends and scroll bars for each X and Y axis:
 // 
 // +-------------------------+---------+--------------+
 // |PlotArea                 |LegendScrollerY         |
@@ -25,13 +42,12 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
-
+using CustomControlBaseLib;
 
 namespace XYGraphLib {
-  
-  
+
+
   public class Chart1Plot1X1YLegend: Chart {
 
 
@@ -45,7 +61,7 @@ namespace XYGraphLib {
       get { return (PlotArea)GetValue(PlotAreaProperty); }
       private set { SetValue(PlotAreaProperty, value); }
     }
-    readonly PlotArea plotArea; //local copy for faster acces
+    readonly PlotArea plotArea; //local copy for faster access
 
     // DependencyProperty definition for PlotArea
     public static readonly DependencyProperty PlotAreaProperty = 
@@ -59,7 +75,7 @@ namespace XYGraphLib {
       get { return (LegendScrollerY)GetValue(LegendScrollerYProperty); }
       private set { SetValue(LegendScrollerYProperty, value); }
     }
-    readonly LegendScrollerY legendScrollerY; //local copy for faster acces
+    readonly LegendScrollerY legendScrollerY; //local copy for faster access
 
     // DependencyProperty definition for LegendScrollerY
     public static readonly DependencyProperty LegendScrollerYProperty = 
@@ -73,7 +89,7 @@ namespace XYGraphLib {
       get { return (LegendScrollerX)GetValue(LegendScrollerXProperty); }
       private set { SetValue(LegendScrollerXProperty, value); }
     }
-    readonly LegendScrollerX legendScrollerX; //local copy for faster acces
+    readonly LegendScrollerX legendScrollerX; //local copy for faster access
 
     // DependencyProperty definition for XLegendScroller
     public static readonly DependencyProperty LegendScrollerXProperty = 
@@ -88,14 +104,14 @@ namespace XYGraphLib {
     /// Default Constructor
     /// </summary>
     public Chart1Plot1X1YLegend(): 
-      this(new PlotArea(), new LegendScrollerX(), new LegendScrollerY(), new Grid()) { }
+      this(new PlotArea(), new LegendScrollerX(), new LegendScrollerY()) { }
 
 
     /// <summary>
     /// Constructor supporting Chart1Plot1X1YLegend with plugged in components
     /// </summary>
     public Chart1Plot1X1YLegend(PlotArea newPlotArea, LegendScrollerX newLegendScrollerX,
-      LegendScrollerY newLegendScrollerY, Grid newZoomGrid) 
+      LegendScrollerY newLegendScrollerY) 
     {
       PlotArea = plotArea = Add(newPlotArea);
 
@@ -131,7 +147,7 @@ namespace XYGraphLib {
       base.FillData<TRecord>(newRecords, newSerieSettings);
 
       for (int serieIndex = 0; serieIndex < newSerieSettings.Length; serieIndex++) {
-        Renderer renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);
+        Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);
         if (renderer!=null) {
           if (newSerieSettings[serieIndex].Group==0) {
             AddRenderer(renderer, plotArea, legendScrollerX, legendScrollerY);
@@ -148,7 +164,7 @@ namespace XYGraphLib {
     /// </summary>
     /// <param name="chartNotes">string to be displayed, font formatting and links to lists.</param>
     /// <param name="fontDefinitions">if null, chartNotes.FontDefinitionId must be 0. The Font information from this chart will be used </param>
-    /// <param name="IsAddToUpper">if false, the notes will be added to to lower plotarea</param>
+    /// <param name="IsAddToUpper">if false, the notes will be added to lower plot-area</param>
     protected void AddNotes(IEnumerable<ChartNote> chartNotes, FontDefinition[] fontDefinitions) {
       RendererNotes rendererNotes = CreateNotesRenderer(chartNotes, fontDefinitions);
       AddRenderer(rendererNotes, plotArea, legendScrollerX, legendScrollerY);
@@ -156,7 +172,7 @@ namespace XYGraphLib {
 
 
     private void addGridLineRenderers() {
-      //x-gridlines are controlled by y-legends and y-gridlines are controll by x-legends
+      //x-grid-lines are controlled by y-legends and y-grid-lines are controlled by x-legends
 
       //link RendererGridLineX with legendScrollerY
       AddRenderer(new RendererGridLineX(legendScrollerY, Brushes.DarkGray, 1), plotArea, null, legendScrollerY);
@@ -166,8 +182,8 @@ namespace XYGraphLib {
     #endregion
 
     
-    #region Layouting
-    //      ---------
+    #region Layout
+    //      ------
 
     //double xLegendHeight = double.NegativeInfinity;
     //double zoomButtonSize = double.NegativeInfinity;
@@ -182,13 +198,13 @@ namespace XYGraphLib {
         addGridLineRenderers();
       }
 
-      TotalZoom100Button.Measure(new Size(constraint.Width, constraint.Height));
+      TotalZoom100Button!.Measure(new Size(constraint.Width, constraint.Height));
       double totalZoom100ButtonWidth = TotalZoom100Button.DesiredSize.Width;
       double totalZoom100ButtonHeight = TotalZoom100Button.DesiredSize.Height;
       legendScrollerX.Legend.MinHeight = totalZoom100ButtonHeight;
 
       legendScrollerX.Measure(constraint);
-      double zoomButtonDimension = TotalZoomOutButton.Width = TotalZoomOutButton.Height = TotalZoomInButton.Height = TotalZoomInButton.Width = 
+      double zoomButtonDimension = TotalZoomOutButton!.Width = TotalZoomOutButton.Height = TotalZoomInButton!.Height = TotalZoomInButton.Width = 
         legendScrollerX.ScrollBarHeight;
 
       double legendHeight = Math.Min(constraint.Height, Math.Max(legendScrollerX.DesiredSize.Height, totalZoom100ButtonHeight + zoomButtonDimension));
@@ -220,21 +236,21 @@ namespace XYGraphLib {
 
     protected override Size ArrangeContentOverride(Rect arrangeRect) {
       double legendWidth = Math.Min(arrangeRect.Width, 
-        Math.Max(legendScrollerY.DesiredSize.Width, TotalZoom100Button.DesiredSize.Width));
+        Math.Max(legendScrollerY.DesiredSize.Width, TotalZoom100Button!.DesiredSize.Width));
       double remainingWidth = arrangeRect.Width - legendWidth;
       double legendHeight = Math.Min(arrangeRect.Height, 
-        Math.Max(legendScrollerX.DesiredSize.Height, TotalZoom100Button.DesiredSize.Height + TotalZoomOutButton.DesiredSize.Height));
+        Math.Max(legendScrollerX.DesiredSize.Height, TotalZoom100Button.DesiredSize.Height + TotalZoomOutButton!.DesiredSize.Height));
       double remainingHeight = arrangeRect.Height - legendHeight;
       legendScrollerY.ArrangeBorderPadding(arrangeRect, remainingWidth, 0, legendWidth, remainingHeight);
       legendScrollerX.ArrangeBorderPadding(arrangeRect, 0, remainingHeight, remainingWidth, legendHeight);
-      //arrange plotarea after scrollers, which might change the values plotarea has to display
+      //arrange plot-area after scrollers, which might change the values plot-area has to display
       plotArea.ArrangeBorderPadding(arrangeRect, 0, 0, remainingWidth, remainingHeight);
       TotalZoom100Button.ArrangeBorderPadding(arrangeRect, remainingWidth, remainingHeight, legendWidth, TotalZoom100Button.DesiredSize.Height);
 
       double zoomInOutY = remainingHeight + TotalZoom100Button.DesiredSize.Height;
       TotalZoomOutButton.ArrangeBorderPadding(arrangeRect, remainingWidth, zoomInOutY, 
         TotalZoomOutButton.DesiredSize.Width, TotalZoomOutButton.DesiredSize.Height);
-      TotalZoomInButton.ArrangeBorderPadding(arrangeRect, arrangeRect.Width - TotalZoomInButton.DesiredSize.Width, zoomInOutY, TotalZoomInButton.DesiredSize.Width, TotalZoomInButton.DesiredSize.Height);
+      TotalZoomInButton!.ArrangeBorderPadding(arrangeRect, arrangeRect.Width - TotalZoomInButton!.DesiredSize.Width, zoomInOutY, TotalZoomInButton.DesiredSize.Width, TotalZoomInButton.DesiredSize.Height);
       return arrangeRect.Size;
     }
     #endregion

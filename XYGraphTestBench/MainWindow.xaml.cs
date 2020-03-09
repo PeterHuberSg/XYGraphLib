@@ -100,7 +100,7 @@ namespace XYGraphLib {
     //------------
 
     void CustomControlSampleButton_Click(object sender, RoutedEventArgs e) {
-      CustomControlSampleWindow.Show(this);
+      //CustomControlSampleWindow.Show(this);
     }
 
     

@@ -1,11 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.DoubleDigitsExponent
+===============================
+
+Gives access to the significant digits and the power of 10 exponent of a double
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
+
 
 namespace XYGraphLib {
   /// <summary>
-  /// Gives access to the significant digits and the powerr of 10 exponent of a double
+  /// Gives access to the significant digits and the power of 10 exponent of a double
   /// 
   /// double   digits  exponent
   /// 123      1.23     2

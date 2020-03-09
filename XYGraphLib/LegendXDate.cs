@@ -1,13 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.LegendXDate
+======================
+
+Horizontal Legend with date values
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Windows;
 
 
 namespace XYGraphLib {
-  
-  
+
+
+  /// <summary>
+  /// /// Displays the legend below the PlotArea with date values.
+  /// </summary>
   public class LegendXDate: LegendX {
 
     #region Properties
@@ -95,7 +112,7 @@ namespace XYGraphLib {
     #region Measurement Overrides
     //      ---------------------
 
-    TimeSpanUnitFormatter timeSpanUnitFormatter = new TimeSpanUnitFormatter();
+    readonly TimeSpanUnitFormatter timeSpanUnitFormatter = new TimeSpanUnitFormatter();
 
 
     protected override void OnFontChanged(bool hasOnlyFontSizeChanged) {
@@ -152,7 +169,7 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
     }
 
 
-    protected override void OnRecalculate(ref double[] labelValues, ref string[] labelStrings, ref Point[] labelPoints) {
+    protected override void OnRecalculate(ref double[]? labelValues, ref string?[]? labelStrings, ref Point[]? labelPoints) {
       //choose time unit (seconds to years)
       TimeSpanUnitEnum newTimeSpanUnit = timeSpanUnitFormatter.GetDefaultTimeSpanUnit(DisplayDateRange, RenderWidthTracked);
 
@@ -162,10 +179,7 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
       int labelsCount = int.MinValue;
       double spaceBetweenLabels = LegendGlyphDrawer.GetLength("    ", FontSize);
       while (true) {
-        TimeSpan newStep;
-        DateTime newFirstLabelDate;
-        int newLabelsCount;
-        calculate(newTimeSpanUnit, out newStep, out newFirstLabelDate, out newLabelsCount);
+        calculate(newTimeSpanUnit, out var newStep, out var newFirstLabelDate, out var newLabelsCount);
         TimeSpanUnitConfig timeSpanUnitConfig = timeSpanUnitFormatter.GetWidths(newTimeSpanUnit);
         double totalWidth = timeSpanUnitConfig.FirstLabelWidth;
         if (newLabelsCount>1) {
@@ -216,12 +230,12 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
           }
         }
 #endif
-        labelPoints[labelIndex] = new Point(xPosition, 0);
+        labelPoints![labelIndex] = new Point(xPosition, 0);
 
         //calculate label string
         if (labelIndex==1 && xPosition<firstLabelWidth) {
           //skip second label, it would overlap with first label
-          labelStrings[labelIndex] = null;
+          labelStrings![labelIndex] = null;
 
         } else {
           string legendString;
@@ -230,7 +244,7 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
           } else {
             legendString = labelDate.ToFollowLabel(newTimeSpanUnit);
           }
-          labelStrings[labelIndex] = legendString;
+          labelStrings![labelIndex] = legendString;
           if (labelIndex==0) {
             firstLabelWidth = xPosition + LegendGlyphDrawer.GetLength(legendString, FontSize) * 1.05;
           }
@@ -246,29 +260,13 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
           labelDate = labelDate.AddTicks(step.Ticks);
         }
       }
-
-
-      //for (int labelIndex = 0; labelIndex < labelsCount; labelIndex++) {
-      //  double xPosition = (labelsDates[labelIndex]-MinDisplayDate).Ticks * pixelPerValue;
-      //  LabelCoordinates[labelIndex] = xPosition;
-      //  if (xPosition> RenderWidthTracked) break;
-
-      //  //skip second label if first label is too long
-      //  if (labelIndex!=1 || firstLabelWidth<xPosition) {
-      //    LegendGlyphDrawer.Write(drawingContext, new Point(xPosition, yPos), legendStrings[labelIndex], FontSize, Foreground);
-      //  }
-      //  if (labelIndex==0) {
-      //    //      double firstLabelWidth = glyphDrawer.GetLength(mask.FirstLabelMask, FontSize) * 1.10;
-      //    firstLabelWidth = xPosition + LegendGlyphDrawer.GetLength(legendStrings[0], FontSize) * 1.05;
-      //  }
-      //}
     }
 
 
-    private void calculate(TimeSpanUnitEnum TimeSpanUnit, out TimeSpan step, out DateTime firstLabelDate, out int labelsCount) {
-      step = new TimeSpan(TimeSpanUnit.GetTicks());
+    private void calculate(TimeSpanUnitEnum timeSpanUnit, out TimeSpan step, out DateTime firstLabelDate, out int labelsCount) {
+      step = new TimeSpan(timeSpanUnit.GetTicks());
       //find start of first time unit after MinDisplayDate
-      if (TimeSpanUnit==TimeSpanUnitEnum.month) {
+      if (timeSpanUnit==TimeSpanUnitEnum.month) {
         firstLabelDate = DisplayDate.Date;
         if (firstLabelDate!=DisplayDate) {
           //day has already started. Take the next one for the first label
@@ -281,7 +279,7 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
             firstLabelDate = new DateTime(firstLabelDate.Year+1, 1, 1);
           }
         }
-      } else if (TimeSpanUnit>=TimeSpanUnitEnum.year) {
+      } else if (timeSpanUnit>=TimeSpanUnitEnum.year) {
         firstLabelDate = DisplayDate.Date;
         if (firstLabelDate!=DisplayDate) {
           //day has already started. Take the next one for the first label
@@ -290,8 +288,8 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
         if (firstLabelDate.Day!=1 || firstLabelDate.Month!=1) {
           firstLabelDate = new DateTime(firstLabelDate.Year+1, 1, 1);
         }
-        if (TimeSpanUnit>=TimeSpanUnitEnum.year5) {
-          int yearMultiplier = TimeSpanUnit.GetYearMultiplier();
+        if (timeSpanUnit>=TimeSpanUnitEnum.year5) {
+          int yearMultiplier = timeSpanUnit.GetYearMultiplier();
           if (firstLabelDate.Year%yearMultiplier>0) {
             firstLabelDate = new DateTime(firstLabelDate.Year - firstLabelDate.Year%yearMultiplier + yearMultiplier, 1, 1); ;
           }
@@ -316,15 +314,15 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
       }
 
       DateTime maxDisplayDate = DisplayDate + DisplayDateRange;
-      if (TimeSpanUnit>=TimeSpanUnitEnum.year) {
+      if (timeSpanUnit>=TimeSpanUnitEnum.year) {
         //a year or more
-        int yearMultiplier = TimeSpanUnit.GetYearMultiplier();
+        int yearMultiplier = timeSpanUnit.GetYearMultiplier();
         int yearsDifference = maxDisplayDate.Year - firstLabelDate.Year;
         labelsCount = yearsDifference/yearMultiplier + 1;
         //lastLabelDate = firstLabelDate.AddYears(labelsCount);
         //labelsCount++;
 
-      } else if (TimeSpanUnit==TimeSpanUnitEnum.month) {
+      } else if (timeSpanUnit==TimeSpanUnitEnum.month) {
         labelsCount = maxDisplayDate.Month - firstLabelDate.Month + (maxDisplayDate.Year - firstLabelDate.Year)*12 + 1;
         //lastLabelDate = firstLabelDate.AddMonths(labelsCount);
         //labelsCount++;

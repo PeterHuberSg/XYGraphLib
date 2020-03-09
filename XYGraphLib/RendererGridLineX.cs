@@ -1,9 +1,30 @@
-﻿using System;
+﻿/**************************************************************************************
+
+XYGraphLib.RendererGridLineX
+============================
+
+Creates a Visual for the horizontal grid lines displayed in the PlotArea.
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Windows;
 using System.Windows.Media;
 
 
 namespace XYGraphLib {
+
+  /// <summary>
+  /// Creates a Visual for the horizontal grid lines displayed in the PlotArea.
+  /// </summary>
   public class RendererGridLineX: Renderer {
 
     #region Properties
@@ -20,7 +41,7 @@ namespace XYGraphLib {
     //      -----------
 
     public RendererGridLineX(LegendScrollerY legendScrollerY, System.Windows.Media.Brush strokeBrush, double strokeThickness):
-      //gridlineX are parallel to horizontal x-line, but the distance between them is controled by LegendY, therefore dimension Y
+      //gridlineX are parallel to horizontal x-line, but the distance between them is controlled by LegendY, therefore dimension Y
       base(strokeBrush, strokeThickness, DimensionMapY) 
     {
       LegendScrollerY = legendScrollerY;
@@ -32,17 +53,17 @@ namespace XYGraphLib {
     //      -------
 
     /// <summary>
-    /// Renders the horizontal x-gridline to the drawingContext, one line for each label in YLegend.
+    /// Renders the horizontal x-grid-line to the drawingContext, one line for each label in YLegend.
     /// </summary>
-    protected override void OnCreateVisual(DrawingContext drawingContext, double width, double height) {
+    protected override void OnCreateVisual(DrawingContext drawingContext, double width, double height, DrawingVisual _) {
       LegendY legendy = (LegendY)LegendScrollerY.Legend;
-      //gridlines use only 1 dimension. Both for x and y gridline, 
+      //grid-lines use only 1 dimension. Both for x and y grid-line, 
       double minDisplayValue = MinDisplayValues[0];
 
       // Create a GuidelineSet to get the lines exactly on a pixel
       GuidelineSet guidelines = new GuidelineSet();
       double halfPenWidth = StrokePen.Thickness / 2;
-      foreach (double lableValue in legendy.LabelValues) {
+      foreach (double lableValue in legendy.LabelValues!) {
         double yPos = height - (ScaleY * (lableValue - minDisplayValue));
         guidelines.GuidelinesY.Add(yPos + halfPenWidth);
       }

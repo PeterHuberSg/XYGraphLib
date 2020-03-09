@@ -1,9 +1,25 @@
-﻿using System;
+﻿/**************************************************************************************
+
+XYGraphLib.Legend
+=================
+
+Base class for LegendX and LegendY
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Media;
-using System.ComponentModel;
-using System.Windows.Controls;
-using System.Windows.Documents;
+using CustomControlBaseLib;
 
 
 namespace XYGraphLib {
@@ -47,7 +63,7 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Lowest value stored in the datarecords for the supported dimension, allows to have the same formatting when displayed values 
+    /// Lowest value stored in the data-records for the supported dimension, allows to have the same formatting when displayed values 
     /// are within Min- and MaxValue. If this functionality is not needed, set it to NaN. Infinity throws an exception
     ///  
     /// Default Value: double.Nan
@@ -127,7 +143,7 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Highest value stored in the datarecords for the supported dimension, allows to have the same formatting when displayed values 
+    /// Highest value stored in the data-records for the supported dimension, allows to have the same formatting when displayed values 
     /// are within Min- and MaxValue.
     /// Default Value: double.MinValue
     /// </summary>
@@ -163,7 +179,7 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Set to true if legend should be written right aligned. This is used vor vertically written numbers
+    /// Set to true if legend should be written right aligned. This is used for vertically written numbers
     /// </summary>
     public readonly bool IsWriteRightAligned = false;
 
@@ -172,11 +188,11 @@ namespace XYGraphLib {
     /// coordinates of all value labels, used to draw grid lines
     /// Default Value: null
     /// </summary>
-    public double[] LabelValues {
+    public double[]? LabelValues {
       get { return (double[])GetValue(LabelValuesProperty); }
       private set { SetValue(LabelValuesProperty, value); }
     }
-    const double[] LabelValuesInit = null;
+    const double[]? labelValuesInit = null;
 
 
     /// <summary>
@@ -187,7 +203,7 @@ namespace XYGraphLib {
       "LabelValues", // Property name 
       typeof(double[]), // Property type
       typeof(Legend), // Property owner
-      new UIPropertyMetadata(LabelValuesInit));
+      new UIPropertyMetadata(labelValuesInit));
 
 
     /// <summary>
@@ -217,7 +233,7 @@ namespace XYGraphLib {
         }
       }
 
-      //The original and the tracked value get assigned NaN. We use the strange behaviour of doubles that
+      //The original and the tracked value get assigned NaN. We use the strange behavior of doubles that
       //comparing 2 NaN-values is always false, even they have actually the same value. In the code, we 
       //check first if the original value (DisplayVale. FidplayValueRange) is NaN. If it is, we use some 
       //default value. When we later check original against tracked, we will always detect a change as long
@@ -244,7 +260,7 @@ namespace XYGraphLib {
         MaxValue = maxValueInit;
         maxValueTracked = maxValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
       */
-      LabelValues = LabelValuesInit;
+      LabelValues = labelValuesInit;
 
       resetLocalData();
       OnReset();
@@ -259,7 +275,7 @@ namespace XYGraphLib {
     /// Raised when DisplayValue or DisplayValue Range has changed, but only once new legend values are calculated during
     /// rendering
     /// </summary>
-    public event Action<Legend> DisplayValueChanged;
+    public event Action<Legend>? DisplayValueChanged;
     #endregion
 
 
@@ -302,8 +318,9 @@ namespace XYGraphLib {
     #region Measurement Overrides
     //      ---------------------
 
-    protected GlyphDrawer LegendGlyphDrawer;
-    FontFamily fontFamilyTracked = null; //there is no need to reset font tracking
+    [AllowNull]
+    protected GlyphDrawer LegendGlyphDrawer = null;
+    FontFamily? fontFamilyTracked = null; //there is no need to reset font tracking
     double fontSizeTracked = double.NaN;
     bool isNewGlyphDrawer = false;
 
@@ -311,8 +328,7 @@ namespace XYGraphLib {
     sealed protected override Size MeasureContentOverride(Size availableSize) {
       if (double.IsNaN(DisplayValue) || double.IsNaN(DisplayValueRange)) {
         //Replace default data with some data which can be displayed.
-        double displayValue, displayValueRange;
-        OnProvideDefaultValues(out displayValue, out displayValueRange);
+        OnProvideDefaultValues(out var displayValue, out var displayValueRange);
         DisplayValue = displayValue;
         DisplayValueRange = displayValueRange;
       }
@@ -327,7 +343,7 @@ namespace XYGraphLib {
       if (double.IsNaN(MinValue)!=double.IsNaN(MaxValue)) throw new ApplicationException("MinValue " + MinValue + " and MaxValue " + MaxValue + " must be both NaN or not.");
 
       if (!double.IsNaN(MinValue)) {
-        //min and max values are defined. Ensure that Max>Min and they are bigerer or equal DisplayValue and DisplayValueRange
+        //min and max values are defined. Ensure that Max>Min and they are bigger or equal DisplayValue and DisplayValueRange
         if (MaxValue<MinValue) {
           throw new ApplicationException("MaxValue " + MaxValue + " must be greater than MinValue " + MinValue + " .");
         }
@@ -341,12 +357,12 @@ namespace XYGraphLib {
 
       Size requiredSize = availableSize;
       if (double.IsInfinity(requiredSize.Width)) {
-        //evaluate a minimum value if host gives unlimitted space. The size requested as indicated in the the return value of 
+        //evaluate a minimum value if host gives unlimited space. The size requested as indicated in the return value of 
         //MeasureContentOverride() can be changed in OnLegendMeasurement(() by an inheritor
         //
-        //Normally, the legend should be in a container telling the legend the available space. If it is unlimitted (Scroll Region or host
+        //Normally, the legend should be in a container telling the legend the available space. If it is unlimited (Scroll Region or host
         //wants Legend to take all available space), arrange will later provide the space available, even requiredSize was 0. Another 
-        //reason for unlimmitted space is that Grid sometimes makes 2 measurement calls, in which the first one has infinite space to get 
+        //reason for unlimited space is that Grid sometimes makes 2 measurement calls, in which the first one has infinite space to get 
         //the requested size, followed by second measurement call with the available size, after processing the measurement information
         //from other GridCells
 
@@ -354,7 +370,7 @@ namespace XYGraphLib {
           //in Visual Studio require some width to display something
           requiredSize.Width = 200;
         } else {
-          //normally, the legend should be in a container telling the legend the available width. If it is unlimitted (Scroll Container),
+          //normally, the legend should be in a container telling the legend the available width. If it is unlimited (Scroll Container),
           //arrange will return all width available, even requiredSize.Width is 0. 
           requiredSize.Width = 0;
         }
@@ -386,7 +402,7 @@ namespace XYGraphLib {
 
         //font might have different dimension than before. Recalculate space needed
         isNewGlyphDrawer = true;
-        LegendGlyphDrawer = new GlyphDrawer(FontFamily, FontStyle, FontWeight, FontStretch);
+        LegendGlyphDrawer = new GlyphDrawer(FontFamily, FontStyle, FontWeight, FontStretch, VisualTreeHelper.GetDpi(this).PixelsPerDip);
         OnFontChanged(hasOnlyFontSizeChanged);
       }
 
@@ -415,8 +431,8 @@ namespace XYGraphLib {
     #region Render Overrides
     //      ----------------
 
-    string[] labelStrings;
-    Point[] labelPoints;
+    string?[]? labelStrings;
+    Point[]? labelPoints;
 
 
     private void resetLocalData() {
@@ -439,7 +455,7 @@ namespace XYGraphLib {
         isNewGlyphDrawer = false;
         haveDisplayValuesChanged = true;
 
-        double[] labelValues = LabelValues;
+        double[]? labelValues = LabelValues;
         OnRecalculate(ref labelValues, ref labelStrings, ref labelPoints);
         LabelValues = labelValues;
       }
@@ -447,12 +463,15 @@ namespace XYGraphLib {
       if (labelStrings!=null) {
         Point offset = OnContentAlignment(renderContentSize);
         for (int labelIndex = 0; labelIndex < labelStrings.Length; labelIndex++) {
-          Point labelPoint = labelPoints[labelIndex];
+          var labelString = labelStrings[labelIndex];
+          if (labelString is null) continue;
+
+          Point labelPoint = labelPoints![labelIndex];
           Point labelPointWithOffset = new Point(offset.X + labelPoint.X, offset.Y +labelPoint.Y);
           if (IsWriteRightAligned) {
-            LegendGlyphDrawer.WriteRightAligned(drawingContext, labelPointWithOffset, labelStrings[labelIndex], FontSize, Foreground);
+            LegendGlyphDrawer.WriteRightAligned(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
           } else {
-            LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelStrings[labelIndex], FontSize, Foreground);
+            LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
           }
         }
 
@@ -470,7 +489,13 @@ namespace XYGraphLib {
     /// <summary>
     /// Calculates first and last label in legend and how many labels are needed. There is always at least 1 label
     /// </summary>
-    protected void FindFirstLastLabel(ref double[] labelValues, ref string[] labelStrings, ref Point[] labelPoints, StepStruct step, out double firstLabel) {
+    protected void FindFirstLastLabel(
+      [NotNull]ref double[]? labelValues, 
+      [NotNull]ref string?[]? labelStrings, 
+      [NotNull]ref Point[]? labelPoints, 
+      StepStruct step, 
+      out double firstLabel) 
+    {
       //find value of first label
 //      firstLabel = ((int)(DisplayValue/step.Value)) * step.Value;
       firstLabel = (Math.Ceiling(DisplayValue/step.Value)) * step.Value;
@@ -541,11 +566,11 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Legend calls OnRecalculate before OnLegendMeasurement() if one of the following changed:       OnIsRecalculationNeeded(), DisplayValue, 
-    /// DisplayValueRange, MinValue, MaxValue or GlyphDrawer 
+    /// Legend calls OnRecalculate before OnLegendMeasurement() if one of the following changed:       
+    /// OnIsRecalculationNeeded(), DisplayValue, DisplayValueRange, MinValue, MaxValue or GlyphDrawer 
     /// Inheritor should recalculate the label values
     /// </summary>
-    protected abstract void OnRecalculate(ref double[] labelValues, ref string[] labelStrings, ref Point[] labelPoints);
+    protected abstract void OnRecalculate(ref double[]? labelValues, ref string?[]? labelStrings, ref Point[]? labelPoints);
 
 
     protected virtual Point OnContentAlignment(Size renderContentSize) {

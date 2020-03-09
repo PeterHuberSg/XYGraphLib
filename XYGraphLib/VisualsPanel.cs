@@ -1,4 +1,21 @@
-﻿using System.ComponentModel;
+﻿/**************************************************************************************
+
+XYGraphLib.VisualsPanel
+=======================
+
+A FrameworkElement which can host DrawingVisuals  
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -11,13 +28,13 @@ namespace XYGraphLib {
   /// <summary>
   /// VisualsPanel is a FrameworkElement which can host DrawingVisuals. This allows for very fast Graphics without the overhead of
   /// Templates, WPF Layout, gazillions of Dependency Properties and events.
-  /// VisualsPanel stores DrawingVisuals in a VisualsCollection, which WPF uses to draw the VisualsPanel and its content. Just addig or removing
+  /// VisualsPanel stores DrawingVisuals in a VisualsCollection, which WPF uses to draw the VisualsPanel and its content. Just adding or removing
   /// a DrawingVisuals will cause WPF to render VisualsPanel again.
   /// 
   /// VisualsPanel can have a simple border (no rounded corners), Padding and Background. It can be used as is or more often by inheriting classes 
   /// wanting to render directly using DrawingVisuals, which is not supported by plain FrameworkElements.
   /// DrawingVisual.Offest must be zero. VisualsPanel uses the DrawingVisual's Offset property to position it inside of Border and Padding while
-  /// executing ArrangeOverride. Inheritors should do their layouting in MeasureVisualsOverride and ArrangeVisualsOverride.
+  /// executing ArrangeOverride. Inheritors should do their layouts in MeasureVisualsOverride and ArrangeVisualsOverride.
   /// 
   /// VisualsPanel is a FrameworkElement and does not inherit from Panel ! Panel in its name just indicates that it has similar functionality like 
   /// a Panel. A Panel supports UIElements as children, while VisualsPanel supports DrawingVisuals.
@@ -52,13 +69,13 @@ namespace XYGraphLib {
     /// </summary>
     public static readonly DependencyProperty BorderPenThicknessProperty= DependencyProperty.Register(
       "BorderPenThickness", typeof(double), typeof(VisualsPanel),
-      new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsMeasure, BorderPenThickness_Changed));
+      new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsMeasure, borderPenThickness_Changed));
 
 
-    private static void BorderPenThickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+    private static void borderPenThickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
       double thickness = (double)e.NewValue;
       if (double.IsNaN(thickness) || double.IsInfinity(thickness) || thickness < 0.0){
-        throw new Exception("Thickness " + thickness + " must be greate equal 0 and cannot be infinite.");
+        throw new Exception("Thickness " + thickness + " must be greater equal 0 and cannot be infinite.");
       }
     }
 
@@ -79,10 +96,10 @@ namespace XYGraphLib {
     /// PaddingProperty
     /// </summary>
     public static readonly DependencyProperty PaddingProperty= DependencyProperty.Register("Padding", typeof(Thickness), typeof(VisualsPanel),
-      new FrameworkPropertyMetadata(thickness0, FrameworkPropertyMetadataOptions.AffectsMeasure, Thickness_Changed));
+      new FrameworkPropertyMetadata(thickness0, FrameworkPropertyMetadataOptions.AffectsMeasure, thickness_Changed));
 
 
-    private static void Thickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+    private static void thickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
       Thickness thickness = (Thickness)e.NewValue;
       if (double.IsNaN(thickness.Left) || double.IsNaN(thickness.Right) || 
         double.IsNaN(thickness.Top) || double.IsNaN(thickness.Bottom) ||
@@ -90,7 +107,8 @@ namespace XYGraphLib {
         double.IsInfinity(thickness.Top) || double.IsInfinity(thickness.Bottom) ||
         thickness.Left < 0.0 || thickness.Right < 0.0 || thickness.Top < 0.0 || thickness.Bottom < 0.0)
       {
-        throw new Exception("Thickness " + thickness.Left + ", " + thickness.Top + ", " + thickness.Right + ", " + thickness.Bottom + " must be greate equal 0 and cannot be infinite.");
+        throw new Exception("Thickness " + thickness.Left + ", " + thickness.Top + ", " + thickness.Right + ", " + thickness.Bottom + 
+          " must be greater equal 0 and cannot be infinite.");
       }
     }
 
@@ -134,7 +152,7 @@ namespace XYGraphLib {
 
     /// <summary>
     ///     The horizontal alignment of the VisualsPanel.
-    ///     This will only affect intheriting controls who use the property
+    ///     This will only affect inheriting controls who use the property
     ///     as a parameter. On other controls, the property will do nothing.
     /// </summary>
     [Bindable(true), Category("Layout")]
@@ -155,7 +173,7 @@ namespace XYGraphLib {
 
     /// <summary>
     ///     The vertical alignment of the VisualsPanel.
-    ///     This will only affect intheriting controls who use the property
+    ///     This will only affect inheriting controls who use the property
     ///     as a parameter. On other controls, the property will do nothing.
     /// </summary>
     [Bindable(true), Category("Layout")]
@@ -166,7 +184,7 @@ namespace XYGraphLib {
 
 
     // Tab properties are not supported, because VisualsPanel is used for drawing quickly to the screen, but not
-    // for keyvoard input
+    // for keyboard input
     ///// <summary>
     /////     The DependencyProperty for the TabIndex property.
     ///// </summary>
@@ -208,7 +226,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Raised if ContentSize size.
     /// </summary>
-    public event Action<Size> ContentSizeChanged;
+    public event Action<Size>? ContentSizeChanged;
     #endregion
 
 
@@ -230,7 +248,7 @@ namespace XYGraphLib {
     /// </summary>
     public VisualsPanel() {
       visuals = new VisualCollection(this);
-      LayoutUpdated += VisualsPanel_LayoutUpdated;
+      LayoutUpdated += visualsPanel_LayoutUpdated;
     }
     #endregion
 
@@ -242,13 +260,13 @@ namespace XYGraphLib {
     /// TraceMeasureOverride is for the support of TraceWPFEvents.
     /// Input: MeasureOverride(), constraint; Output: actually desired size
     /// </summary>
-    protected Func<Func<Size, Size>, Size, Size> TraceMeasureOverride = null;
+    protected Func<Func<Size, Size>, Size, Size>? TraceMeasureOverride = null;
 
 
     /// <summary>
-    /// It is sealed because inheritors should not not override MeasureOverride but MeasureVisualsOverride instead.
+    /// It is sealed because inheritors should not override MeasureOverride but MeasureVisualsOverride instead.
     /// 
-    /// MeasureOverride subtracts the space needed for Border and Padding, then calls MeasureVisualsOverride with the remainaing size.
+    /// MeasureOverride subtracts the space needed for Border and Padding, then calls MeasureVisualsOverride with the remaining size.
     /// </summary>
     protected override sealed Size MeasureOverride(Size constraint) {
       if (TraceMeasureOverride!=null) {
@@ -261,13 +279,9 @@ namespace XYGraphLib {
 
 
     private Size doMeasureOverride(Size constraint) {
-      double borderWidth;
-      double contentAvailableWidth;
-      calculateBorderWidth(constraint, BorderPenThickness, Padding, out borderWidth, out contentAvailableWidth);
+      calculateBorderWidth(constraint, BorderPenThickness, Padding, out var borderWidth, out var contentAvailableWidth);
 
-      double borderHeight;
-      double contentAvailableHeight;
-      calculateBorderHeight(constraint, BorderPenThickness, Padding, out borderHeight, out contentAvailableHeight);
+      calculateBorderHeight(constraint, BorderPenThickness, Padding, out var borderHeight, out var contentAvailableHeight);
 
       //measure content within the size left, which might be 0.
       Size contentRequiredSize = MeasureVisualsOverride(new Size (contentAvailableWidth, contentAvailableHeight));
@@ -277,14 +291,14 @@ namespace XYGraphLib {
     }
 
 
-    private void calculateBorderWidth(Size constraint, double borderPenThickness, Thickness Padding, out double borderWidth, out double contentAvailableWidth) {
-      borderWidth = 2 * borderPenThickness + Padding.Left + Padding.Right;
+    private void calculateBorderWidth(Size constraint, double borderPenThickness, Thickness padding, out double borderWidth, out double contentAvailableWidth) {
+      borderWidth = 2 * borderPenThickness + padding.Left + padding.Right;
       contentAvailableWidth = Math.Max(constraint.Width - borderWidth, 0);
     }
 
 
-    private void calculateBorderHeight(Size constraint, double borderPenThickness, Thickness Padding, out double borderHeight, out double contentAvailableHeight) {
-      borderHeight = 2 * borderPenThickness  + Padding.Top + Padding.Bottom;
+    private void calculateBorderHeight(Size constraint, double borderPenThickness, Thickness padding, out double borderHeight, out double contentAvailableHeight) {
+      borderHeight = 2 * borderPenThickness  + padding.Top + padding.Bottom;
       contentAvailableHeight = Math.Max(constraint.Height - borderHeight, 0);
     }
 
@@ -305,16 +319,16 @@ namespace XYGraphLib {
     /// <summary>
     /// Called by VisualsPanel.MeasureOverride to find out the size needed by all Visuals. If
     /// the Visuals use all available size, return 0; if a dimension of availableSize is infinite, return
-    /// the real size or zero, but not inifite !
+    /// the real size or zero, but not infinite !
     /// </summary>
     protected virtual Size MeasureVisualsOverride(Size availableSize) {
       isWidthInfinity = false;
       isHeightInfinity = false;
 
       if (double.IsInfinity(availableSize.Width)){
-        //parent pretends that there is unlimitted space available.
+        //parent pretends that there is unlimited space available.
         //we would like to use all the space the parent can give. But there is no way to find out at this point how much this is. So
-        //we just clame a big amount and fix the size in Arrange
+        //we just claim a big amount and fix the size in Arrange
         availableSize.Width = System.Windows.SystemParameters.PrimaryScreenWidth;;
         isWidthInfinity = true;
       }
@@ -333,13 +347,12 @@ namespace XYGraphLib {
     static readonly Vector illegalVector = new Vector(double.MinValue, double.MinValue);
     Vector offsetVector = illegalVector;
 
-    static readonly  Size illegalSize = new Size(double.NaN, double.NaN);
-    static readonly  Thickness illegalThickness = new Thickness(double.MinValue);
+    static readonly Size illegalSize = new Size(double.NaN, double.NaN);
     Size actualArrangeBounds = illegalSize;
     Brush actualBackground = Brushes.Transparent;
     Brush actualBorderBrush = Brushes.Transparent; 
     double actualBorderPenThickness = double.MinValue;
-    DrawingVisual BackgroundDrawingVisual;
+    DrawingVisual? backgroundDrawingVisual;
     bool hasBackgroundVisual;
 
 
@@ -347,13 +360,13 @@ namespace XYGraphLib {
     /// TraceArrangeOverride is for the support of TraceWPFEvents.
     /// Input: ArrangeOverride(), arrangeBounds; Output: actually used size
     /// </summary>
-    protected Func<Func<Size, Size>, Size, Size> TraceArrangeOverride = null;
+    protected Func<Func<Size, Size>, Size, Size>? TraceArrangeOverride = null;
 
 
     /// <summary>
-    /// It is sealed because inheritors should not not override ArrangeOverride but ArrangeVisualsOverride instead.
+    /// It is sealed because inheritors should not  override ArrangeOverride but ArrangeVisualsOverride instead.
     /// 
-    /// ArrangeOverride subtracts the space needed for Border and Padding, then calls ArrangeVisualsOverride with the remainaing size.
+    /// ArrangeOverride subtracts the space needed for Border and Padding, then calls ArrangeVisualsOverride with the remaining size.
     /// </summary>
     protected override sealed Size ArrangeOverride(Size arrangeBounds) {
       if (TraceArrangeOverride!=null) {
@@ -378,9 +391,8 @@ namespace XYGraphLib {
         DependencyObject current = this;
         do {
           current = VisualTreeHelper.GetParent(current);
-          var parentUIElement = current as UIElement;
-          if (parentUIElement!=null) {
-            double adjustedWidth, adjustedHeigth; 
+          if (current is UIElement parentUIElement) {
+            double adjustedWidth, adjustedHeigth;
             adjustedWidth = isWidthInfinity ? parentUIElement.DesiredSize.Width : adjustedBounds.Width;
             adjustedHeigth = isHeightInfinity ? parentUIElement.DesiredSize.Height : adjustedBounds.Height;
             adjustedBounds = new Size(adjustedWidth, adjustedHeigth);
@@ -390,13 +402,9 @@ namespace XYGraphLib {
       }
 
 
-      double borderWidth;
-      double contentAvailableWidth;
-      calculateBorderWidth(adjustedBounds, BorderPenThickness, Padding, out borderWidth, out contentAvailableWidth);
+      calculateBorderWidth(adjustedBounds, BorderPenThickness, Padding, out var borderWidth, out var contentAvailableWidth);
 
-      double borderHeight;
-      double contentAvailableHeight;
-      calculateBorderHeight(adjustedBounds, BorderPenThickness, Padding, out borderHeight, out contentAvailableHeight);
+      calculateBorderHeight(adjustedBounds, BorderPenThickness, Padding, out var borderHeight, out var contentAvailableHeight);
 
       //arrange content within the size left, which might be 0.
       Size contentRequiredSize = ArrangeVisualsOverride(new Size (contentAvailableWidth, contentAvailableHeight));
@@ -411,17 +419,17 @@ namespace XYGraphLib {
         actualBorderBrush = BorderBrush;
         actualBorderPenThickness = BorderPenThickness;
         //remove old BackgroundDrawingVisual
-        if (visuals.Count>0 && ((DrawingVisual)visuals[0])==BackgroundDrawingVisual){
+        if (visuals.Count>0 && ((DrawingVisual)visuals[0])==backgroundDrawingVisual){
           visuals.RemoveAt(0);
         }
         if (Background==null && BorderPenThickness<=0 && Padding==thickness0) {
           //no BackgroundDrawingVisual needed
-          BackgroundDrawingVisual = null;
+          backgroundDrawingVisual = null;
           hasBackgroundVisual = false;
         } else {
           //create updated background
-          BackgroundDrawingVisual = new DrawingVisual();
-          using (DrawingContext drawingContext = BackgroundDrawingVisual.RenderOpen()) {
+          backgroundDrawingVisual = new DrawingVisual();
+          using (DrawingContext drawingContext = backgroundDrawingVisual.RenderOpen()) {
             if (BorderPenThickness>0) {
               if (TraceWpf.IsTracing) {
                 TraceWpf.Line(this, "DrawBackgroundBorder(Width: " + actualArrangeBounds.Width + ", Height: " + actualArrangeBounds.Height + ", Border: " + BorderPenThickness + ")");
@@ -436,7 +444,7 @@ namespace XYGraphLib {
               drawingContext.DrawRectangle(Background, null, new Rect(0, 0, actualArrangeBounds.Width, actualArrangeBounds.Height));
             }
           }
-          visuals.Insert(0, BackgroundDrawingVisual);
+          visuals.Insert(0, backgroundDrawingVisual);
           hasBackgroundVisual = true;
         }
       }
@@ -476,7 +484,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Called by VisualsPanel.ArrangeOverride to let the inheritor arrange its content. If
     /// the Visuals use all available size, return arrangeBounds; if a dimension of availableSize is infinite, return
-    /// the real size or 0, but not inifite !
+    /// the real size or 0, but not infinite !
     /// </summary>
     protected virtual Size ArrangeVisualsOverride(Size arrangeBounds) {
       if (double.IsInfinity(arrangeBounds.Width)){
@@ -489,10 +497,10 @@ namespace XYGraphLib {
     }
 
 
-    void VisualsPanel_LayoutUpdated(object sender, EventArgs e) {
+    void visualsPanel_LayoutUpdated(object? sender, EventArgs e) {
       if (hasContentSizeChanged) {
         hasContentSizeChanged = false;
-        if (ContentSizeChanged!=null) ContentSizeChanged(ContentSize);
+        ContentSizeChanged?.Invoke(ContentSize);
       }
     }
     #endregion
@@ -544,8 +552,8 @@ namespace XYGraphLib {
     /// </summary>
     public void Clear() {
       visuals.Clear();
-      if (BackgroundDrawingVisual!=null) {
-        visuals.Add(BackgroundDrawingVisual);
+      if (backgroundDrawingVisual!=null) {
+        visuals.Add(backgroundDrawingVisual);
       }
     }
 

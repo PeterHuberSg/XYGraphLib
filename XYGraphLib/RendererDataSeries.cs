@@ -1,11 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**************************************************************************************
+
+XYGraphLib.RendererDataSeries
+=============================
+
+Creates a Visual for a series of data to be displayed in the PlotArea.
+
+Written 2014-2020 by Jürgpeter Huber 
+Contact: PeterCode at Peterbox dot com
+
+To the extent possible under law, the author(s) have dedicated all copyright and 
+related and neighboring rights to this software to the public domain worldwide under
+the Creative Commons 0 license (details see COPYING.txt file, see also
+<http://creativecommons.org/publicdomain/zero/1.0/>). 
+
+This software is distributed without any warranty. 
+**************************************************************************************/
+using System;
 using System.Windows.Media;
-using System.Windows;
+
 
 namespace XYGraphLib {
+
 
   /// <summary>
   /// Creates a Visual for the PlotArea to display. Inherit from this class if dataserie(s) are linked to this Renderer.
@@ -30,13 +45,13 @@ namespace XYGraphLib {
     //      ----------
 
     /// <summary>
-    /// Lowest value stored in the datarecords per dimension
+    /// Lowest value stored in the data-records per dimension
     /// </summary>
     public readonly double[] MinValues;
 
 
     /// <summary>
-    /// Highest value stored in the datarecords per dimension
+    /// Highest value stored in the data-records per dimension
     /// </summary>
     public readonly double[] MaxValues;
 

@@ -41,10 +41,14 @@ namespace XYGraphLib {
     /// Dummy constructor allowing public constructor to call TraceCreateStart() before construtor gets executed 
     /// </summary>
     private Chart2Plots1X2YLegendsTraced(DummyTraceClass dummyArgument)
-      : base(new PlotAreaTraced("PlotArea0"), new PlotAreaTraced("PlotArea1"), new LegendScrollerXTraced(new LegendXDateTraced()), 
-      new LegendScrollerYTraced("YLegendScroller0"), new LegendScrollerYTraced("YLegendScroller1"), new GridTraced("ZoomGrid")) 
-    {
+      : base(new PlotAreaTraced("PlotArea0"), new PlotAreaTraced("PlotArea1"), new LegendScrollerXTraced(new LegendXDateTraced()),
+      new LegendScrollerYTraced("YLegendScroller0"), new LegendScrollerYTraced("YLegendScroller1")) {
     }
+    //private Chart2Plots1X2YLegendsTraced(DummyTraceClass dummyArgument)
+    //  : base(new PlotAreaTraced("PlotArea0"), new PlotAreaTraced("PlotArea1"), new LegendScrollerXTraced(new LegendXDateTraced()), 
+    //  new LegendScrollerYTraced("YLegendScroller0"), new LegendScrollerYTraced("YLegendScroller1"), new GridTraced("ZoomGrid")) 
+    //{
+    //}
     #endregion
 
 
