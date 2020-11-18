@@ -76,7 +76,7 @@ namespace XYGraphLib {
     const double minValueInit = double.NaN;
 
 
-    private double throwExceptionIfInfite(double value) {
+    private static double throwExceptionIfInfite(double value) {
       if (double.IsInfinity(value)) {
         throw new Exception("Infinity is not supported in a legend.");
       }
@@ -377,11 +377,7 @@ namespace XYGraphLib {
       }
       //do the same for required Height
       if (double.IsInfinity(requiredSize.Height)) {
-        if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(this)) {
-          requiredSize.Height = 200;
-        } else {
-          requiredSize.Height = 0;
-        }
+        requiredSize.Height =System.ComponentModel.DesignerProperties.GetIsInDesignMode(this) ? 200 : 0;
       }
 
       if (double.IsNaN(FontSize) ) {
@@ -551,7 +547,9 @@ namespace XYGraphLib {
         labelStrings = new string[labelsCount];
         labelPoints = new Point[labelsCount];
       }
+    #pragma warning disable CS8777 // Parameter must have a non-null value when exiting.
     }
+    #pragma warning restore CS8777 
 
 
     protected virtual void OnProvideDefaultValues(out double displayValue, out double displayValueRange) {

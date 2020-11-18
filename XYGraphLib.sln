@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfControlTestbenchLib", ".
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomControlSampleLib", "..\CustomControlBaseLib\CustomControlSampleLib\CustomControlSampleLib.csproj", "{271E4C67-3F46-46F3-88B8-BC7EFCB30771}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XYGraphLibBase", "XYGraphLibBase\XYGraphLibBase.csproj", "{61123535-C573-4113-958F-00E29FA7E039}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TracerLib", "..\TracerLib\TracerLib\TracerLib.csproj", "{6E399D53-1391-41F6-97E1-B289BACF12FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{271E4C67-3F46-46F3-88B8-BC7EFCB30771}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{271E4C67-3F46-46F3-88B8-BC7EFCB30771}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{271E4C67-3F46-46F3-88B8-BC7EFCB30771}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61123535-C573-4113-958F-00E29FA7E039}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61123535-C573-4113-958F-00E29FA7E039}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61123535-C573-4113-958F-00E29FA7E039}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61123535-C573-4113-958F-00E29FA7E039}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E399D53-1391-41F6-97E1-B289BACF12FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E399D53-1391-41F6-97E1-B289BACF12FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E399D53-1391-41F6-97E1-B289BACF12FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E399D53-1391-41F6-97E1-B289BACF12FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
