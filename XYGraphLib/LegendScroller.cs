@@ -373,11 +373,13 @@ namespace XYGraphLib {
       if (renderer is RendererDataSeries rendererDataSeries) {
         if (MinValue > rendererDataSeries.MinValues[Dimension]) {
           MinValue = rendererDataSeries.MinValues[Dimension];
-          TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MinValue: " + MinValue.ToDateTime());
+          //Todo: LegendScrollerY is usually not DateTime, can be minus and then throws exception here 
+          //TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MinValue: " + MinValue.ToDateTime());
         }
         if (MaxValue < rendererDataSeries.MaxValues[Dimension]) {
           MaxValue = rendererDataSeries.MaxValues[Dimension];
-          TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MaxValue: " + MaxValue.ToDateTime());
+          //Todo: LegendScrollerY is usually not DateTime, can be minus and then throws exception here 
+          //TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MaxValue: " + MaxValue.ToDateTime());
         }
       }
     }

@@ -31,6 +31,7 @@ namespace XYGraphLib {
       LegendScrollerYButton.Click += LegendScrollerYButton_Click;
       Chart1Plot1X1YLegendButton.Click += Chart1Plot1X1YLegendButton_Click;
       Chart2Plots1X2YLegendsButton.Click += Chart2Plots1X2YLegendsButton_Click;
+      Chart4Plots1X4YLegendsButton.Click += Chart4Plots1X4YLegendsButton_Click;
 
       CustomControlSampleButton.Click += CustomControlSampleButton_Click;
       SizeBindingButton.Click += SizeBindingButton_Click;
@@ -93,6 +94,11 @@ namespace XYGraphLib {
 
     void Chart2Plots1X2YLegendsButton_Click(object sender, RoutedEventArgs e) {
       Chart2Plots1X2YLegendsWindow.Show(this);
+    }
+
+
+    void Chart4Plots1X4YLegendsButton_Click(object sender, RoutedEventArgs e) {
+      Chart4Plots1X4YLegendsWindow.Show(this);
     }
 
 

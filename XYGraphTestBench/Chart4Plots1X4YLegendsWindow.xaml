@@ -1,0 +1,19 @@
+﻿<WpfControlTestbenchLib:TestbenchWindow x:Class="XYGraphLib.Chart4Plots1X4YLegendsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:WpfControlTestbenchLib="clr-namespace:WpfTestbench;assembly=WpfControlTestbenchLib"
+        xmlns:XYGraphTracedLib="clr-namespace:XYGraphLib;assembly=XYGraphTracedLib"
+                     
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        mc:Ignorable="d" 
+        d:DesignHeight="500" d:DesignWidth="1000"
+        Title="Graph with 2 Plotareas, 1X- and 2YLegends">
+  <WpfControlTestbenchLib:WpfControlTestbench Name="WpfControlTestbench">
+    <WpfControlTestbenchLib:WpfControlTestbench.TestFrameworkElement>
+      <XYGraphTracedLib:Chart4Plots1X4YLegendsTraced Name="TestChart4Plots1X4YLegendsTraced" />
+    </WpfControlTestbenchLib:WpfControlTestbench.TestFrameworkElement>
+  </WpfControlTestbenchLib:WpfControlTestbench>
+  
+  <!--Put textboxes, etc. for testing control specific properties here-->
+</WpfControlTestbenchLib:TestbenchWindow>
