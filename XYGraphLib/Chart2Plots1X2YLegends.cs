@@ -43,6 +43,7 @@ using System.Windows;
 using System.Windows.Media;
 using CustomControlBaseLib;
 
+
 namespace XYGraphLib {
   /// <summary>
   /// Displays 2 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).

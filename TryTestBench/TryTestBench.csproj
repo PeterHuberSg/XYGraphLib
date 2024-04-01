@@ -3,19 +3,14 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\XYGraphLib\XYGraphLib.csproj" />
     <ProjectReference Include="..\XYGraphTracedLib\XYGraphTracedLib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Chart4Plots1X4YLegendsWindow.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
   </ItemGroup>
 
 </Project>

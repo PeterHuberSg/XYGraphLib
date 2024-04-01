@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XYGraphLib", "XYGraphLib\XYGraphLib.csproj", "{899B3773-4786-45FA-A49E-9B0438ED0F13}"
 EndProject
@@ -20,6 +20,15 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XYGraphLibBase", "XYGraphLibBase\XYGraphLibBase.csproj", "{61123535-C573-4113-958F-00E29FA7E039}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TracerLib", "..\TracerLib\TracerLib\TracerLib.csproj", "{6E399D53-1391-41F6-97E1-B289BACF12FC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TryTestBench", "TryTestBench\TryTestBench.csproj", "{896AC8ED-9962-473A-9A85-E43BA9DDE206}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2AEE079A-AF53-4ABB-A3AD-6D2CA8B54DCC}"
+	ProjectSection(SolutionItems) = preProject
+		XYGraph.docx = XYGraph.docx
+		XYGraphDesign.pptx = XYGraphDesign.pptx
+		XYGraphDesign1.pptx = XYGraphDesign1.pptx
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +72,10 @@ Global
 		{6E399D53-1391-41F6-97E1-B289BACF12FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E399D53-1391-41F6-97E1-B289BACF12FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E399D53-1391-41F6-97E1-B289BACF12FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{896AC8ED-9962-473A-9A85-E43BA9DDE206}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{896AC8ED-9962-473A-9A85-E43BA9DDE206}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{896AC8ED-9962-473A-9A85-E43BA9DDE206}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{896AC8ED-9962-473A-9A85-E43BA9DDE206}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

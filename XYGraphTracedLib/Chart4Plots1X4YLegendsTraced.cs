@@ -38,9 +38,11 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Dummy constructor allowing public constructor to call TraceCreateStart() before construtor gets executed 
+    /// Dummy constructor allowing public constructor to call TraceCreateStart() before constructor gets executed 
     /// </summary>
-    private Chart4Plots1X4YLegendsTraced(DummyTraceClass dummyArgument)
+    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
+    //Chart4Plots1X4YLegendsTraced is private and the other constructors invoking it set Name already
+    private Chart4Plots1X4YLegendsTraced(DummyTraceClass? dummyArgument)
       : base(
           new PlotAreaTraced("PlotArea0"), 
           new PlotAreaTraced("PlotArea1"),
@@ -53,6 +55,7 @@ namespace XYGraphLib {
           new LegendScrollerYTraced("YLegendScroller3")
           ) 
     {}
+    #pragma warning restore CS8618 
     //private Chart4Plots1X4YLegendsTraced(DummyTraceClass dummyArgument)
     //  : base(new PlotAreaTraced("PlotArea0"), new PlotAreaTraced("PlotArea1"), new LegendScrollerXTraced(new LegendXDateTraced()), 
     //  new LegendScrollerYTraced("YLegendScroller0"), new LegendScrollerYTraced("YLegendScroller1"), new GridTraced("ZoomGrid")) 

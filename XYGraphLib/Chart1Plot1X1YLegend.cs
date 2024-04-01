@@ -45,6 +45,7 @@ using System.Windows;
 using System.Windows.Media;
 using CustomControlBaseLib;
 
+
 namespace XYGraphLib {
 
 

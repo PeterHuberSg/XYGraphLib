@@ -18,16 +18,15 @@ namespace XYGraphLib {
   /// <summary>
   /// Testbench Window for XControl
   /// </summary>
-  public partial class XControlWindow: TestbenchWindow {
+  public partial class XControlWindow: Window {
 
-    
+
     /// <summary>
     /// Creates and opens a new XControlWindow
     /// </summary>
     public static void Show(Window ownerWindow) {
-      ShowProtected( () => new XControlWindow(), ownerWindow);
+      new XControlWindow { Owner = ownerWindow }.Show();
     }
-
 
 
     public XControlWindow() {

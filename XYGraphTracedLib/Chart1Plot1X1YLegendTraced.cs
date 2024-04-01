@@ -27,7 +27,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Default Constructor
     /// </summary>
-    public Chart1Plot1X1YLegendTraced(): this("XYGraph2") {}
+    public Chart1Plot1X1YLegendTraced(): this("Graph1Plot1X1YLegend") {}
 
 
     /// <summary>
@@ -40,13 +40,17 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Dummy constructor allowing public constructor to call TraceCreateStart() before construtor gets executed 
+    /// Dummy constructor allowing public constructor to call TraceCreateStart() before constructor gets executed 
     /// </summary>
     //private Chart1Plot1X1YLegendTraced(DummyTraceClass dummyArgument): base(new PlotAreaTraced(), new LegendScrollerXTraced(), new LegendScrollerYTraced(), 
     //  new GridTraced("ZoomGrid")) {
     //}
-    private Chart1Plot1X1YLegendTraced(DummyTraceClass dummyArgument) : base(new PlotAreaTraced(), new LegendScrollerXTraced(), new LegendScrollerYTraced()) {
+    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
+    //Chart1Plot1X1YLegendTraced is private and the other constructors invoking it set Name already
+    private Chart1Plot1X1YLegendTraced(DummyTraceClass? _) : 
+      base(new PlotAreaTraced(), new LegendScrollerXTraced(new LegendXDateTraced()), new LegendScrollerYTraced()) {
     }
+    #pragma warning restore CS8618 
     #endregion
 
 

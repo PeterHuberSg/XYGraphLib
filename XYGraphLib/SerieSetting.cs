@@ -64,7 +64,7 @@ namespace XYGraphLib {
       SerieStyleEnum newSerieStyle,
       Brush newStrokeBrush,
       double newStrokeThickness,
-      Brush newFillBrush):
+      Brush? newFillBrush):
       this(newGetter, newSerieStyle, 0, newStrokeBrush, newStrokeThickness, newFillBrush) { }
 
 

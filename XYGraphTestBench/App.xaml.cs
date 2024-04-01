@@ -7,7 +7,10 @@ using System.Windows;
 using XYGraphLib;
 using WpfTestbench;
 
+
 namespace XYGraphTestBench {
+
+
   /// <summary>
   /// Interaction logic for App.xaml
   /// </summary>
@@ -48,13 +51,13 @@ namespace XYGraphTestBench {
 
 
     void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e) {
-      TracerLib.Tracer.Exception(e.Exception);
+      Tracer.Exception(e.Exception);
 
       e.Handled = true;
     }
 
   
-    void TraceWpf_LineAdded(FrameworkElement frameworkElement, string line) {
+    void TraceWpf_LineAdded(FrameworkElement? frameworkElement, string line) {
       TraceWPFEvents.TraceLine(frameworkElement, line);
     }
   }
