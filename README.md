@@ -1,0 +1,1 @@
+XYGraph shows a interactive (zoom in and out, scrolling, use mouse to investigate values) line graphic. It is extremely flexible, supporting any data structure and displaying the data intelligently. Professional quality.
