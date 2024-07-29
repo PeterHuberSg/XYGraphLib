@@ -27,7 +27,7 @@ namespace XYGraphLib {
   /// <summary>
   /// Displays the legend next to a PlotArea. The legend has labels displaying the value a pixel at this location corresponds to. DisplayValue and 
   /// DisplayValueRange control the value range displayed. MinValue and MaxValue indicate the largest values the legend might have to display after scrolling. This
-  /// information is needed to chose a number formating which is correct from Min- to MaxValue.</br>
+  /// information is needed to chose a number formatting which is correct from Min- to MaxValue.</br>
   /// Legend is the abstract base class for LegendX (horizontal) and LegendY (vertical).
   /// </summary>
   public abstract class Legend: CustomControlBase {
@@ -235,7 +235,7 @@ namespace XYGraphLib {
 
       //The original and the tracked value get assigned NaN. We use the strange behavior of doubles that
       //comparing 2 NaN-values is always false, even they have actually the same value. In the code, we 
-      //check first if the original value (DisplayVale. FidplayValueRange) is NaN. If it is, we use some 
+      //check first if the original value (DisplayValue, DisplayValueRange) is NaN. If it is, we use some 
       //default value. When we later check original against tracked, we will always detect a change as long
       //the tracked value is NaN. After detecting the change for the first time, the tracked value gets
       //the original value assigned.
