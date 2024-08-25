@@ -16,6 +16,7 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 This software is distributed without any warranty. 
 **************************************************************************************/
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media;
 
 
@@ -32,10 +33,17 @@ namespace XYGraphLib {
 
 
   /// <summary>
+  /// Takes any dataRecord and returns the x and y values in dataExtracted. When GetterDoubleDouble(0 gets called
+  /// for the first time, dataExtracted can be null, but must return a properly sized array. 
+  /// </summary>
+  public delegate void GetterDoubleDouble<TRecord>(TRecord dataRecord, [NotNull] ref double[]? dataExtracted);
+
+
+  /// <summary>
   /// Stores the parameters of a LineGraph data serie
   /// </summary>
   public class SerieSetting<TRecord> {
-    public Func<TRecord, double[]> Getter { get; set; }
+    public GetterDoubleDouble<TRecord> Getter { get; set; }
     public SerieStyleEnum SerieStyle { get; set; }
     public int Group { get; set; }
     public Brush StrokeBrush { get; set; }
@@ -48,7 +56,7 @@ namespace XYGraphLib {
     /// constructor without FillBrush, which will be null
     /// </summary>
     public SerieSetting(
-      Func<TRecord, double[]> newGetter,
+      GetterDoubleDouble<TRecord> newGetter,
       SerieStyleEnum newSerieStyle,
       int newGroup,
       Brush newStrokeBrush,
@@ -60,7 +68,7 @@ namespace XYGraphLib {
     /// constructor without Group, which will be 0
     /// </summary>
     public SerieSetting(
-      Func<TRecord, double[]> newGetter,
+      GetterDoubleDouble<TRecord> newGetter,
       SerieStyleEnum newSerieStyle,
       Brush newStrokeBrush,
       double newStrokeThickness,
@@ -72,7 +80,7 @@ namespace XYGraphLib {
     /// constructor without Group (=0) nor FillBrush (=null)
     /// </summary>
     public SerieSetting(
-      Func<TRecord, double[]> newGetter,
+      GetterDoubleDouble<TRecord> newGetter,
       SerieStyleEnum newSerieStyle,
       Brush newStrokeBrush,
       double newStrokeThickness) :
@@ -82,8 +90,8 @@ namespace XYGraphLib {
     /// <summary>
     /// constructor with all parameters
     /// </summary>
-    public SerieSetting( 
-      Func<TRecord, double[]> newGetter,
+    public SerieSetting(
+      GetterDoubleDouble<TRecord> newGetter,
       SerieStyleEnum newSerieStyle,
       int newGroup,
       Brush newStrokeBrush,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfTestbench;
 using XYGraphLib;
+using static XYGraphLib.Chart4Plots1X4YLegendsWindow;
 
 
 namespace XYGraphTestBench {
@@ -54,6 +56,8 @@ namespace XYGraphTestBench {
       TraceWPFEvents.TraceLineEnd("NumberScrollBar ValueChanged");
     }
 
+    [NotNull]
+    (double x, double y)[] stringsLengths;
 
 
     /// <summary>
@@ -64,12 +68,20 @@ namespace XYGraphTestBench {
         maxStringLength: (int)MaxStringLenghtNumberScrollBar.Value);
       legendXString.LegendStrings = strings;
 
-      double[][] stringsLengths = new double[strings.Length][];
+      stringsLengths = new (double x, double y)[strings.Length];
       for (int i = 0; i < strings.Length; i++) {
-        stringsLengths[i] = [i, strings[i].Length];
+        stringsLengths[i] = (i, strings[i].Length);
       }
       TestChart1Plot1XString1YLegend.FillData(stringsLengths, 
-        [new SerieSetting<double[]>(i => i, SerieStyleEnum.line, Brushes.Blue, 2, null)]);
+        [new SerieSetting<(double x, double y)>(getSeries0Data, SerieStyleEnum.line, Brushes.Blue, 2, null)]);
     }
+
+
+    private static void getSeries0Data((double x, double y) dataRecord, [NotNull] ref double[]? dataExtracted) {
+      dataExtracted ??= new double[2];
+      dataExtracted[0] = dataRecord.x;
+      dataExtracted[1] = dataRecord.y;
+    }
+
   }
 }

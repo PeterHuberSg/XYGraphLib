@@ -31,6 +31,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfTestbench;
 using System.Windows.Controls.Primitives;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace XYGraphLib {
@@ -268,21 +269,33 @@ namespace XYGraphLib {
       int seriesSettingsIndex = 0;
       for (int seriesUIIndex = 0; seriesUIIndex < seriesCountUI; seriesUIIndex++) {
         if (serieCheckBoxes[seriesUIIndex].IsChecked!.Value) {
-          int lambdaIndex = seriesSettingsIndex; //we need to create a new instance within the loop, otherwise the lambda expression will use the latest value of seriesSettingsIndex (i.e. max(seriesSettingsIndex)), see C# reference "Outer Variables"
-          if (seriesUIIndex==areaLineIndex) {
-            var areaBrush = seriesBrushes[seriesUIIndex]!;
-            seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.Values[lambdaIndex]],
-              SerieStyleEnum.area1, areaBrush, 1, null);
-            seriesSettingsIndex++;
-            int lambdaIndex2 = lambdaIndex+1;
-            seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.Values[lambdaIndex2]],
-              SerieStyleEnum.area2, areaBrush, 1, null);
-            seriesSettingsIndex++;
-          } else {
-            seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.Values[lambdaIndex]],
-              SerieStyleEnum.line, seriesBrushes[seriesUIIndex]!, 2, null);
-            seriesSettingsIndex++;
-          }
+
+          seriesSettings[seriesSettingsIndex++] =seriesUIIndex switch {
+            0 => new SerieSetting<DataRecord>(getSeries0Data, SerieStyleEnum.line,
+                          seriesBrushes[seriesUIIndex]!, 2, null),
+            1 => new SerieSetting<DataRecord>(getSeries1Data, SerieStyleEnum.line,
+                          seriesBrushes[seriesUIIndex]!, 2, null),
+            2 => new SerieSetting<DataRecord>(getSeries2Data, SerieStyleEnum.area1,
+                          seriesBrushes[seriesUIIndex]!, 1, null),
+            3 => new SerieSetting<DataRecord>(getSeries3Data, SerieStyleEnum.area1,
+                          seriesBrushes[seriesUIIndex]!, 1, null),
+            _ => throw new NotSupportedException($"seriesUIIndex: {seriesUIIndex}"),
+          };
+          //int lambdaIndex = seriesSettingsIndex; //we need to create a new instance within the loop, otherwise the lambda expression will use the latest value of seriesSettingsIndex (i.e. max(seriesSettingsIndex)), see C# reference "Outer Variables"
+          //if (seriesUIIndex==areaLineIndex) {
+          //  //an area graphic has 2 lines and needs two seriesSettings
+          //  var areaBrush = seriesBrushes[seriesUIIndex]!;
+          //  seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(getSeries1Data, SerieStyleEnum.area1, areaBrush, 1, null);
+          //  seriesSettingsIndex++;
+          //  int lambdaIndex2 = lambdaIndex+1;
+          //  seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.Values[lambdaIndex2]],
+          //    SerieStyleEnum.area2, areaBrush, 1, null);
+          //  seriesSettingsIndex++;
+          //} else {
+          //  seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.Values[lambdaIndex]],
+          //    SerieStyleEnum.line, seriesBrushes[seriesUIIndex]!, 2, null);
+          //  seriesSettingsIndex++;
+          //}
         }
       }
 
@@ -300,5 +313,34 @@ namespace XYGraphLib {
 
       chart1Plot1X1YLegendTraced.FillData<DataRecord>(dataRecords, seriesSettings);
     }
+
+
+    private static void getSeries0Data(DataRecord dataRecord, [NotNull] ref double[]? dataExtracted) {
+      dataExtracted ??= new double[2];
+      dataExtracted[0] = dataRecord.Date.ToDouble();
+      dataExtracted[1] = dataRecord.Values[0];
+    }
+
+
+    private static void getSeries1Data(DataRecord dataRecord, [NotNull] ref double[]? dataExtracted) {
+      dataExtracted ??= new double[2];
+      dataExtracted[0] = dataRecord.Date.ToDouble();
+      dataExtracted[1] = dataRecord.Values[1];
+    }
+
+
+    private static void getSeries2Data(DataRecord dataRecord, [NotNull] ref double[]? dataExtracted) {
+      dataExtracted ??= new double[2];
+      dataExtracted[0] = dataRecord.Date.ToDouble();
+      dataExtracted[1] = dataRecord.Values[2];
+    }
+
+
+    private static void getSeries3Data(DataRecord dataRecord, [NotNull] ref double[]? dataExtracted) {
+      dataExtracted ??= new double[2];
+      dataExtracted[0] = dataRecord.Date.ToDouble();
+      dataExtracted[1] = dataRecord.Values[3];
+    }
   }
 }
+

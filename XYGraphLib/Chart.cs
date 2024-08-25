@@ -207,8 +207,9 @@ namespace XYGraphLib {
       serieStyle = new SerieStyleEnum[newSerieSettings.Length];
       //Groups = new int[newSerieSettings.Length];
       int recordsCount = newRecords.Count();
-      double[] firstDataPoint = newSerieSettings[0].Getter(newRecords.First());
-      int dimensionCount = firstDataPoint.Length;
+      double[]? dataExtracted = null;
+      newSerieSettings[0].Getter(newRecords.First(), ref dataExtracted);
+      int dimensionCount = dataExtracted.Length;
       for (int dataSeriesIndex = 0; dataSeriesIndex < DataSeries.Length; dataSeriesIndex++) {
         DataSeries[dataSeriesIndex] = new double[recordsCount, dimensionCount];
         serieStyle[dataSeriesIndex] = newSerieSettings[dataSeriesIndex].SerieStyle;
@@ -219,13 +220,9 @@ namespace XYGraphLib {
       foreach (TRecord record in newRecords) {
         for (int dataSerieIndex = 0; dataSerieIndex<newSerieSettings.Length; dataSerieIndex++) {
           SerieSetting<TRecord> serieSetting = newSerieSettings[dataSerieIndex];
-          double[] dataPoint = serieSetting.Getter(record);
-          //double[] dataPoint;
-          //try{
-          //          dataPoint = serieSetting.Getter(record);
-          //} catch (Exception ex) { System.Diagnostics.Debugger.Break(); }
-          for (int dimensionIndex = 0; dimensionIndex < dataPoint.Length; dimensionIndex++) {
-            DataSeries[dataSerieIndex][recordIndex, dimensionIndex] = dataPoint[dimensionIndex];
+          serieSetting.Getter(record, ref dataExtracted);
+          for (int dimensionIndex = 0; dimensionIndex < dataExtracted.Length; dimensionIndex++) {
+            DataSeries[dataSerieIndex][recordIndex, dimensionIndex] = dataExtracted[dimensionIndex];
           }
         }
         recordIndex++;
