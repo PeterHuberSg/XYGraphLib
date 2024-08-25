@@ -15,15 +15,16 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
+
 // Chart2Plots1X2YLegends displays 2 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).
 // 
-// +-------------------------+-------------------+
-// | PlotArea0               | LegendScrollerY0  |
-// + ----------------------- + ----------------- +
-// | PlotArea1               | LegendScrollerY1  |
-// +-------------------------+-------------------+
-// |XLegendScroller          |Total Zoom Buttons |
-// +-------------------------+-------------------+
+// ┌────────────────┬───────────────────┐
+// │ PlotArea0      │ LegendScrollerY0  │
+// ├────────────────┼───────────────────┤
+// │ PlotArea1      │ LegendScrollerY1  │
+// ├────────────────┼───────────────────┤
+// │LegendScrollerX │Total Zoom Buttons │
+// └────────────────┴───────────────────┘
 //
 //
 // Usage:

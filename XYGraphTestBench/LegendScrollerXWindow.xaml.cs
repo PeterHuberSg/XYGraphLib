@@ -11,9 +11,9 @@ namespace XYGraphLib {
   public partial class LegendScrollerXWindow: Window {
 
 
-    ///// <summary>
-    ///// Creates and opens a new LegendScrollerXWindow
-    ///// </summary>
+    /// <summary>
+    /// Creates and opens a new LegendScrollerXWindow
+    /// </summary>
     public static void Show(Window ownerWindow) {
       new LegendScrollerXWindow { Owner = ownerWindow }.Show();
     }

@@ -21,37 +21,40 @@ using System.Windows;
 using System.Windows.Media;
 using CustomControlBaseLib;
 
+//
+// LegendX:
+// --------
+//            ┌────────────────────────────────────┐
+// -100       │ 100             150            200 │     500
+//    ↑       └────────────────────────────────────┘      ↑
+// MinValue     ↑DisplayValue                   ↑        MaxValue
+//              DisplayValue + DisplayValueRange│
+//
+//
+// LegendY:
+// --------
+//    500 ← MaxValue
+//       
+// ┌─────┐
+// │  100│ ← DisplayValue + DisplayValueRange
+// │     │
+// │   50│
+// │     │
+// │    0│ ← DisplayValue
+// └─────┘
+//       
+//   -100 ← MinValue * 
+
 
 namespace XYGraphLib {
 
   /// <summary>
-  /// Displays the legend next to a PlotArea. The legend has labels displaying the value a pixel at this location corresponds to. DisplayValue and 
-  /// DisplayValueRange control the value range displayed. MinValue and MaxValue indicate the largest values the legend might have to display after scrolling. This
-  /// information is needed to chose a number formatting which is correct from Min- to MaxValue.</br>
+  /// Displays a legend next to a PlotArea. The legend has labels displaying the value the pixel location corresponds to. 
+  /// DisplayValue and DisplayValueRange control the value range displayed. MinValue and MaxValue indicate the smallest and 
+  /// largest values the legend might have to display after scrolling. </br>
   /// Legend is the abstract base class for LegendX (horizontal) and LegendY (vertical).
   /// </summary>
   public abstract class Legend: CustomControlBase {
-    //
-    //LegendX:
-    //            +------------------------------------+
-    // -100       | 100             150            200 |     500
-    //            +------------------------------------+
-    // :MinValue   :DisplayValue                    :        MaxValue
-    //              DisplayValue + DisplayValueRange:
-    // 
-    //
-    //LegendY:
-    //    100'...MinValue
-    //       '
-    // +-----'+
-    // |  200'| DisplayValue
-    // |     '|
-    // |  150'|
-    // |     '|
-    // |  100'| DisplayValue + DisplayValueRange
-    // +-----'+
-    //       '
-    //   -100'..MaxValue
 
     #region Properties
     //      ----------
@@ -185,6 +188,12 @@ namespace XYGraphLib {
 
 
     /// <summary>
+    /// In which direction the label gets written. Angle is in degrees and clock wise
+    /// </summary>
+    public readonly double LegendAngle = 0;
+
+
+    /// <summary>
     /// coordinates of all value labels, used to draw grid lines
     /// Default Value: null
     /// </summary>
@@ -286,31 +295,20 @@ namespace XYGraphLib {
     /// Default Constructor. newNeedsMeasureWhenValuesChange should be true when changing Min, 
     /// Max or DisplayRange should invoke Measure(), which is needed for vertical legends.
     /// </summary>
-    public Legend(int Dimension, bool newNeedsMeasureWhenValuesChange = false, bool isWriteRightAligned = false) {
+    public Legend(
+      int Dimension, 
+      bool newNeedsMeasureWhenValuesChange = false, 
+      bool isWriteRightAligned = false, 
+      double legendAngle = 0) 
+    {
       this.Dimension = Dimension;
       NeedsMeasureWhenValuesChange = newNeedsMeasureWhenValuesChange;
       IsWriteRightAligned = isWriteRightAligned;
+      LegendAngle = legendAngle;
 
       ClipToBounds = true;
 
       Reset();
-    }
-    #endregion
-
-
-    #region Arrange Overrides
-    //      -----------------
-
-    sealed protected override Size ArrangeContentOverride(Rect arrangeRect) {
-      return OnLegendArrange(arrangeRect);
-    }
-
-
-    /// <summary>
-    /// During the arrangement of the legend, inheritor should return arranged size
-    /// </summary>
-    protected virtual Size OnLegendArrange(Rect arrangeRect) {
-      return arrangeRect.Size;
     }
     #endregion
 
@@ -424,6 +422,23 @@ namespace XYGraphLib {
     #endregion
 
 
+    #region Arrange Overrides
+    //      -----------------
+
+    sealed protected override Size ArrangeContentOverride(Rect arrangeRect) {
+      return OnLegendArrange(arrangeRect);
+    }
+
+
+    /// <summary>
+    /// During the arrangement of the legend, inheritor should return arranged size
+    /// </summary>
+    protected virtual Size OnLegendArrange(Rect arrangeRect) {
+      return arrangeRect.Size;
+    }
+    #endregion
+
+
     #region Render Overrides
     //      ----------------
 
@@ -464,11 +479,13 @@ namespace XYGraphLib {
 
           Point labelPoint = labelPoints![labelIndex];
           Point labelPointWithOffset = new Point(offset.X + labelPoint.X, offset.Y +labelPoint.Y);
-          if (IsWriteRightAligned) {
-            LegendGlyphDrawer.WriteRightAligned(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
-          } else {
-            LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
-          }
+          //if (IsWriteRightAligned) {
+          //  LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground, isRightAligned: true);
+          //} else {
+          //  LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
+          //}
+          LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground, 
+            isRightAligned: IsWriteRightAligned, angle: LegendAngle);
         }
 
         if (haveDisplayValuesChanged && DisplayValueChanged!=null) {

@@ -17,12 +17,12 @@ This software is distributed without any warranty.
 **************************************************************************************/
 // Chart1Plot1X1YLegend displays some line graphics in the PlotArea with legends and scroll bars for each X and Y axis:
 // 
-// +-------------------------+---------+--------------+
-// |PlotArea                 |LegendScrollerY         |
-// |XYGridLines              |                        |
-// +-------------------------+---------+--------------+
-// |XLegendScroller          |Total Zoom Buttons      |
-// +-------------------------+------------------------+
+// ┌─────────────────────────┬────────────────────────┐
+// │PlotArea                 │LegendScrollerY         │
+// │XYGridLines              │                        │
+// ├─────────────────────────┼────────────────────────┤
+// │XLegendScroller          │Total Zoom Buttons      │
+// └─────────────────────────┴────────────────────────┘
 //
 // 
 // Usage:
@@ -48,8 +48,10 @@ using CustomControlBaseLib;
 
 namespace XYGraphLib {
 
-
-  public class Chart1Plot1X1YLegend: Chart {
+  /// <summary>
+  /// Chart with 1 PlotArea, 1 XLegendScroller and 1 LegendScrollerY
+  /// </summary>
+  public class Chart1Plot1X1YLegend: Chart{
 
 
     #region Properties

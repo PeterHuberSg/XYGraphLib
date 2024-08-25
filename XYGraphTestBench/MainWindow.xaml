@@ -15,11 +15,13 @@
     <Button Name="LegendXButton" Content="LegendX" HorizontalContentAlignment="Left"/>
     <Button Name="LegendXDateButton" Content="LegendXDate" HorizontalContentAlignment="Left"/>
     <Button Name="LegendScrollerXButton" Content="LegendXScroller"/>
+    <Button Name="LegendScrollerXStringButton" Content="LegendXStringScroller"/>
     <Button Name="LegendYButton" Content="LegendY"/>
     <Button Name="LegendScrollerYButton" Content="LegendScrollerY"/>
     <Button Name="Chart1Plot1X1YLegendButton" Content="Chart1Plot1X1YLegend"/>
     <Button Name="Chart2Plots1X2YLegendsButton" Content="Chart2Plots1X2YLegends"/>
     <Button Name="Chart4Plots1X4YLegendsButton" Content="Chart4Plots1X4YLegends"/>
+    <Button Name="Chart1Plot1XString1YButton" Content="Chart1Plot1XString1Y"/>
     <Button Visibility="Hidden" Content="Hidden"/>
     <Button Name="CustomControlSampleButton" Content="Custom Control Sample"/>
     <Button Name="SizeBindingButton" Content="SizeBinding"/>

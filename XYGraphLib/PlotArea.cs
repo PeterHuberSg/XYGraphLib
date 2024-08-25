@@ -138,7 +138,7 @@ namespace XYGraphLib {
       TraceWpf.Line("PlotArea.AddRenderer()");
       renderers.Add(renderer);
       renderer.RenderingRequested += renderer_RenderingRequested;
-      //When a new renderer gets added, first the legends has to be calculated again, which might change the width of the legend and
+      //When a new renderer gets added, first the legends have to be calculated again, which might change the width of the legend and
       //in consequence also the width of the Plot-area
       isRenderingNeeded = true;
       InvalidateVisual();
@@ -181,8 +181,8 @@ namespace XYGraphLib {
     protected override Size MeasureOverride(Size availableSize) {
       //use all available size, unless size is infinite, then use 0
       Size desiredSize = availableSize;
-      if (double.IsInfinity(desiredSize.Width)) desiredSize.Width=0;
-      if (double.IsInfinity(desiredSize.Height)) desiredSize.Height=0;
+      if (double.IsInfinity(desiredSize.Width)) desiredSize.Width = 0;
+      if (double.IsInfinity(desiredSize.Height)) desiredSize.Height = 0;
       return desiredSize;
     }
 

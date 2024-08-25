@@ -113,7 +113,7 @@ namespace XYGraphLib {
                          //TimeSpanUnit              FirstLabelMask        FirstLabelToString    FollowLabelMask     Ticks
                          //                                                                                FollowLabelToString
       new TimeSpanUnitMask(TimeSpanUnitEnum.none,    null,                 null,                 null,     null,     long.MaxValue),
-      new TimeSpanUnitMask(TimeSpanUnitEnum.second,  "31.WWW 99 23:00:59", "dd.MMM yy HH:mm:tis", "00",     "ss",     SecondTicks), 
+      new TimeSpanUnitMask(TimeSpanUnitEnum.second,  "31.WWW 99 23:00:59", "dd.MMM yy HH:mm:ss", "00",     "ss",     SecondTicks), 
       new TimeSpanUnitMask(TimeSpanUnitEnum.second10,"31.WWW 99 23:00:50", "dd.MMM yy HH:mm:ss", "00",     "ss",     10*SecondTicks), 
       new TimeSpanUnitMask(TimeSpanUnitEnum.minute,  "31.WWW 99 23:00",    "dd.MMM yy HH:mm",    "23:01",  "HH:mm",  MinuteTicks),
       new TimeSpanUnitMask(TimeSpanUnitEnum.minute10,"31.WWW 99 23:00",    "dd.MMM yy HH:mm",    "23:10",  "HH:mm",  10*MinuteTicks),

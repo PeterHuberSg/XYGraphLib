@@ -19,13 +19,26 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 
+// Displays a horizontal legend for a PlotArea. The values are often DateTimes (LegendXDate), but can also be doubles
+// (LegendX) or strings (LegendXString).
+// MinValue and MaxValue indicate the largest values the legend can display.
+// 
+//            ┌────────────────────────────────────┐
+// -100       │ 100             150            200 │     500
+//    ↑       └────────────────────────────────────┘      ↑
+// MinValue     ↑DisplayValue                   ↑        MaxValue
+//              DisplayValue + DisplayValueRange│
+//
+
+
 
 namespace XYGraphLib {
 
   /// <summary>
-  /// /// Displays the legend below the PlotArea (time axis).
+  /// Displays the legend below the PlotArea (often time axis).
   /// </summary>
   public class LegendX: Legend {
+
 
     #region Constructor
     //      -----------

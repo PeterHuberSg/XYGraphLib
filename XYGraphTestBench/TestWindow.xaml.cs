@@ -12,7 +12,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 
+
 namespace XYGraphLib {
+
+
   /// <summary>
   /// Interaction logic for TestWindow.xaml
   /// </summary>
@@ -52,10 +55,11 @@ namespace XYGraphLib {
       //testControl = new Chart1Plot1X1YLegend();
       //testControl = new Chart2Plots1X2YLegendsTraced();
       //testControl = new LegendXDate();
-      //MainGrid.Children.Add(testControl);
+      testControl = new LegendXString();
+      MainGrid.Children.Add(testControl);
 
       //testSomething();
-      testChart();
+      //testChart();
     }
 
 

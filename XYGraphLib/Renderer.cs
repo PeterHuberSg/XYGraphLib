@@ -180,7 +180,7 @@ namespace XYGraphLib {
     protected Pen StrokePen;
 
 
-    public Renderer(System.Windows.Media.Brush? strokeBrush, double strokeThickness, int[] dimensionMap) {
+    public Renderer(Brush? strokeBrush, double strokeThickness, int[] dimensionMap) {
       RendererId = nextRendererId++;
       StrokePen = new Pen(strokeBrush, strokeThickness);
       DimensionMap = dimensionMap;

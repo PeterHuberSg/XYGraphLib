@@ -15,19 +15,20 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
+
 // Chart4Plots1X4YLegends displays 4 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).
 // 
-// +-------------------------+-------------------+
-// | PlotArea0               | LegendScrollerY0  |
-// + ----------------------- + ----------------- +
-// | PlotArea1               | LegendScrollerY1  |
-// + ----------------------- + ----------------- +
-// | PlotArea2               | LegendScrollerY2  |
-// + ----------------------- + ----------------- +
-// | PlotArea3               | LegendScrollerY3  |
-// +-------------------------+-------------------+
-// |XLegendScroller          |Total Zoom Buttons |
-// +-------------------------+-------------------+
+// ┌────────────────┬───────────────────┐
+// │ PlotArea0      │ LegendScrollerY0  │
+// ├────────────────┼───────────────────┤
+// │ PlotArea1      │ LegendScrollerY1  │
+// ├────────────────┼───────────────────┤
+// │ PlotArea2      │ LegendScrollerY2  │
+// ├────────────────┼───────────────────┤
+// │ PlotArea3      │ LegendScrollerY3  │
+// ├────────────────┼───────────────────┤
+// │XLegendScroller │Total Zoom Buttons │
+// └────────────────┴───────────────────┘
 //
 //
 // Usage:

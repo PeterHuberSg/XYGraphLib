@@ -15,6 +15,38 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
+
+// LegendScrollerY
+// ---------------
+//                                      Legend
+//                                       ↓
+//                                     ┌──┬───┐
+//  DisplayValue + DisplayValueRange → │10│ + │ ← Zoom In Button
+//                                     │  ├───┤
+//                                     │  │Scr│
+//                                     │ 5│oll│
+//                                     │  │Bar│
+//                                     │  ├───┤
+//                      DisplayValue → │ 0│ - │ ← Zoom Out Button 
+//                                     └──┴───┘
+// 
+// LegendScrollerX
+// ---------------
+//               ┌─────────────────────┐
+//               │1.1.2000   1.2.2000  │ ← Legend
+//               ├─┬─────────────────┬─┤
+//    Zoom Out → │-│    Scrollbar    │+│ ← Zoom In Button
+//               └─┴─────────────────┴─┘
+//               ╎                     ╎
+//  1.1.2000     1.2.2000   1.3.2000   1.4.2000   1.5.2000   1.6.2000
+//  MinDate      DisplayDate           MaxDisplayDate        MaxDate
+//  MinIndex     DisplayIndex                                MaxIndex
+//               ←---------------------→
+//                 ↑ DisplayRangeIndex
+// 
+// LegendScroller informs Renderers by raising the DisplayIndexRangeChanged event which data needs to be displayed
+
+
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,22 +62,6 @@ namespace XYGraphLib {
   /// the zoom buttons how many samples should be displayed (DisplayRangeIndex). LegendScroller calculates DisplayDate and DisplayDateRange 
   /// based on MinDate and MaxDate and sets the Legend accordingly.
   /// </summary>
-  /// <remarks>
-  ///              +---------------------+
-  ///              |1.1.2000   1.2.2000  |  Legend
-  ///              +-+-----------------+-+
-  ///              |-|      ####       |+|
-  ///              +-+-----------------+-+
-  ///       Zoom Out^     Scrollbar     ^Zoom In Button
-  ///              :                     :
-  /// 1.1.2000     1.2.2000   1.3.2000   1.4.2000   1.5.2000   1.6.2000
-  /// MinDate      DisplayDate           MaxDisplayDate        MaxDate
-  /// 0            DisplayIndex                                MaxIndex
-  ///              <--------------------->
-  ///                 DisplayRangeIndex
-  /// 
-  /// LegendScroller informs Renderers by raising the DisplayIndexRangeChanged event which data needs to be displayed
-  /// </remarks>
   public abstract class LegendScroller: CustomControlBase, IZoom {
 
     #region Properties
@@ -293,7 +309,7 @@ namespace XYGraphLib {
 
     
     /// <summary>
-    /// Removes all Renderers from LegendScroller and reinitialises data
+    /// Removes all Renderers from LegendScroller and reinitialises data. This is useful when new data gets assigned to chart.
     /// </summary>
     public void Reset() {
       areNewMinMax = true;

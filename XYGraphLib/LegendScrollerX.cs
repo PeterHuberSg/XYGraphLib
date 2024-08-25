@@ -18,12 +18,34 @@ This software is distributed without any warranty.
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using CustomControlBaseLib;
+
+//              ┌─────────────────────┐
+//              │1.1.2000   1.2.2000  │ ← Legend
+//              ├─┬─────────────────┬─┤
+//              │-│    Scrollbar    │+│ ← Zoom In Button
+//  Zoom Out →  └─┴─────────────────┴─┘
+//              ↑                     ↑
+// 1.1.2000     1.2.2000   1.3.2000   1.4.2000   1.5.2000   1.6.2000
+// MinDate      DisplayDate           MaxDisplayDate        MaxDate
+// MinIndex     DisplayIndex                                MaxIndex
+//              ←---------------------→
+//                ↑ DisplayRangeIndex
+// 
+// LegendScroller informs Renderers by raising the DisplayIndexRangeChanged event which data needs to be displayed
 
 
 namespace XYGraphLib {
 
 
+  /// <summary>
+  /// Displays an x axis legend (often DateTime), Scrollbar and 2 ZoomButton. It can be used to select which data-samples 
+  /// should be displayed in a Renderer based on their x values and to display that value range in the legend. The user 
+  /// choses with the scrollbar which is the first sample to display (DisplayIndex) and with the zoom buttons how many 
+  /// samples should be displayed (DisplayRangeIndex). 
+  /// </summary>
   public class LegendScrollerX: LegendScroller {
 
     #region Properties
@@ -41,7 +63,6 @@ namespace XYGraphLib {
     #endregion
 
 
-
     #region Constructor
     //      -----------
 
@@ -57,6 +78,44 @@ namespace XYGraphLib {
     public LegendScrollerX(LegendX legend): base(legend) {
     }
 
+
+    /// <summary>
+    /// Constructor using a string based x-axis legend
+    /// </summary>
+    public LegendScrollerX(LegendXString legend) : base(legend) {
+      MinValue = 0;
+      MaxValue = legend.LegendStrings.Count;
+
+      /////////////////////////////
+      topLine = new Line {
+        HorizontalAlignment = HorizontalAlignment.Left,
+        VerticalAlignment = VerticalAlignment.Top,
+        Stretch = Stretch.None,
+        Stroke = Brushes.Yellow,
+        StrokeThickness = 3
+      };
+      AddChild(topLine);
+      middleLine = new Line {
+        HorizontalAlignment = HorizontalAlignment.Left,
+        VerticalAlignment = VerticalAlignment.Top,
+        Stretch = Stretch.None,
+        Stroke = Brushes.Orange,
+        StrokeThickness = 3
+      };
+      AddChild(middleLine);
+      bottomLine = new Line {
+        HorizontalAlignment = HorizontalAlignment.Left,
+        VerticalAlignment = VerticalAlignment.Top,
+        Stretch = Stretch.None,
+        Stroke = Brushes.Red,
+        StrokeThickness = 3
+      };
+      AddChild(bottomLine);
+
+    }
+    Line topLine;
+    Line middleLine;
+    Line bottomLine;
 
     protected override void OnButtonScrollbarCreated() {
       ScrollBar.Orientation = Orientation.Horizontal;
@@ -104,7 +163,8 @@ namespace XYGraphLib {
           break;
         case VerticalAlignment.Center:
           legendY    = (arrangeRect.Size.Height - legendHeight - ScrollBarHeight)/2;
-          scrollbarY = (arrangeRect.Size.Height - legendHeight + ScrollBarHeight)/2;
+          //scrollbarY = (arrangeRect.Size.Height - legendHeight + ScrollBarHeight)/2;
+          scrollbarY = legendY + legendHeight;
           break;
         case VerticalAlignment.Bottom:
           legendY    = arrangeRect.Size.Height - legendHeight - ScrollBarHeight;
@@ -114,11 +174,34 @@ namespace XYGraphLib {
           throw new NotSupportedException();
         }
       }
-
       Legend.ArrangeBorderPadding(arrangeRect, 0, legendY, arrangeRect.Size.Width, legendHeight);
       ZoomOutButton.ArrangeBorderPadding(arrangeRect, 0, scrollbarY, ScrollBarHeight, ScrollBarHeight);
       ScrollBar.ArrangeBorderPadding(arrangeRect, ScrollBarHeight, scrollbarY, Math.Max(0,  arrangeRect.Size.Width-2*ScrollBarHeight), ScrollBarHeight);
       ZoomInButton.ArrangeBorderPadding(arrangeRect, arrangeRect.Width-ScrollBarHeight, scrollbarY, ScrollBarHeight, ScrollBarHeight);
+
+      //////////////////////////////
+      //topLine.X1 = 0;
+      //topLine.Y1 = arrangeRect.Size.Height/2;
+      //topLine.X2 = arrangeRect.Size.Width;
+      //topLine.Y2 = arrangeRect.Size.Height/2;
+      //topLine.Arrange(arrangeRect);
+      //topLine.X1 = 0;
+      //topLine.Y1 = legendY;
+      //topLine.X2 = arrangeRect.Size.Width;
+      //topLine.Y2 = legendY;
+      //topLine.Arrange(arrangeRect);
+
+      //middleLine.X1 = 0;
+      //middleLine.Y1 = scrollbarY;
+      //middleLine.X2 = arrangeRect.Size.Width;
+      //middleLine.Y2 = scrollbarY;
+      //middleLine.Arrange(arrangeRect);
+
+      //bottomLine.X1 = 0;
+      //bottomLine.Y1 = scrollbarY + ScrollBarHeight;
+      //bottomLine.X2 = arrangeRect.Size.Width;
+      //bottomLine.Y2 = scrollbarY + ScrollBarHeight;
+      //bottomLine.Arrange(arrangeRect);
 
 
       //if (IsSizingHeightToExpandableContent()) {

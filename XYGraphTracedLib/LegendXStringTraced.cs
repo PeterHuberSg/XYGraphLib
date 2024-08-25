@@ -1,15 +1,19 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Controls;
 using System.Windows.Media;
 using WpfTestbench;
-using System;
+using System.Windows;
 
 
 namespace XYGraphLib {
 
   /// <summary>
-  /// Version of XYGraph which traces WPF events 
+  /// Version of XLegend which traces WPF events 
   /// </summary>
-  public class Chart1Plot1X1YLegendTraced: Chart1Plot1X1YLegend, ITraceName {
+  public class LegendXStringTraced: LegendXString, ITraceName {
 
     #region ITraceName
     //      ----------
@@ -24,32 +28,20 @@ namespace XYGraphLib {
     #region Constructor
     //      -----------
 
-    /// <summary>
-    /// Default Constructor
-    /// </summary>
-    public Chart1Plot1X1YLegendTraced(): this("Graph1Plot1X1YLegend") {}
+    public LegendXStringTraced() : this("LegendXStringT") {}
 
 
-    /// <summary>
-    /// Constructor supporting tracing of multiple XYGraphs with different names
-    /// </summary>
-    public Chart1Plot1X1YLegendTraced(string traceName): this(TraceWPFEvents.TraceCreateStart(traceName)) {
+    public LegendXStringTraced(string traceName) : this(TraceWPFEvents.TraceCreateStart(traceName)) {
       TraceName = traceName;
       TraceWPFEvents.TraceCreateEnd(traceName);
     }
 
 
-    /// <summary>
-    /// Dummy constructor allowing public constructor to call TraceCreateStart() before constructor gets executed 
-    /// </summary>
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
-    //Chart1Plot1X1YLegendTraced is private and the other constructors invoking it set Name already
-    private Chart1Plot1X1YLegendTraced(DummyTraceClass? _) : 
-      base(new PlotAreaTraced(), new LegendScrollerXTraced(new LegendXDateTraced()), new LegendScrollerYTraced()) {
-    }
-    #pragma warning restore CS8618 
+    //LegendXStringTraced is private and the other constructors invoking it set Name already
+    public LegendXStringTraced(DummyTraceClass? _) { }
+    #pragma warning restore CS8618
     #endregion
-
 
     #region Event Tracing
     //      -------------
@@ -63,12 +55,12 @@ namespace XYGraphLib {
       return TraceWPFEvents.MeasureOverride(this, constraint, base.MeasureOverrideTraced);
     }
 
-    
+
     protected override Size ArrangeOverrideTraced(Size finalSize) {
       return TraceWPFEvents.ArrangeOverride(this, finalSize, base.ArrangeOverrideTraced);
     }
 
-    
+
     protected override void OnRenderTraced(DrawingContext drawingContext) {
       TraceWPFEvents.OnRender(this, drawingContext, base.OnRenderTraced);
     }

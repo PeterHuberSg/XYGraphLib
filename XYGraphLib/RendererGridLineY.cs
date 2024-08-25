@@ -22,6 +22,9 @@ using System.Windows.Media;
 
 namespace XYGraphLib {
 
+  /// <summary>
+  /// Creates a Visual for the vertical grid lines displayed in the PlotArea.
+  /// </summary>
   public class RendererGridLineY: Renderer {
 
     #region Properties
@@ -37,11 +40,11 @@ namespace XYGraphLib {
     #region Constructor
     //      -----------
 
-    public RendererGridLineY(LegendScrollerX legendScrollerx, Brush strokeBrush, double strokeThickness):
+    public RendererGridLineY(LegendScrollerX legendScrollerX, Brush strokeBrush, double strokeThickness):
       //gridlineY are parallel to vertical y-line, but the distance between them is controlled by LegendX, therefore dimension X
       base(strokeBrush, strokeThickness, DimensionMapX) 
     {
-      LegendScrollerX = legendScrollerx;
+      LegendScrollerX = legendScrollerX;
     }
     #endregion
 
@@ -49,25 +52,33 @@ namespace XYGraphLib {
     #region Methods
     //      -------
 
+    bool isFirstTime = true;//do the test only once
+
+
     /// <summary>
     /// Renders the vertical x-grid-line to the drawingContext, one line for each label in XLegend.
     /// </summary>
     protected override void OnCreateVisual(DrawingContext drawingContext, double width, double height, DrawingVisual _) {
-      LegendX legendx = (LegendX)LegendScrollerX.Legend;
+      if (isFirstTime) {
+        if (LegendScrollerX.Legend is not LegendX && LegendScrollerX.Legend is not LegendXString)
+          throw new NotSupportedException($"RendererGridLineY works only with LegendX or LegendXString, but LegendScrollerX.Legend was {LegendScrollerX.Legend.GetType().Name}.");
+        isFirstTime = false;
+      }
+      Legend legendX = (Legend)LegendScrollerX.Legend;
       //grid-lines use only 1 dimension. Both for x and y grid-line, 
       double minDisplayValue = MinDisplayValues[0];
 
       // Create a GuidelineSet to get the lines exactly on a pixel
-      GuidelineSet guidelines = new GuidelineSet();
+      var guidelines = new GuidelineSet();
       double halfPenWidth = StrokePen.Thickness / 2;
-      foreach (double lableValue in legendx.LabelValues!) {
-        double xPos = ScaleX * (lableValue - minDisplayValue);
+      foreach (double labelValue in legendX.LabelValues!) {
+        double xPos = ScaleX * (labelValue - minDisplayValue);
         guidelines.GuidelinesX.Add(xPos + halfPenWidth);
       }
 
       drawingContext.PushGuidelineSet(guidelines);
-      foreach (double lableValue in legendx.LabelValues) {
-        double xPos = ScaleX * (lableValue - minDisplayValue);
+      foreach (double labelValue in legendX.LabelValues) {
+        double xPos = ScaleX * (labelValue - minDisplayValue);
         drawingContext.DrawLine(StrokePen, new Point(xPos, 0), new Point(xPos, height));
       }
       drawingContext.Pop();

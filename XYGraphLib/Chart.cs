@@ -15,6 +15,53 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
+
+// 
+// ┌─────────────┬─────────┐
+// │             │Legend   │
+// │ PlotArea    │Scroller │
+// │             │Y        │
+// ├─────────────┼─────────┤              
+// │Legend       │  100 %  │ ← Total Reset ZoomButton
+// │Scroller     ├────┬────┤              
+// │X            │ +  │ -  │ ← Total ZoomButtons, they zoom in and out for X and Y simultaneously
+// └─────────────┴────┴────┘
+// 
+// PlotArea: where line graphic gets painted
+// LegendScroller: can be used to zoom in & out and scroll, displays also the legend and 
+//                 ZoomButtons for that axis
+// Total ZoomButtons: allow to zoom in and out both for x and y axis at the same time.
+// 
+// 
+// A chart can hold several PlotAreas and LegendScrollers at the same time. XYGraphLib provides
+// some preconfigured charts:
+// Chart1Plot1X1YLegend: 1 PlotArea, 1 LegendScrollerX, 1 LegendScrollerY. See sample above
+//
+// Chart2Plots1X2YLegends:
+// ┌────────────────┬────────────────────┐
+// │ PlotArea0      │ LegendScrollerY0   │
+// ├────────────────┼────────────────────┤
+// │ PlotArea1      │ LegendScrollerY1   │
+// ├────────────────┼────────────────────┤
+// │LegendScrollerX │ Total Zoom Buttons │
+// └────────────────┴────────────────────┘
+//
+// Chart4Plots1X4YLegends:
+// ┌────────────────┬────────────────────┐
+// │ PlotArea0      │ LegendScrollerY0   │
+// ├────────────────┼────────────────────┤
+// │ PlotArea1      │ LegendScrollerY1   │
+// ├────────────────┼────────────────────┤
+// │ PlotArea2      │ LegendScrollerY2   │
+// ├────────────────┼────────────────────┤
+// │ PlotArea3      │ LegendScrollerY3   │
+// ├────────────────┼────────────────────┤
+// │XLegendScroller │ Total Zoom Buttons │
+// └────────────────┴────────────────────┘
+//
+//you can create your own combination by inheriting from Chart
+
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +100,7 @@ namespace XYGraphLib {
     #endregion
 
 
-    #region Add to control methods for Constructor
+    #region Add() to chart methods for Constructor
     //      --------------------------------------
 
     protected readonly List<PlotArea> PlotAreas = new List<PlotArea>();
@@ -104,7 +151,7 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Add PlotArea to Control
+    /// Add ZoomButtons to Control
     /// </summary>
     protected void AddZoomButtons() {
       Brush strokeBrush = Brushes.DarkSlateGray;
@@ -136,6 +183,17 @@ namespace XYGraphLib {
     #region Fill Data
     //      ---------
 
+    /*----------------------------------------------------------------------------------------------------------
+    A line chart can display data as they are produced in a measurement. A measurement is taken at one point of 
+    time and might cover several values. FillData() takes IEnumerable<TRecord> newRecords, which gives easy 
+    access to all values at one particular time. A line graph displays only one value of each measurement, for 
+    example one line for the first values and another line for the second values. FillData() stores all first 
+    values together in DataSeries as an array, then all second values in another array to make the life easier of 
+    LegendX and Renderers.
+
+    IEnumerable<TRecord> newRecords => double[][,]? DataSeries
+    ----------------------------------------------------------------------------------------------------------*/
+
     protected double[][,]? DataSeries;
     SerieStyleEnum[]? serieStyle;
     //int[] Groups;
@@ -159,7 +217,7 @@ namespace XYGraphLib {
 
       int recordIndex = 0;
       foreach (TRecord record in newRecords) {
-        for (int dataSerieIndex = 0; dataSerieIndex < newSerieSettings.Length; dataSerieIndex++) {
+        for (int dataSerieIndex = 0; dataSerieIndex<newSerieSettings.Length; dataSerieIndex++) {
           SerieSetting<TRecord> serieSetting = newSerieSettings[dataSerieIndex];
           double[] dataPoint = serieSetting.Getter(record);
           //double[] dataPoint;
