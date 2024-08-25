@@ -464,11 +464,12 @@ namespace XYGraphLib {
 
           Point labelPoint = labelPoints![labelIndex];
           Point labelPointWithOffset = new Point(offset.X + labelPoint.X, offset.Y +labelPoint.Y);
-          if (IsWriteRightAligned) {
-            LegendGlyphDrawer.WriteRightAligned(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
-          } else {
-            LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
-          }
+          //if (IsWriteRightAligned) {
+          //  LegendGlyphDrawer.WriteRightAligned(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
+          //} else {
+          //  LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground);
+          //}
+          LegendGlyphDrawer.Write(drawingContext, labelPointWithOffset, labelString, FontSize, Foreground, isRightAligned: IsWriteRightAligned);
         }
 
         if (haveDisplayValuesChanged && DisplayValueChanged!=null) {
