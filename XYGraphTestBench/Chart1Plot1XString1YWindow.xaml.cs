@@ -73,11 +73,11 @@ namespace XYGraphTestBench {
         stringsLengths[i] = (i, strings[i].Length);
       }
       TestChart1Plot1XString1YLegend.FillData(stringsLengths, 
-        [new SerieSetting<(double x, double y)>(getSeries0Data, SerieStyleEnum.line, Brushes.Blue, 2, null)]);
+        [new SerieSetting<(double x, double y)>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null)]);
     }
 
 
-    private static void getSeries0Data((double x, double y) dataRecord, [NotNull] ref double[]? dataExtracted) {
+    private static void getSeriesData((double x, double y) dataRecord, int _, [NotNull] ref double[]? dataExtracted) {
       dataExtracted ??= new double[2];
       dataExtracted[0] = dataRecord.x;
       dataExtracted[1] = dataRecord.y;

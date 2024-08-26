@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -92,37 +93,56 @@ namespace XYGraphLib {
       var seriesSettings = new SerieSetting<DataRecord>[selectSeriesCount];
       var seriesBrushes = new Brush?[] { Brushes.Green, Brushes.Blue, Brushes.Gray, /*area2*/null };
       int seriesSettingsIndex = 0;
-      for (int seriesUIIndex = 0; seriesUIIndex < seriesCountUI; seriesUIIndex++) {
-        int lambdaIndex = seriesSettingsIndex; //we need to create a new instance within the loop, otherwise the lambda expression will use the latest value of seriesSettingsIndex (i.e. max(seriesSettingsIndex)), see C# reference "Outer Variables"
-        if (seriesUIIndex==areaLineIndex) {
-          var areaBrush = seriesBrushes[seriesUIIndex]!;
-          seriesSettings[seriesSettingsIndex] =
-            new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex]],
-            SerieStyleEnum.area1, 0, areaBrush, 1, null);
-          seriesSettingsIndex++;
-          int lambdaIndex2 = lambdaIndex+1;
-          seriesSettings[seriesSettingsIndex] =
-            new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex2]],
-            SerieStyleEnum.area2, 0, areaBrush, 1, null);
-          seriesSettingsIndex++;
-        } else {
-          int group;
-          Brush? fillBrush;
-          if (seriesUIIndex==lowerGraphLineIndex) {
-            group = 1;
-            Color fillColor = Colors.LightSkyBlue;
-            fillColor.A = 128;
-            fillBrush = new SolidColorBrush(fillColor);
-          } else {
-            group = 0;
-            fillBrush = null;
-          }
-          seriesSettings[seriesSettingsIndex] =
-            new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex]],
-            SerieStyleEnum.line, group, seriesBrushes[seriesUIIndex]!, 2, fillBrush);
-          seriesSettingsIndex++;
-        }
-      }
+      Color fillColor = Colors.LightSkyBlue;
+      fillColor.A = 128;
+      //for (int seriesUIIndex = 0; seriesUIIndex < seriesCountUI; seriesUIIndex++) {
+      //  //int lambdaIndex = seriesSettingsIndex; //we need to create a new instance within the loop, otherwise the lambda expression will use the latest value of seriesSettingsIndex (i.e. max(seriesSettingsIndex)), see C# reference "Outer Variables"
+      //  //if (seriesUIIndex==areaLineIndex) {
+      //  //  var areaBrush = seriesBrushes[seriesUIIndex]!;
+      //  //  seriesSettings[seriesSettingsIndex] =
+      //  //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex]],
+      //  //    SerieStyleEnum.area1, 0, areaBrush, 1, null);
+      //  //  seriesSettingsIndex++;
+      //  //  int lambdaIndex2 = lambdaIndex+1;
+      //  //  seriesSettings[seriesSettingsIndex] =
+      //  //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex2]],
+      //  //    SerieStyleEnum.area2, 0, areaBrush, 1, null);
+      //  //  seriesSettingsIndex++;
+      //  //} else {
+      //  //  int group;
+      //  //  Brush? fillBrush;
+      //  //  if (seriesUIIndex==lowerGraphLineIndex) {
+      //  //    group = 1;
+      //  //    //Color fillColor = Colors.LightSkyBlue;
+      //  //    //fillColor.A = 128;
+      //  //    fillBrush = new SolidColorBrush(fillColor);
+      //  //  } else {
+      //  //    group = 0;
+      //  //    fillBrush = null;
+      //  //  }
+      //  //  seriesSettings[seriesSettingsIndex] =
+      //  //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex]],
+      //  //    SerieStyleEnum.line, group, seriesBrushes[seriesUIIndex]!, 2, fillBrush);
+      //  //  seriesSettingsIndex++;
+      //  //}
+
+
+      //  seriesSettings[seriesSettingsIndex++] =seriesUIIndex switch {
+      //    0 => new SerieSetting<DataRecord>(getSeries0Data, SerieStyleEnum.line, 0, Brushes.Green, 2, null),
+      //    1 => new SerieSetting<DataRecord>(getSeries1Data, SerieStyleEnum.line, 1, Brushes.Blue, 2, new SolidColorBrush(fillColor)),
+      //    2 => new SerieSetting<DataRecord>(getSeries2Data, SerieStyleEnum.area1, 0, Brushes.Gray, 1, null),
+      //    3 => new SerieSetting<DataRecord>(getSeries3Data, SerieStyleEnum.area2, 0, null!, 1, null),
+      //    _ => throw new NotSupportedException($"seriesUIIndex: {seriesUIIndex}"),
+      //  };
+      //}
+
+      seriesSettings = [
+        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, 0, Brushes.Green, 2, null),
+        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, 1, Brushes.Blue, 2, new SolidColorBrush(fillColor)),
+        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area1, 0, Brushes.Gray, 1, null),
+        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, 0, null!, 1, null)];
+
+
       //fill serie values into records
       for (int stepIndex = 0; stepIndex < stepsCount; stepIndex++) {
         var recordValues = new double[selectSeriesCount];
@@ -151,6 +171,13 @@ namespace XYGraphLib {
         time = time.AddMinutes(20*minutes);
       }
       TestChart2Plots1X2YLegendsTraced.AddNotes(chartNotes, fontDefinitions, true);
+    }
+
+
+    private static void getSeriesData(DataRecord dataRecord, int index, [NotNull] ref double[]? dataExtracted) {
+      dataExtracted ??= new double[2];
+      dataExtracted[0] = dataRecord.Date.ToDouble();
+      dataExtracted[1] = dataRecord.DataPoint[index];
     }
   }
 }

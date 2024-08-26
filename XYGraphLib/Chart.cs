@@ -208,7 +208,7 @@ namespace XYGraphLib {
       //Groups = new int[newSerieSettings.Length];
       int recordsCount = newRecords.Count();
       double[]? dataExtracted = null;
-      newSerieSettings[0].Getter(newRecords.First(), ref dataExtracted);
+      newSerieSettings[0].Getter(newRecords.First(), 0, ref dataExtracted);
       int dimensionCount = dataExtracted.Length;
       for (int dataSeriesIndex = 0; dataSeriesIndex < DataSeries.Length; dataSeriesIndex++) {
         DataSeries[dataSeriesIndex] = new double[recordsCount, dimensionCount];
@@ -220,7 +220,7 @@ namespace XYGraphLib {
       foreach (TRecord record in newRecords) {
         for (int dataSerieIndex = 0; dataSerieIndex<newSerieSettings.Length; dataSerieIndex++) {
           SerieSetting<TRecord> serieSetting = newSerieSettings[dataSerieIndex];
-          serieSetting.Getter(record, ref dataExtracted);
+          serieSetting.Getter(record, dataSerieIndex, ref dataExtracted);
           for (int dimensionIndex = 0; dimensionIndex < dataExtracted.Length; dimensionIndex++) {
             DataSeries[dataSerieIndex][recordIndex, dimensionIndex] = dataExtracted[dimensionIndex];
           }

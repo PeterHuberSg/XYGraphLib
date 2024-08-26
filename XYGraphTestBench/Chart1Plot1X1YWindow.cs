@@ -265,22 +265,22 @@ namespace XYGraphLib {
 
       //setup line settings
       var seriesSettings = new SerieSetting<DataRecord>[selectSeriesCount];
-      var seriesBrushes = new Brush?[] { Brushes.Green, Brushes.Blue, Brushes.Gray, /*area2*/null };
       int seriesSettingsIndex = 0;
       for (int seriesUIIndex = 0; seriesUIIndex < seriesCountUI; seriesUIIndex++) {
         if (serieCheckBoxes[seriesUIIndex].IsChecked!.Value) {
 
-          seriesSettings[seriesSettingsIndex++] =seriesUIIndex switch {
-            0 => new SerieSetting<DataRecord>(getSeries0Data, SerieStyleEnum.line,
-                          seriesBrushes[seriesUIIndex]!, 2, null),
-            1 => new SerieSetting<DataRecord>(getSeries1Data, SerieStyleEnum.line,
-                          seriesBrushes[seriesUIIndex]!, 2, null),
-            2 => new SerieSetting<DataRecord>(getSeries2Data, SerieStyleEnum.area1,
-                          seriesBrushes[seriesUIIndex]!, 1, null),
-            3 => new SerieSetting<DataRecord>(getSeries3Data, SerieStyleEnum.area1,
-                          seriesBrushes[seriesUIIndex]!, 1, null),
+          seriesSettings[seriesSettingsIndex++] = seriesUIIndex switch {
+            0 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Green, 2, null),
+            1 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null),
+            2 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area1, Brushes.Gray, 1, null),
+            //3 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null!, 1, null),
             _ => throw new NotSupportedException($"seriesUIIndex: {seriesUIIndex}"),
           };
+          if (seriesUIIndex==areaLineIndex) {
+            seriesSettings[seriesSettingsIndex++] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null!, 1, null);
+          }
+
+
           //int lambdaIndex = seriesSettingsIndex; //we need to create a new instance within the loop, otherwise the lambda expression will use the latest value of seriesSettingsIndex (i.e. max(seriesSettingsIndex)), see C# reference "Outer Variables"
           //if (seriesUIIndex==areaLineIndex) {
           //  //an area graphic has 2 lines and needs two seriesSettings
@@ -315,31 +315,10 @@ namespace XYGraphLib {
     }
 
 
-    private static void getSeries0Data(DataRecord dataRecord, [NotNull] ref double[]? dataExtracted) {
+    private static void getSeriesData(DataRecord dataRecord, int index, [NotNull] ref double[]? dataExtracted) {
       dataExtracted ??= new double[2];
       dataExtracted[0] = dataRecord.Date.ToDouble();
-      dataExtracted[1] = dataRecord.Values[0];
-    }
-
-
-    private static void getSeries1Data(DataRecord dataRecord, [NotNull] ref double[]? dataExtracted) {
-      dataExtracted ??= new double[2];
-      dataExtracted[0] = dataRecord.Date.ToDouble();
-      dataExtracted[1] = dataRecord.Values[1];
-    }
-
-
-    private static void getSeries2Data(DataRecord dataRecord, [NotNull] ref double[]? dataExtracted) {
-      dataExtracted ??= new double[2];
-      dataExtracted[0] = dataRecord.Date.ToDouble();
-      dataExtracted[1] = dataRecord.Values[2];
-    }
-
-
-    private static void getSeries3Data(DataRecord dataRecord, [NotNull] ref double[]? dataExtracted) {
-      dataExtracted ??= new double[2];
-      dataExtracted[0] = dataRecord.Date.ToDouble();
-      dataExtracted[1] = dataRecord.Values[3];
+      dataExtracted[1] = dataRecord.Values[index];
     }
   }
 }
