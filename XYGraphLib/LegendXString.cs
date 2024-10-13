@@ -38,12 +38,8 @@ namespace XYGraphLib {
     public IReadOnlyList<string> LegendStrings {
       get { return legendStrings; }
       set {
-        if (legendStrings==value) return;
-
         legendStrings = value;
-        DisplayValueRange = value.Count - 1 + 1;//todo: add 1 more datarecord in Chart.FillData() to show last label ?
-        //InvalidateArrange();
-        InvalidateMeasure();
+        InvalidateMeasure(); //It seems InvalidateVisual() does not force Measure()
         InvalidateVisual();
         OnReset();
       }
@@ -146,9 +142,9 @@ namespace XYGraphLib {
 
 
     protected override void OnRecalculate(ref double[]? labelValues, ref string?[]? labelStrings, ref Point[]? labelPoints) {
-      int stringsIndex;
+      var stringsIndex = (int)Math.Ceiling(DisplayValue);//first label to display
+      var labelsCount = (int)(DisplayValue + DisplayValueRange) - stringsIndex + 1;
       var stringWidth = FontFamily.LineSpacing*FontSize;
-      var labelsCount = (int)DisplayValueRange;
       if (stringWidth>=RenderWidthTracked || //not enough space to display even 1 string completely
         labelsCount<1) {                     //only part of a label gets displayed
         //only 1 or even only the part of a label can be displayed. Just display the very first value.
@@ -164,7 +160,6 @@ namespace XYGraphLib {
         return;
       }
 
-      stringsIndex = (int)Math.Ceiling(DisplayValue);//first label to display
       var stringIndexOffset = stringsIndex - DisplayValue;
       var stringXIncrement = RenderWidthTracked / DisplayValueRange;
       var maxLabelCount = (int)(RenderWidthTracked / stringWidth);//maximum number of labels that can be displayed
@@ -175,12 +170,21 @@ namespace XYGraphLib {
         stringIndexIncrement *= 2;
       }
 
+      //add one more label at the very end. Otherwise that label gets never displayed 
+      var isLastLabelNeeded = (int)(DisplayValue + DisplayValueRange) == legendStrings.Count - 1;
+
+      if (isLastLabelNeeded) {
+        labelsCount++;
+      }
       if (labelValues==null || labelValues.Length!=labelsCount) {
         labelValues = new double[labelsCount];
         labelStrings = new string[labelsCount];
         labelPoints = new Point[labelsCount];
       }
-
+      if (isLastLabelNeeded) {
+        labelsCount--;
+      }
+ 
       double stringX;
       if (stringIndexOffset<=precision) {
         //DisplayValue is (close) to an integer, i.e. the Legend starts exactly with stringsIndex 
@@ -192,7 +196,8 @@ namespace XYGraphLib {
       }
 
       //create labels
-      for (var labelIndex = 0; labelIndex<labelsCount; labelIndex++) {
+      var labelIndex = 0;
+      for (; labelIndex<labelsCount; labelIndex++) {
         labelValues[labelIndex] = stringsIndex;
         labelStrings![labelIndex] = legendStrings[stringsIndex];
         labelPoints![labelIndex] = new Point(stringX, 0);
@@ -200,6 +205,12 @@ namespace XYGraphLib {
         stringX += stringXIncrement;
       }
 
+      if (isLastLabelNeeded) {
+        labelValues[labelIndex] = stringsIndex;
+        labelStrings![labelIndex] = legendStrings[^1];
+        //draw very last label next to RenderWidth
+        labelPoints![labelIndex] = new Point(RenderWidthTracked - FontFamily.Baseline*FontSize*0.8, 0);
+      }
       ////number of labels that can be displayed in window
       //Array.Fill(LegendStringXs, int.MinValue);
       ////var firstStringsIndex = (int)Math.Round(DisplayValue, 0);

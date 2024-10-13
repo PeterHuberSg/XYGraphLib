@@ -283,7 +283,11 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] newSerieSettings){
+    public override void FillData<TRecord>(
+      IEnumerable<TRecord> newRecords,
+      SerieSetting<TRecord>[] newSerieSettings,
+      Func<TRecord, string>? stringGetter = null) 
+    {
       plotArea0.ClearRenderers();
       plotArea1.ClearRenderers();
       plotArea2.ClearRenderers();
@@ -296,7 +300,7 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData<TRecord>(newRecords, newSerieSettings);
+      base.FillData<TRecord>(newRecords, newSerieSettings, stringGetter);
 
       for (int serieIndex = 0; serieIndex < newSerieSettings.Length; serieIndex++) {
         Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);

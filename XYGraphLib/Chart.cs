@@ -202,7 +202,11 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public virtual void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] newSerieSettings) {
+    public virtual void FillData<TRecord>(
+      IEnumerable<TRecord> newRecords,
+      SerieSetting<TRecord>[] newSerieSettings,
+      Func<TRecord, string>? stringGetter = null) 
+    {
       DataSeries = new double[newSerieSettings.Length][,];
       serieStyle = new SerieStyleEnum[newSerieSettings.Length];
       //Groups = new int[newSerieSettings.Length];
@@ -227,7 +231,27 @@ namespace XYGraphLib {
         }
         recordIndex++;
       }
-      
+
+      //handle x legends with strings
+      //the code is here and not in the loop above because LegendXString is seldom used
+      var legendXString = LegendScrollerXs[0].Legend as LegendXString;
+      if (stringGetter is null) {
+        if (legendXString is not null)  
+        throw new ArgumentException("When a LegendXString is used, the stringGetter argument in FillData() cannot be null.");
+
+      } else { 
+        if (legendXString is null) throw new NotSupportedException(
+          "stringGetter should only be defined when LegendScrollerXs[0].Legend is a LegendXString, but it was " +
+          $"a '{LegendScrollerXs[0].Legend.GetType().Name}'.");
+
+        var legendXStrings = new string[recordsCount];
+        recordIndex = 0;
+        foreach (TRecord record in newRecords) {
+          legendXStrings[recordIndex++] = stringGetter(record);
+        }
+        legendXString.LegendStrings = legendXStrings;
+      }
+
       InvalidateMeasure(); //It seems InvalidateVisual() does not force Measure()
       InvalidateVisual();
       IsEnabled = true;

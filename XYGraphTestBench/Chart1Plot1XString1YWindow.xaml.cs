@@ -57,7 +57,7 @@ namespace XYGraphTestBench {
     }
 
     [NotNull]
-    (double x, double y)[] stringsLengths;
+    (double x, double y, string label)[] stringsLengths;
 
 
     /// <summary>
@@ -66,22 +66,35 @@ namespace XYGraphTestBench {
     private void updateParameters() {
       var strings = RandomText.GetStrings(stringsCount: (int)NumberOfStringsNumberScrollBar.Value,
         maxStringLength: (int)MaxStringLenghtNumberScrollBar.Value);
-      legendXString.LegendStrings = strings;
+      //legendXString.LegendStrings = strings;
 
-      stringsLengths = new (double x, double y)[strings.Length];
+      ////add new line in middle of string for testing
+      //for (var stringsIndex=0; stringsIndex<strings.Length; stringsIndex++) {
+      //  if (strings[stringsIndex].Length>4) {
+      //    strings[stringsIndex] = strings[stringsIndex][..4] + Environment.NewLine + strings[stringsIndex][4..];
+      //  }
+      //}
+
+      stringsLengths = new (double x, double y, string label)[strings.Length];
       for (int i = 0; i < strings.Length; i++) {
-        stringsLengths[i] = (i, strings[i].Length);
+        var label = strings[i];
+        stringsLengths[i] = (i, label.Length, label);
       }
       TestChart1Plot1XString1YLegend.FillData(stringsLengths, 
-        [new SerieSetting<(double x, double y)>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null)]);
+        [new SerieSetting<(double x, double y, string label)>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null)],
+        getSeriesLabel);
     }
 
 
-    private static void getSeriesData((double x, double y) dataRecord, int _, [NotNull] ref double[]? dataExtracted) {
+    private static void getSeriesData((double x, double y, string _) dataRecord, int _, [NotNull] ref double[]? dataExtracted) {
       dataExtracted ??= new double[2];
       dataExtracted[0] = dataRecord.x;
       dataExtracted[1] = dataRecord.y;
     }
 
+
+    private static string getSeriesLabel((double x, double y, string label) dataRecord) {
+      return dataRecord.label;
+    }
   }
 }

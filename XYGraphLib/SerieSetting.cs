@@ -38,7 +38,6 @@ namespace XYGraphLib {
   /// </summary>
   public delegate void GetterIndexDoubleDouble<TRecord>(TRecord dataRecord, int index, [NotNull] ref double[]? dataExtracted);
 
-
   /// <summary>
   /// Stores the parameters of a LineGraph data serie
   /// </summary>

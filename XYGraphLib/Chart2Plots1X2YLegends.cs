@@ -173,7 +173,11 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] newSerieSettings){
+    public override void FillData<TRecord>(
+      IEnumerable<TRecord> newRecords,
+      SerieSetting<TRecord>[] newSerieSettings,
+      Func<TRecord, string>? stringGetter = null) 
+    {
       plotAreaUpper.ClearRenderers();
       plotAreaLower.ClearRenderers();
       legendScrollerX.Reset();
@@ -182,7 +186,7 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData<TRecord>(newRecords, newSerieSettings);
+      base.FillData<TRecord>(newRecords, newSerieSettings, stringGetter);
 
       //MaxValueTextBlock.Text = maxValue.ToString("N");
       ////ValueXYLegend.MaxValue = maxValue;
