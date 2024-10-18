@@ -44,12 +44,12 @@ namespace XYGraphLib {
       //add _ and a, b, c ... at the start of every Button Text to support Alt key
       IEnumerator logicalChildren = LogicalChildren;
       logicalChildren.MoveNext();
-      StackPanel stackpanel = logicalChildren.Current as StackPanel;
+      StackPanel stackPanel = (StackPanel)logicalChildren.Current;
       char buttonChar = 'a';
-      foreach (var item in stackpanel.Children) {
-        Button button = item as Button;
+      foreach (var item in stackPanel.Children) {
+        Button button = (Button)item;
         if (button!=null) {
-          string contentString = button.Content as string;
+          string contentString = (string)button.Content;
           if (contentString!=null) {
             if (buttonChar=='z'+1) {
               buttonChar = '0';

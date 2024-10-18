@@ -170,7 +170,7 @@ namespace XYGraphLib {
         TestLegendXScroller.DisplayValue -= TestLegendXScroller.Legend.DisplayValueRange;
       }
 
-      if (labels==null) return null; //no test needed
+      if (labels==null) return null!; //no test needed
 
       //test to be executed before next values get applies
       return () => {

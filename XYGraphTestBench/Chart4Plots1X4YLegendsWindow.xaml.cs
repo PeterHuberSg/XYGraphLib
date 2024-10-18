@@ -65,41 +65,18 @@ namespace XYGraphLib {
       //prepare values for data calculation
       var serieIndex = 0;
       var seriesSettings = new SerieSetting<DataRecord>[seriesCount];
-      //var seriesBrushes = new Brush[] { new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0x00)) };
-      //var seriesFillBrushes = new Brush[] { Brushes.Green, Brushes.Blue, Brushes.Gray };
-      //for (var groupIndex = 0; groupIndex < groupCount; groupIndex++) {
-      //  var lambdaIndex = serieIndex; //A new instance within the loop is needed, otherwise the lambda expression will use the latest value of serieIndex (i.e. 12), see C# reference "Outer Variables"
-      //  seriesSettings[serieIndex] =
-      //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex]],
-      //      SerieStyleEnum.line, groupIndex,
-      //      new SolidColorBrush(Color.FromRgb(0xA0, 0xA0, 0xA0)), 2,
-      //      new SolidColorBrush(Color.FromArgb(0x30, 0xA0, 0xA0, 0xA0)));
-      //  serieValues[serieIndex++] = random.NextDouble() * 100;
-      //  var lambdaIndex1 = serieIndex;
-      //  seriesSettings[serieIndex] =
-      //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex1]],
-      //      SerieStyleEnum.line, groupIndex,
-      //      new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)), 2,
-      //      new SolidColorBrush(Color.FromArgb(0x30, 0x80, 0x80, 0x80)));
-      //  serieValues[serieIndex++] = random.NextDouble() * 100;
-      //  var lambdaIndex2 = serieIndex;
-      //  seriesSettings[serieIndex] =
-      //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex2]],
-      //      SerieStyleEnum.line, groupIndex,
-      //      new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0x00)), 2,
-      //      new SolidColorBrush(Color.FromArgb(0x30, 0x00, 0x00, 0x00)));
-      //  serieValues[serieIndex] = serieValues[serieIndex-1] + serieValues[serieIndex-2];
-      //  serieIndex++;
-      //}
       for (var groupIndex = 0; groupIndex < groupCount; groupIndex++) {
-        seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, groupIndex,
-          new SolidColorBrush(Color.FromRgb(0xA0, 0xA0, 0xA0)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0xA0, 0xA0, 0xA0)));
+        seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line,
+          new SolidColorBrush(Color.FromRgb(0xA0, 0xA0, 0xA0)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0xA0, 0xA0, 0xA0)), 
+          $"Plot{groupIndex}: Name with Unit" , "Unit with Name", groupIndex);
         serieValues[serieIndex++] = random.NextDouble() * 100;
-        seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, groupIndex,
-          new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0x80, 0x80, 0x80)));
+        seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, 
+          new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0x80, 0x80, 0x80)),
+          $"Plot{groupIndex}: Name only", null, groupIndex);
         serieValues[serieIndex++] = random.NextDouble() * 100;
-        seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, groupIndex,
-          new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0x00)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0x00, 0x00, 0x00)));
+        seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, 
+          new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0x00)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0x00, 0x00, 0x00)),
+          null, $"Plot{groupIndex}: Unit only", groupIndex);
         serieValues[serieIndex] = serieValues[serieIndex-1] + serieValues[serieIndex-2];
         serieIndex++;
       }
@@ -121,7 +98,7 @@ namespace XYGraphLib {
         time = time.AddMinutes(minutes);
       }
 
-      TestChart4Plots1X4YLegendsTraced.FillData<DataRecord>(dataRecords, seriesSettings);
+      TestChart4Plots1X4YLegendsTraced.FillData<DataRecord>(dataRecords, seriesSettings, "Date");
 
       FontDefinition[] fontDefinitions = [
         new FontDefinition(Brushes.DarkBlue, FontFamily, null, null, null, FontWeights.Bold),

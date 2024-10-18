@@ -21,6 +21,9 @@ using System.Windows;
 using System.Windows.Media;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using System.Windows.Shapes;
+using System.Windows.Markup;
+using System.Windows.Input;
 
 /*
  Helpful Links
@@ -48,6 +51,10 @@ namespace XYGraphLib {
   /// going first through measure and arrange.
   /// </summary>
   public class PlotArea: VisualsFrameworkElement {
+    //The PlotArea paints its visual children in this sequence:
+    //Background: always there
+    //Renderers: count varies
+    //Crosshair: added if mouse is within PlotArea 
 
     #region Properties
     //      ----------
@@ -65,10 +72,25 @@ namespace XYGraphLib {
     /// The DependencyProperty definition for Background.
     /// </summary>
     public static readonly DependencyProperty BackgroundProperty =
-                Panel.BackgroundProperty.AddOwner(typeof(PlotArea),
-                new FrameworkPropertyMetadata(
-                    Brushes.White,
-                    FrameworkPropertyMetadataOptions.AffectsRender));
+      Panel.BackgroundProperty.AddOwner(typeof(PlotArea),
+      new FrameworkPropertyMetadata(Brushes.White, FrameworkPropertyMetadataOptions.AffectsRender));
+
+
+    public bool IsShowCrosshair {
+      get { return (bool)GetValue(IsShowCrosshairProperty); }
+      set { SetValue(IsShowCrosshairProperty, value); }
+    }
+
+
+    /// <summary>
+    /// The DependencyProperty definition for IsShowCrosshair.
+    /// </summary>
+    public static readonly DependencyProperty IsShowCrosshairProperty =
+      DependencyProperty.RegisterAttached(
+        "IsShowCrosshair", // Property name
+        typeof(bool), // Property type
+        typeof(PlotArea), // Property owner
+        new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsRender));
 
 
     /// <summary>
@@ -81,29 +103,53 @@ namespace XYGraphLib {
     /// Raised when renderer gets added to PlotArea. Is used to added WPF tracing to renderer.
     /// </summary>
     public event Action<Renderer>? RendererAdded;
-
-
     #endregion
 
 
     #region Constructor
     //      -----------
 
-    /// <summary>
-    /// Default Constructor
-    /// </summary>
-    public PlotArea(): this(null) {}
+    readonly Crosshair crosshair;
+
+
+    ///// <summary>
+    ///// Default Constructor
+    ///// </summary>
+    //public PlotArea(): this(null) {}
 
 
     /// <summary>
     /// This constructor allows to give the PlotArea a name straight away. This is helpful for WPF event tracing.
     /// </summary>
-    public PlotArea(string? plotAreaName) {
+    public PlotArea(string? plotAreaName = null, Pen? crosshairPen = null) {
       if (plotAreaName!=null) {
         Name = plotAreaName;
       }
+      crosshair = new Crosshair(crosshairPen);
       ClipToBounds = true;
-      //SnapsToDevicePixels = true;//'
+
+
+      MouseEnter += PlotArea_MouseEnter;
+      MouseMove += PlotArea_MouseMove;
+      MouseLeave += PlotArea_MouseLeave;
+    }
+    #endregion
+
+
+    #region Events
+    //      ------
+
+    private void PlotArea_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
+    }
+
+
+    private void PlotArea_MouseMove(object sender, System.Windows.Input.MouseEventArgs e) {
+      this.InvalidateVisual();
+    }
+
+
+    private void PlotArea_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) {
+      this.InvalidateVisual();
     }
     #endregion
 
@@ -111,8 +157,7 @@ namespace XYGraphLib {
     #region Methods
     //      -------
 
-
-    readonly List<Renderer> renderers = new List<Renderer>();
+    readonly List<Renderer> renderers = new();
 
 
     /// <summary>
@@ -131,6 +176,18 @@ namespace XYGraphLib {
 
 
     /// <summary>
+    /// used by Crosshair to calculate cursor position to x value
+    /// </summary>
+    LegendScrollerX? legendScrollerX;
+
+
+    /// <summary>
+    /// used by Crosshair to find y values based on cursor x position
+    /// </summary>
+    List<RendererDataSeries> rendererDataSeriesList = new();
+
+
+    /// <summary>
     /// Adds one renderer to PlotArea
     /// </summary>
     /// <param name="renderer"></param>
@@ -140,17 +197,20 @@ namespace XYGraphLib {
       renderer.RenderingRequested += renderer_RenderingRequested;
       //When a new renderer gets added, first the legends have to be calculated again, which might change the width of the legend and
       //in consequence also the width of the Plot-area
-      isRenderingNeeded = true;
+      isRendererAdded = true;
       InvalidateVisual();
-      //////if (Visuals.Count<firstRendererVisual) {
-      //////  //Background not added yet => onRender will get executed later, which will add the visuals for the Renderer;
-      //////  //nothing to do now
-      //////} else {
-      //////  //Background Visual exists already. Other Visuals can be added.
-      //////  Visuals.Add(renderer.Render(ActualWidth, ActualHeight));
-      //////}
 
       RendererAdded?.Invoke(renderer);
+
+      //remember the renderers crosshair needs to display the x and y values at the cursor x location.
+      //if (renderer is RendererGridLineY rendererGridLineY) {
+      //  legendScrollerX = rendererGridLineY.LegendScrollerX;
+      //}
+      switch (renderer) {
+      case RendererGridLineY rendererGridLineY: legendScrollerX = rendererGridLineY.LegendScrollerX; break;
+      case RendererDataSeries rendererDataSeries: rendererDataSeriesList.Add(rendererDataSeries); break;
+      default: break; 
+      }
     }
 
 
@@ -193,39 +253,46 @@ namespace XYGraphLib {
     }
 
 
-    const int firstRendererVisual = 1;
+    const int firstRendererVisual = 1; //at 0 is the background renderer
     double oldActualWidth = double.NaN;
     double oldActualHeight = double.NaN;
-    bool isRenderingNeeded;
+    bool isRendererAdded;
 
 
     protected override void OnRender(DrawingContext drawingContext) {
-      if (double.IsNaN(ActualWidth) ||double.IsNaN(ActualHeight)) return;
+      if (double.IsNaN(ActualWidth) ||double.IsNaN(ActualHeight)) return;//not ready for rendering yet
 
-      if (!isRenderingNeeded && oldActualWidth==ActualWidth && oldActualHeight==ActualHeight) return;
+      if (isRendererAdded || oldActualWidth!=ActualWidth || oldActualHeight!=ActualHeight){
+        //Size has changed. Recreate all Visuals
+        oldActualWidth = ActualWidth;
+        oldActualHeight = ActualHeight;
+        isRendererAdded = false;
 
-      //Size has changed. Recreate all Visuals
-      oldActualWidth = ActualWidth;
-      oldActualHeight = ActualHeight;
-      isRenderingNeeded = false;
-
-      Visuals.Clear();
-      Visuals.Add(crerateBackGroundVisual());
-      foreach (Renderer renderer in renderers) {
-        //////var xGridLineRenderer = renderer as XGridLineRenderer;
-        //////if (xGridLineRenderer!=null) {
-        //////  if (double.IsNaN(xGridLineRenderer.MinDisplayValueY) || double.IsNaN(xGridLineRenderer.MaxDisplayValueY)){
-        //////    xGridLineRenderer.SetDisplayValueRangeY(xGridLineRenderer.YLegendScroller.MinDisplayValue, xGridLineRenderer.YLegendScroller.MaxDisplayValue);
-        //////  }
-        //////}
-        Visuals.Add(renderer.CreateVisual(ActualWidth, ActualHeight));
+        Visuals.Clear();
+        Visuals.Add(createBackGroundVisual());
+        foreach (Renderer renderer in renderers) {
+          Visuals.Add(renderer.CreateVisual(ActualWidth, ActualHeight));
+        }
+        TraceWpf.Line("PlotArea.OnRender: " + renderers.Count + " Renderer Visuals recreated");
       }
-      TraceWpf.Line("PlotArea.OnRender: " + renderers.Count + " Renderer Visuals recreated");
+
+      //handle crosshair
+      var backGroundAndRendererCount = renderers.Count + 1;
+      if (Visuals.Count>backGroundAndRendererCount) {
+        Visuals.RemoveAt(backGroundAndRendererCount);
+      }
+      if (IsMouseOver && IsShowCrosshair) {
+        TraceWpf.Line("PlotArea.OnRender:P draw  crosshair");
+        //draw  crosshair
+        var mousePosition = Mouse.GetPosition(this);
+        var xValue = legendScrollerX!.DisplayValue + mousePosition.X / ActualWidth * legendScrollerX!.DisplayValueRange;
+        Visuals.Add(crosshair.CreateVisual(mousePosition.X, ActualWidth, ActualHeight));
+      }
     }
 
 
-    private Visual crerateBackGroundVisual() {
-      DrawingVisual drawingVisual = new DrawingVisual();
+    private Visual createBackGroundVisual() {
+      DrawingVisual drawingVisual = new();
       using (DrawingContext drawingContext = drawingVisual.RenderOpen()) {
         drawingContext.DrawRectangle(Background, null, new Rect(0, 0, ActualWidth, ActualHeight));
       }
@@ -235,181 +302,3 @@ namespace XYGraphLib {
   }
 }
 
-/*    
-    private void AddRulerdrawingContext(DrawingContext drawingContext) {
-      StreamGeometry streamGeometry = new StreamGeometry();
-      using (StreamGeometryContext streamGeometryContext = streamGeometry.Open()) {
-        streamGeometryContext.BeginFigure(new Point(1200, 20), isFilled: false, isClosed: false);
-        streamGeometryContext.LineTo(new Point(0, 20), isStroked: true, isSmoothJoin: false);
-        streamGeometryContext.LineTo(new Point(0, 0), isStroked: true, isSmoothJoin: false);
-        for (int i = 0; i < 60; i++) {
-          streamGeometryContext.LineTo(new Point(i*20, 20), isStroked: false, isSmoothJoin: false);
-          streamGeometryContext.LineTo(new Point(i*20, 0), isStroked: true, isSmoothJoin: false);
-        }
-      }
-      streamGeometry.Freeze();
-      drawingContext.DrawGeometry(Brushes.DarkGray, new Pen(Brushes.DarkGoldenrod, 1), streamGeometry);
-    }
-
-
-    private void AddStreamGeometry(DrawingContext drawingContext) {
-      StreamGeometry streamGeometry = new StreamGeometry();
-      using (StreamGeometryContext streamGeometryContext = streamGeometry.Open()) {
-        streamGeometryContext.BeginFigure(new Point(0, 0), isFilled: false, isClosed: false);
-        streamGeometryContext.LineTo(new Point(FullWidth, FullHeight), isStroked: true, isSmoothJoin: false);
-        streamGeometryContext.LineTo(new Point(FullWidth, 0), isStroked: true, isSmoothJoin: false);
-        streamGeometryContext.LineTo(new Point(1000, 0), isStroked: true, isSmoothJoin: false);
-      }
-      streamGeometry.Freeze();
-      drawingContext.DrawGeometry(Brushes.LightGoldenrodYellow, new Pen(Brushes.DarkGoldenrod, 1), streamGeometry);
-    }
-
-
-    private void AddHorizontalStreamGeometry(DrawingContext drawingContext) {
-      StreamGeometry streamGeometry = new StreamGeometry();
-      double yStep = FullHeight / 20;
-      using (StreamGeometryContext streamGeometryContext = streamGeometry.Open()) {
-        for (int i = 0; i < 21; i++) {
-          streamGeometryContext.BeginFigure(new Point(0, i*yStep), isFilled : false, isClosed : false);
-          streamGeometryContext.LineTo(new Point(FullWidth, i*yStep), isStroked : true, isSmoothJoin : false);
-        }
-      }
-      streamGeometry.Freeze();
-      drawingContext.DrawGeometry(Brushes.DarkBlue, new Pen(Brushes.Gray, 0.5), streamGeometry);
-    }
-
-
-    private void AddRectangle(DrawingContext drawingContext) {
-      // Create a rectangle and draw it in the DrawingContext.
-      Rect rect = new Rect(new System.Windows.Point(160, 100), new System.Windows.Size(320, 80));
-      drawingContext.DrawRectangle(System.Windows.Media.Brushes.LightBlue, (System.Windows.Media.Pen)null, rect);
-    }
-
-
-    private void AddText(DrawingContext drawingContext, string text) {
-      Typeface typeface = new Typeface(new FontFamily("Arial"),
-                                       FontStyles.Normal,
-                                       FontWeights.Normal,
-                                       FontStretches.Normal);
-
-      GlyphTypeface glyphTypeface;
-      if (!typeface.TryGetGlyphTypeface(out glyphTypeface))
-        throw new InvalidOperationException("No glyphtypeface found");
-
-      double size = 40;
-
-      ushort[] glyphIndexes = new ushort[text.Length];
-      double[] advanceWidths = new double[text.Length];
-
-      double totalWidth = 0;
-
-      for (int n = 0; n < text.Length; n++) {
-        ushort glyphIndex = glyphTypeface.CharacterToGlyphMap[text[n]];
-        glyphIndexes[n] = glyphIndex;
-
-        double width = glyphTypeface.AdvanceWidths[glyphIndex] * size;
-        advanceWidths[n] = width;
-
-        totalWidth += width;
-      }
-
-      Point origin = new Point(50, 200);
-
-      GlyphRun glyphRun = new GlyphRun(glyphTypeface, 0, false, size,
-          glyphIndexes, origin, advanceWidths, null, null, null, null,
-          null, null);
-
-      drawingContext.DrawGlyphRun(Brushes.Black, glyphRun);
-
-      double y = origin.Y;
-      drawingContext.DrawLine(new Pen(Brushes.Red, 1), new Point(origin.X, y),
-          new Point(origin.X + totalWidth, y));
-
-      y -= (glyphTypeface.Baseline * size);
-      drawingContext.DrawLine(new Pen(Brushes.Green, 1), new Point(origin.X, y),
-          new Point(origin.X + totalWidth, y));
-
-      y += (glyphTypeface.Height * size);
-      drawingContext.DrawLine(new Pen(Brushes.Blue, 1), new Point(origin.X, y),
-          new Point(origin.X + totalWidth, y));
-
-    }
-
-
-
-    private Visual CreateDrawingVisualText() {
-      DrawingVisual drawingVisual = new DrawingVisual();
-      DrawingContext drawingContext = drawingVisual.RenderOpen();
-
-
-
-      Typeface typeface = new Typeface(new FontFamily("Arial"),
-                                      FontStyles.Italic,
-                                      FontWeights.Normal,
-                                      FontStretches.Normal);
-
-      GlyphTypeface glyphTypeface;
-      if (!typeface.TryGetGlyphTypeface(out glyphTypeface))
-        throw new InvalidOperationException("No glyphtypeface found");
-
-      string text = "Hello, world!";
-      double size = 40;
-
-      ushort[] glyphIndexes = new ushort[text.Length];
-      double[] advanceWidths = new double[text.Length];
-
-      double totalWidth = 0;
-
-      for (int n = 0; n < text.Length; n++) {
-        ushort glyphIndex = glyphTypeface.CharacterToGlyphMap[text[n]];
-        glyphIndexes[n] = glyphIndex;
-
-        double width = glyphTypeface.AdvanceWidths[glyphIndex] * size;
-        advanceWidths[n] = width;
-
-        totalWidth += width;
-      }
-
-      Point origin = new Point(50, 50);
-
-      GlyphRun glyphRun = new GlyphRun(glyphTypeface, 0, false, size,
-          glyphIndexes, origin, advanceWidths, null, null, null, null,
-          null, null);
-
-      drawingContext.DrawGlyphRun(Brushes.Black, glyphRun);
-
-      double y = origin.Y;
-      drawingContext.DrawLine(new Pen(Brushes.Red, 1), new Point(origin.X, y),
-          new Point(origin.X + totalWidth, y));
-
-      y -= (glyphTypeface.Baseline * size);
-      drawingContext.DrawLine(new Pen(Brushes.Green, 1), new Point(origin.X, y),
-          new Point(origin.X + totalWidth, y));
-
-      y += (glyphTypeface.Height * size);
-      drawingContext.DrawLine(new Pen(Brushes.Blue, 1), new Point(origin.X, y),
-          new Point(origin.X + totalWidth, y));
-
-      // Persist the drawing content.
-      drawingContext.Close();
-
-      return drawingVisual;
-    }
-
-
-    private DrawingVisual CreateDrawingVisualRectangle() {
-      DrawingVisual drawingVisual = new DrawingVisual();
-
-      // Retrieve the DrawingContext in order to create new drawing content.
-      DrawingContext drawingContext = drawingVisual.RenderOpen();
-
-      // Create a rectangle and draw it in the DrawingContext.
-      Rect rect = new Rect(new System.Windows.Point(160, 100), new System.Windows.Size(320, 80));
-      drawingContext.DrawRectangle(System.Windows.Media.Brushes.LightBlue, (System.Windows.Media.Pen)null, rect);
-
-      // Persist the drawing content.
-      drawingContext.Close();
-
-      return drawingVisual;
-    }
-    */

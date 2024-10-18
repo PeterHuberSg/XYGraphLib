@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -56,9 +57,6 @@ namespace XYGraphTestBench {
       TraceWPFEvents.TraceLineEnd("NumberScrollBar ValueChanged");
     }
 
-    [NotNull]
-    (double x, double y, string label)[] stringsLengths;
-
 
     /// <summary>
     /// whenever a setup parameter changes, regenerate the test data and refresh 
@@ -75,14 +73,14 @@ namespace XYGraphTestBench {
       //  }
       //}
 
-      stringsLengths = new (double x, double y, string label)[strings.Length];
+      var x_labelLength_labels = new (double x, double labelLength, string label)[strings.Length];
       for (int i = 0; i < strings.Length; i++) {
         var label = strings[i];
-        stringsLengths[i] = (i, label.Length, label);
+        x_labelLength_labels[i] = (i, label.Length, label);
       }
-      TestChart1Plot1XString1YLegend.FillData(stringsLengths, 
-        [new SerieSetting<(double x, double y, string label)>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null)],
-        getSeriesLabel);
+      TestChart1Plot1XString1YLegend.FillData(x_labelLength_labels, 
+        [new SerieSetting<(double x, double y, string label)>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null, "Y")],
+        "String Name", "String Unit", getSeriesLabel);
     }
 
 

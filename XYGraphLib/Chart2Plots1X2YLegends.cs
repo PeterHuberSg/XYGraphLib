@@ -176,6 +176,8 @@ namespace XYGraphLib {
     public override void FillData<TRecord>(
       IEnumerable<TRecord> newRecords,
       SerieSetting<TRecord>[] newSerieSettings,
+      string? xName = null,
+      string? xUnit = null,
       Func<TRecord, string>? stringGetter = null) 
     {
       plotAreaUpper.ClearRenderers();
@@ -186,35 +188,7 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData<TRecord>(newRecords, newSerieSettings, stringGetter);
-
-      //MaxValueTextBlock.Text = maxValue.ToString("N");
-      ////ValueXYLegend.MaxValue = maxValue;
-      //if (IsShowYFromZero) {
-      //  MinValueTextBlock.Visibility = Visibility.Hidden;
-      //  minValue = 0;
-      //  //ValueXYLegend.MinValue = 0;
-      //} else {
-      //  MinValueTextBlock.Text = minValue.ToString("N");
-      //  //ValueXYLegend.MinValue = minValue;
-      //}
-      //if (IsShowOpenClose && MainSerieIndex>=0 && MainSerieIndex<newSerieSettings.Length && countRecords>0) {
-      //  double open = valueLists[MainSerieIndex][0];
-      //  double close = valueLists[MainSerieIndex][(int)countRecords-1];
-      //  PercentageTextBlock.Text = ((close-open)/open).ToString("P");
-      //  CloseTextBlock.Text = "C: " + close.ToString("N");
-      //  AverageTextBlock.Text = "A: " + (averageValue/countRecords).ToString("N");
-      //  OpenTextBlock.Text = "O: " + open.ToString("N");
-      //} else {
-      //  PercentageTextBlock.Visibility = Visibility.Hidden;
-      //  OpenTextBlock.Visibility = Visibility.Hidden;
-      //  AverageTextBlock.Visibility = Visibility.Hidden;
-      //  CloseTextBlock.Visibility = Visibility.Hidden;
-      //}
-
-      //graphPolylines = new Polyline[newSerieSettings.Length];
-      //highLowPolygons = new Polygon[newSerieSettings.Length];//half would be enough, but easier for programming, only few bytes waisted
-      //closePoints = new List<Point>[newSerieSettings.Length];//to draw line back for Polygon
+      base.FillData<TRecord>(newRecords, newSerieSettings, xName, xUnit, stringGetter);
 
       for (int serieIndex = 0; serieIndex < newSerieSettings.Length; serieIndex++) {
         Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);

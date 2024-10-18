@@ -57,7 +57,7 @@ namespace XYGraphLib {
     }
 
 
-    const int lowerGraphLineIndex = 1;
+    //const int lowerGraphLineIndex = 1;
     const int areaLineIndex = 2;
     const int seriesCountUI = 3;//number of series displayed to user
     const int seriesCountDraw = 4;//number of series passed as data. 1 more than UI, because in UI areaLine is only 1 serie, but
@@ -92,55 +92,15 @@ namespace XYGraphLib {
       //setup line settings
       var seriesSettings = new SerieSetting<DataRecord>[selectSeriesCount];
       var seriesBrushes = new Brush?[] { Brushes.Green, Brushes.Blue, Brushes.Gray, /*area2*/null };
-      int seriesSettingsIndex = 0;
       Color fillColor = Colors.LightSkyBlue;
       fillColor.A = 128;
-      //for (int seriesUIIndex = 0; seriesUIIndex < seriesCountUI; seriesUIIndex++) {
-      //  //int lambdaIndex = seriesSettingsIndex; //we need to create a new instance within the loop, otherwise the lambda expression will use the latest value of seriesSettingsIndex (i.e. max(seriesSettingsIndex)), see C# reference "Outer Variables"
-      //  //if (seriesUIIndex==areaLineIndex) {
-      //  //  var areaBrush = seriesBrushes[seriesUIIndex]!;
-      //  //  seriesSettings[seriesSettingsIndex] =
-      //  //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex]],
-      //  //    SerieStyleEnum.area1, 0, areaBrush, 1, null);
-      //  //  seriesSettingsIndex++;
-      //  //  int lambdaIndex2 = lambdaIndex+1;
-      //  //  seriesSettings[seriesSettingsIndex] =
-      //  //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex2]],
-      //  //    SerieStyleEnum.area2, 0, areaBrush, 1, null);
-      //  //  seriesSettingsIndex++;
-      //  //} else {
-      //  //  int group;
-      //  //  Brush? fillBrush;
-      //  //  if (seriesUIIndex==lowerGraphLineIndex) {
-      //  //    group = 1;
-      //  //    //Color fillColor = Colors.LightSkyBlue;
-      //  //    //fillColor.A = 128;
-      //  //    fillBrush = new SolidColorBrush(fillColor);
-      //  //  } else {
-      //  //    group = 0;
-      //  //    fillBrush = null;
-      //  //  }
-      //  //  seriesSettings[seriesSettingsIndex] =
-      //  //    new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.DataPoint[lambdaIndex]],
-      //  //    SerieStyleEnum.line, group, seriesBrushes[seriesUIIndex]!, 2, fillBrush);
-      //  //  seriesSettingsIndex++;
-      //  //}
-
-
-      //  seriesSettings[seriesSettingsIndex++] =seriesUIIndex switch {
-      //    0 => new SerieSetting<DataRecord>(getSeries0Data, SerieStyleEnum.line, 0, Brushes.Green, 2, null),
-      //    1 => new SerieSetting<DataRecord>(getSeries1Data, SerieStyleEnum.line, 1, Brushes.Blue, 2, new SolidColorBrush(fillColor)),
-      //    2 => new SerieSetting<DataRecord>(getSeries2Data, SerieStyleEnum.area1, 0, Brushes.Gray, 1, null),
-      //    3 => new SerieSetting<DataRecord>(getSeries3Data, SerieStyleEnum.area2, 0, null!, 1, null),
-      //    _ => throw new NotSupportedException($"seriesUIIndex: {seriesUIIndex}"),
-      //  };
-      //}
 
       seriesSettings = [
-        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, 0, Brushes.Green, 2, null),
-        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, 1, Brushes.Blue, 2, new SolidColorBrush(fillColor)),
-        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area1, 0, Brushes.Gray, 1, null),
-        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, 0, null!, 1, null)];
+        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Green, 2, null, "Plot1Line"),
+        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, new SolidColorBrush(fillColor),
+          "Plot2Line", null, 1),
+        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area1, Brushes.Gray, 1, null, "Plot1Area1"),
+        new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null, strokeThickness: 0, null, "Plot1Area2")];
 
 
       //fill serie values into records
@@ -155,7 +115,7 @@ namespace XYGraphLib {
         time = time.AddMinutes(minutes);
       }
 
-      TestChart2Plots1X2YLegendsTraced.FillData<DataRecord>(dataRecords, seriesSettings);
+      TestChart2Plots1X2YLegendsTraced.FillData<DataRecord>(dataRecords, seriesSettings, "Date");
 
       FontDefinition[] fontDefinitions = [
             new FontDefinition(Brushes.DarkBlue, FontFamily, null, null, null, FontWeights.Bold),

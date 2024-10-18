@@ -40,7 +40,7 @@ namespace XYGraphLib {
     #region Constructor
     //      -----------
 
-    public RendererGridLineX(LegendScrollerY legendScrollerY, System.Windows.Media.Brush strokeBrush, double strokeThickness):
+    public RendererGridLineX(LegendScrollerY legendScrollerY, Brush strokeBrush, double strokeThickness):
       //gridlineX are parallel to horizontal x-line, but the distance between them is controlled by LegendY, therefore dimension Y
       base(strokeBrush, strokeThickness, DimensionMapY) 
     {

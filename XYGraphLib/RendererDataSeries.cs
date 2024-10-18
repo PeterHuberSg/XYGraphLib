@@ -27,18 +27,19 @@ namespace XYGraphLib {
   /// </summary>
   public abstract class RendererDataSeries: Renderer {
     // 
-    //                       + MinValueY
-    //            <--Width---> 
-    //          ^ +----------+ MinDisplayValueY
-    //          | |          | 
-    //   Height | | PlotArea | 
-    //          | |          |  
-    // :. . . . v +----------+ MaxDisplayValueY.+
-    // :          :          .                  :
-    // :          :          + MaxValueY        :
-    // :          :          :                  :
-    // MinIndex   :          MaxDisplayIndex    :
-    //            MinDisplayIndex               MaxIndex
+    //                      +← MinValueY
+    //                      .
+    //           ←--Width---→ 
+    //         ↑ ┌──────────┐← MinDisplayValueY
+    //         | │          | 
+    //  Height | | PlotArea | 
+    //         | |          |  
+    // . . . . ↓ └──────────┘← MaxDisplayValueY .
+    // ⇡         ⇡          .                   ⇡
+    // ┊         ┊          +← MaxValueY        ┊
+    // ┊         ┊          ⇡                   ┊
+    // MinIndex  ┊          MaxDisplayIndex     ┊
+    //           MinDisplayIndex                MaxIndex
     //
 
     #region Properties
@@ -66,21 +67,39 @@ namespace XYGraphLib {
     /// DataSeries contains the data displayed by the Renderer.
     /// </summary>
     protected readonly double[][,] DataSeries;
+
+
+    /// <summary>
+    /// Name for Y value displayed in crosshair
+    /// </summary>
+    protected readonly string? YName;
+
+
+    /// <summary>
+    /// Measurement unit for Y value displayed in crosshair
+    /// </summary>
+    protected readonly string? YUnit;
     #endregion
 
 
     #region Constructor
     //      -----------
 
-    public RendererDataSeries(Brush strokeBrush, double strokeThickness, int[] dimensionMap, double[][,] dataSeries) :
+    public RendererDataSeries(Brush strokeBrush, double strokeThickness, int[] dimensionMap, double[][,] dataSeries,
+      string? yName, string? yUnit) :
       base(strokeBrush, strokeThickness, dimensionMap)
     {
+      YName = yName;
+      YUnit = yUnit;
       int dimensionCount = DimensionMap.Length;
       if (dimensionCount!=dataSeries[0].GetLength(1)) {
         throw new Exception("Renderer was set up with " + dimensionCount + " dimensions. The DataPoints in the DataSeries should have the same number of values, but" + 
         "the dataPoints in dataSeries[0] have " + dataSeries[0].GetLength(1) + " values.");
       }
 
+      DataSeries = dataSeries;
+
+      //find min and max value within dataSeries and check if it is sorted
       IsDimensionSorted = new bool[dimensionCount];
       MinValues = new double[dimensionCount];
       MaxValues = new double[dimensionCount];
@@ -90,7 +109,6 @@ namespace XYGraphLib {
         MaxValues[dimensionIndex] = double.MinValue;
       }
 
-      DataSeries = dataSeries;
       foreach (double[,] dataSerie in dataSeries){
         int dataSerieLength = dataSerie.GetLength(0);
         for (int dataPointIndex = 0; dataPointIndex < dataSerieLength; dataPointIndex++) {
