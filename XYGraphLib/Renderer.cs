@@ -29,20 +29,20 @@ namespace XYGraphLib {
   /// used for this purpose. TranslateValueXYToPoint() provides this conversion.
   /// </summary>
   public abstract class Renderer {
-    // 
-    //                       + MinValueY
-    //            <--Width---> 
-    //          ^ +----------+ MinDisplayValueY
-    //          | |          | 
-    //   Height | | PlotArea | 
-    //          | |          |  
-    // :. . . . v +----------+ MaxDisplayValueY.+
-    // :          :          .                  :
-    // :          :          + MaxValueY        :
-    // :          :          :                  :
-    // MinIndex   :          MaxDisplayIndex    :
-    //            MinDisplayIndex               MaxIndex
-    //
+    //                       y ←MinValueY
+    //                       y 
+    //            ←--Width---→                     
+    //          ↑ ┌──────────┐ ←MinDisplayValueY
+    //          | |          |                     
+    //   Height | | PlotArea |                     
+    //          | |          |                      
+    // xxxxxxxx ↓ └──────────┘xxxxxxxxxxxxxxxx ←MaxDisplayValueY
+    // ↑          ↑          y               ↑                      
+    // ┊          ┊          y ←MaxValueY    ┊            
+    // ┊          ┊          ↑               ┊  
+    // MinIndex   ┊          MaxDisplayIndex ┊  
+    //            MinDisplayIndex            MaxIndex
+
 
     #region Properties
     //      ----------

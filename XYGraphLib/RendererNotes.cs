@@ -45,7 +45,7 @@ namespace XYGraphLib {
     }
 
 
-    public override string ToString() {
+    public override readonly string ToString() {
       string? valuesString = null;
       foreach (double value in Values) {
         if (valuesString==null) {
@@ -60,7 +60,7 @@ namespace XYGraphLib {
   }
 
 
-  public struct FontDefinition {
+  public readonly struct FontDefinition {
     public readonly Brush? FontBrush;
     public readonly FontFamily? FontFamily;
     public readonly double? FontSize;
@@ -79,7 +79,7 @@ namespace XYGraphLib {
     }
 
 
-    public override string ToString() {
+    public override readonly string ToString() {
       return "FontBrush: " + FontBrush??"null" + "; FontFamily: " + FontFamily??"null" + "; FontSize: " + FontSize??"null" + 
         "; FontStretch: " + FontStretch??"null" + "; FontStyle: " + FontStyle??"null" + "; FontWeight: " + FontWeight??"null" + ";";
     }
@@ -103,11 +103,9 @@ namespace XYGraphLib {
       base(null, 0, DimensionMapXY) 
     {
       this.chart = chart;
-      if (fontDefinitions==null) {
-        this.fontDefinitions = new FontDefinition[] {new FontDefinition(null, null, null, null, null, null) };
-      } else {
-        this.fontDefinitions = fontDefinitions;
-      }
+      this.fontDefinitions = fontDefinitions is null ? 
+        (new FontDefinition[] {new(null, null, null, null, null, null)}) : 
+        fontDefinitions;
       this.chartNotes = chartNotes.OrderBy(x => x.Values[0]).ToArray();
       foreach (ChartNote chartNote in chartNotes) {
         if (chartNote.FontDefinitionId<0 || chartNote.FontDefinitionId>=fontDefinitions!.Length) {
@@ -123,7 +121,7 @@ namespace XYGraphLib {
     //      -------
 
     GlyphDrawer[]? glyphDrawers;
-    FontFamily? fontFamilytracked;
+    FontFamily? fontFamilyTracked;
     double fontSizeTracked = double.MinValue;
 
     /// <summary>
@@ -131,16 +129,14 @@ namespace XYGraphLib {
     /// values between minDisplayValueX and maxDisplayValueX, if the x-values are sorted.
     /// </summary>
     protected override void OnCreateVisual(DrawingContext drawingContext, double width, double height, DrawingVisual drawingVisual) {
-      if (glyphDrawers==null || fontFamilytracked!=chart.FontFamily || fontSizeTracked!=chart.FontSize) {
-        fontFamilytracked = chart.FontFamily;
+      if (glyphDrawers==null || fontFamilyTracked!=chart.FontFamily || fontSizeTracked!=chart.FontSize) {
+        fontFamilyTracked = chart.FontFamily;
         fontSizeTracked = chart.FontSize;
-        if (glyphDrawers==null) {
-          glyphDrawers = new GlyphDrawer[fontDefinitions.Length];
-        }
+        glyphDrawers ??= new GlyphDrawer[fontDefinitions.Length];
         for (int fontDefinitionIndex = 0; fontDefinitionIndex < fontDefinitions.Length; fontDefinitionIndex++) {
           FontDefinition fontDefinition = fontDefinitions[fontDefinitionIndex];
           glyphDrawers[fontDefinitionIndex] = new GlyphDrawer(
-            fontDefinition.FontFamily ?? chart.FontFamily,
+            fontDefinition.FontFamily??chart.FontFamily,
             fontDefinition.FontStyle??chart.FontStyle,
             fontDefinition.FontWeight??chart.FontWeight,
             fontDefinition.FontStretch??chart.FontStretch,

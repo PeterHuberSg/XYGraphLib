@@ -34,8 +34,7 @@ namespace XYGraphLib {
   /// <summary>
   /// Stores the parameters of a LineGraph data serie
   /// </summary>
-  public class SerieSetting<TRecord> {
-    public Func<TRecord, double[]> Getter { get; set; }
+  public class SerieSetting {
     public SerieStyleEnum SerieStyle { get; set; }
     public int Group { get; set; }
     public Brush StrokeBrush { get; set; }
@@ -48,49 +47,44 @@ namespace XYGraphLib {
     /// constructor without FillBrush, which will be null
     /// </summary>
     public SerieSetting(
-      Func<TRecord, double[]> newGetter,
       SerieStyleEnum newSerieStyle,
       int newGroup,
       Brush newStrokeBrush,
       double newStrokeThickness) :
-      this(newGetter, newSerieStyle, newGroup, newStrokeBrush, newStrokeThickness, null) { }
+      this(newSerieStyle, newGroup, newStrokeBrush, newStrokeThickness, null) { }
 
 
     /// <summary>
     /// constructor without Group, which will be 0
     /// </summary>
     public SerieSetting(
-      Func<TRecord, double[]> newGetter,
       SerieStyleEnum newSerieStyle,
       Brush newStrokeBrush,
       double newStrokeThickness,
       Brush? newFillBrush):
-      this(newGetter, newSerieStyle, 0, newStrokeBrush, newStrokeThickness, newFillBrush) { }
+      this(newSerieStyle, 0, newStrokeBrush, newStrokeThickness, newFillBrush) { }
 
 
     /// <summary>
     /// constructor without Group (=0) nor FillBrush (=null)
     /// </summary>
     public SerieSetting(
-      Func<TRecord, double[]> newGetter,
       SerieStyleEnum newSerieStyle,
       Brush newStrokeBrush,
       double newStrokeThickness) :
-      this(newGetter, newSerieStyle, 0, newStrokeBrush, newStrokeThickness, null) { }
+      this(newSerieStyle, 0, newStrokeBrush, newStrokeThickness, null) { }
 
 
     /// <summary>
     /// constructor with all parameters
     /// </summary>
     public SerieSetting( 
-      Func<TRecord, double[]> newGetter,
       SerieStyleEnum newSerieStyle,
       int newGroup,
       Brush newStrokeBrush,
       double newStrokeThickness,
       Brush? newFillBrush) 
     {
-      Getter = newGetter;
       SerieStyle = newSerieStyle;
       Group = newGroup;
       StrokeBrush = newStrokeBrush;
@@ -110,9 +104,9 @@ namespace XYGraphLib {
 
 
     private string toString(Brush? brush) {
-      if (brush==null) return "null";
+      if (brush is null) return "null";
 
-      if (!(brush is SolidColorBrush solidColorBrush)) return brush.ToString();
+      if (brush is not SolidColorBrush solidColorBrush) return brush.ToString();
 
       return solidColorBrush.Color.ToString();
     }

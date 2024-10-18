@@ -6,14 +6,14 @@
   
  Chart1Plot1X1YLegend specific parameters displayed in Chart1Plot1X1YLegendWindow:
  
- +-----------------------------------------------------+
- |      Start Date: [1.1.2011]  Time:      [1] minutes |
- |      Steps:      [       5]  Increment: [1] minutes |
- |                                                     |
- | Serie 0 [x]  Min: [  0]  Max: [100]                 |
- | Serie 1 [x]  Min: [ 50]  Max: [ 60]                 |
- | Serie 2 [x]  Min: [100]  Max: [100]                 |  serie 3 gets displayed as areaLine
- +-----------------------------------------------------+
+ ┌─────────────────────────────────────────────────────┐
+ │      Start Date: [1.1.2011]  Time:      [1] minutes │
+ │      Steps:      [       5]  Increment: [1] minutes │
+ │                                                     │
+ │ Serie 0 [x]  Min: [  0]  Max: [100]                 │
+ │ Serie 1 [x]  Min: [ 50]  Max: [ 60]                 │
+ │ Serie 2 [x]  Min: [100]  Max: [100]                 │  serie 3 gets displayed as areaLine
+ └─────────────────────────────────────────────────────┘
  
 */
 

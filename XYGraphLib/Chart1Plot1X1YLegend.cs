@@ -17,12 +17,12 @@ This software is distributed without any warranty.
 **************************************************************************************/
 // Chart1Plot1X1YLegend displays some line graphics in the PlotArea with legends and scroll bars for each X and Y axis:
 // 
-// +-------------------------+---------+--------------+
-// |PlotArea                 |LegendScrollerY         |
-// |XYGridLines              |                        |
-// +-------------------------+---------+--------------+
-// |XLegendScroller          |Total Zoom Buttons      |
-// +-------------------------+------------------------+
+// ┌─────────────────────────┬────────────────────────┐
+// │PlotArea                 │LegendScrollerY         │
+// │XYGridLines              │                        │
+// ├─────────────────────────┼────────────────────────┤
+// │XLegendScroller          │Total Zoom Buttons      │
+// └─────────────────────────┴────────────────────────┘
 //
 // 
 // Usage:
@@ -97,12 +97,12 @@ namespace XYGraphLib {
     DependencyProperty.Register("LegendScrollerX", typeof(LegendScrollerX), typeof(Chart1Plot1X1YLegend));
     #endregion
 
-    
+
     #region Constructor
     //      -----------
 
     /// <summary>
-    /// Default Constructor
+    /// Only WPF Editor from Visual Studio should use this constructor
     /// </summary>
     public Chart1Plot1X1YLegend(): 
       this(new PlotArea(), new LegendScrollerX(), new LegendScrollerY()) { }
@@ -111,8 +111,13 @@ namespace XYGraphLib {
     /// <summary>
     /// Constructor supporting Chart1Plot1X1YLegend with plugged in components
     /// </summary>
-    public Chart1Plot1X1YLegend(PlotArea newPlotArea, LegendScrollerX newLegendScrollerX,
-      LegendScrollerY newLegendScrollerY) 
+    public Chart1Plot1X1YLegend(SerieSetting[] serieSettings, PlotArea PlotArea, LegendScrollerX LegendScrollerX,
+      LegendScrollerY LegendScrollerY) : this(PlotArea, LegendScrollerX, LegendScrollerY, serieSettings) {
+    }
+
+
+    private Chart1Plot1X1YLegend(PlotArea newPlotArea, LegendScrollerX newLegendScrollerX, 
+      LegendScrollerY newLegendScrollerY, SerieSetting[]? serieSettings = null) : base(serieSettings) 
     {
       PlotArea = plotArea = Add(newPlotArea);
 
@@ -138,22 +143,22 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] newSerieSettings){
+    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, Func<TRecord, double[]>[] valueGetters){
       plotArea.ClearRenderers();
       legendScrollerX.Reset();
       legendScrollerY.Reset();
 
       addGridLineRenderers();
 
-      base.FillData<TRecord>(newRecords, newSerieSettings);
+      base.FillData(newRecords, valueGetters);//ensures that SerieSettings is not null
 
-      for (int serieIndex = 0; serieIndex < newSerieSettings.Length; serieIndex++) {
-        Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);
+      for (int serieIndex = 0; serieIndex < SerieSettings!.Length; serieIndex++) {
+        Renderer? renderer = CreateGraphRenderer(serieIndex, SerieSettings[serieIndex]);
         if (renderer!=null) {
-          if (newSerieSettings[serieIndex].Group==0) {
+          if (SerieSettings[serieIndex].Group==0) {
             AddRenderer(renderer, plotArea, legendScrollerX, legendScrollerY);
           } else {
-            throw new Exception("Only group 0 is supported. SerieSettings[" + serieIndex + "]: " + newSerieSettings[serieIndex]);
+            throw new Exception("Only group 0 is supported. SerieSettings[" + serieIndex + "]: " + SerieSettings[serieIndex]);
           }
         }
       }

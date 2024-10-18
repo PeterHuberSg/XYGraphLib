@@ -17,13 +17,13 @@ This software is distributed without any warranty.
 **************************************************************************************/
 // Chart2Plots1X2YLegends displays 2 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).
 // 
-// +-------------------------+-------------------+
-// | PlotArea0               | LegendScrollerY0  |
-// + ----------------------- + ----------------- +
-// | PlotArea1               | LegendScrollerY1  |
-// +-------------------------+-------------------+
-// |XLegendScroller          |Total Zoom Buttons |
-// +-------------------------+-------------------+
+// ┌─────────────────────────┬───────────────────┐
+// │ PlotArea0               │ LegendScrollerY0  │
+// ├─────────────────────────┼───────────────────┤
+// │ PlotArea1               │ LegendScrollerY1  │
+// ├─────────────────────────┼───────────────────┤
+// │XLegendScroller          │Total Zoom Buttons │
+// └─────────────────────────┴───────────────────┘
 //
 //
 // Usage:
@@ -124,12 +124,12 @@ namespace XYGraphLib {
     DependencyProperty.Register("LegendScrollerX", typeof(LegendScrollerX), typeof(Chart2Plots1X2YLegends));
     #endregion
 
-    
+
     #region Constructor
     //      -----------
 
     /// <summary>
-    /// Default Constructor
+    /// Only WPF Editor from Visual Studio should use this constructor
     /// </summary>
     public Chart2Plots1X2YLegends(): 
       this(new PlotArea(), new PlotArea(), new LegendScrollerX(), new LegendScrollerY(), new LegendScrollerY()) { }
@@ -138,8 +138,17 @@ namespace XYGraphLib {
     /// <summary>
     /// Constructor supporting XYGraph with plugged in components
     /// </summary>
-    public Chart2Plots1X2YLegends(PlotArea newPlotAreaUpper, PlotArea newPlotAreaLower, LegendScrollerX newLegendScrollerX,
-      LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower) 
+    public Chart2Plots1X2YLegends(SerieSetting[] serieSettings, PlotArea plotAreaUpper, PlotArea plotAreaLower,
+      LegendScrollerX legendScrollerX, LegendScrollerY legendScrollerYUpper, LegendScrollerY legendScrollerYLower) : 
+        this(plotAreaUpper, plotAreaLower, legendScrollerX, legendScrollerYUpper, legendScrollerYLower, serieSettings) {}
+
+
+    /// <summary>
+    /// Constructor supporting XYGraph with plugged in components
+    /// </summary>
+    private Chart2Plots1X2YLegends(PlotArea newPlotAreaUpper, PlotArea newPlotAreaLower, 
+    LegendScrollerX newLegendScrollerX, LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower,
+    SerieSetting[]? serieSettings = null) : base(serieSettings) 
     {
       PlotAreaUpper = plotAreaUpper = Add(newPlotAreaUpper);
       PlotAreaLower = plotAreaLower = Add(newPlotAreaLower);
@@ -172,7 +181,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] newSerieSettings){
+    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, Func<TRecord, double[]>[] valueGetters){
       plotAreaUpper.ClearRenderers();
       plotAreaLower.ClearRenderers();
       legendScrollerX.Reset();
@@ -181,45 +190,17 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData<TRecord>(newRecords, newSerieSettings);
+      base.FillData(newRecords, valueGetters);//ensures that SerieSettings is not null
 
-      //MaxValueTextBlock.Text = maxValue.ToString("N");
-      ////ValueXYLegend.MaxValue = maxValue;
-      //if (IsShowYFromZero) {
-      //  MinValueTextBlock.Visibility = Visibility.Hidden;
-      //  minValue = 0;
-      //  //ValueXYLegend.MinValue = 0;
-      //} else {
-      //  MinValueTextBlock.Text = minValue.ToString("N");
-      //  //ValueXYLegend.MinValue = minValue;
-      //}
-      //if (IsShowOpenClose && MainSerieIndex>=0 && MainSerieIndex<newSerieSettings.Length && countRecords>0) {
-      //  double open = valueLists[MainSerieIndex][0];
-      //  double close = valueLists[MainSerieIndex][(int)countRecords-1];
-      //  PercentageTextBlock.Text = ((close-open)/open).ToString("P");
-      //  CloseTextBlock.Text = "C: " + close.ToString("N");
-      //  AverageTextBlock.Text = "A: " + (averageValue/countRecords).ToString("N");
-      //  OpenTextBlock.Text = "O: " + open.ToString("N");
-      //} else {
-      //  PercentageTextBlock.Visibility = Visibility.Hidden;
-      //  OpenTextBlock.Visibility = Visibility.Hidden;
-      //  AverageTextBlock.Visibility = Visibility.Hidden;
-      //  CloseTextBlock.Visibility = Visibility.Hidden;
-      //}
-
-      //graphPolylines = new Polyline[newSerieSettings.Length];
-      //highLowPolygons = new Polygon[newSerieSettings.Length];//half would be enough, but easier for programming, only few bytes waisted
-      //closePoints = new List<Point>[newSerieSettings.Length];//to draw line back for Polygon
-
-      for (int serieIndex = 0; serieIndex < newSerieSettings.Length; serieIndex++) {
-        Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);
+      for (int serieIndex = 0; serieIndex < SerieSettings!.Length; serieIndex++) {
+        Renderer? renderer = CreateGraphRenderer(serieIndex, SerieSettings[serieIndex]);
         if (renderer!=null) {
-          if (newSerieSettings[serieIndex].Group==0) {
+          if (SerieSettings[serieIndex].Group==0) {
             AddRenderer(renderer, plotAreaUpper, legendScrollerX, legendScrollerYUpper);
-          } else if (newSerieSettings[serieIndex].Group==1) {
+          } else if (SerieSettings[serieIndex].Group==1) {
             AddRenderer(renderer, plotAreaLower, legendScrollerX, legendScrollerYLower);
           } else {
-            throw new Exception("Only group 0 and 1 are supported. SerieSettings[" + serieIndex + "]: " + newSerieSettings[serieIndex]);
+            throw new Exception("Only group 0 and 1 are supported. SerieSettings[" + serieIndex + "]: " + SerieSettings[serieIndex]);
           }
         }
       }

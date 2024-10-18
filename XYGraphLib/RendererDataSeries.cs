@@ -26,20 +26,20 @@ namespace XYGraphLib {
   /// Creates a Visual for the PlotArea to display. Inherit from this class if dataserie(s) are linked to this Renderer.
   /// </summary>
   public abstract class RendererDataSeries: Renderer {
-    // 
-    //                       + MinValueY
-    //            <--Width---> 
-    //          ^ +----------+ MinDisplayValueY
-    //          | |          | 
-    //   Height | | PlotArea | 
-    //          | |          |  
-    // :. . . . v +----------+ MaxDisplayValueY.+
-    // :          :          .                  :
-    // :          :          + MaxValueY        :
-    // :          :          :                  :
-    // MinIndex   :          MaxDisplayIndex    :
-    //            MinDisplayIndex               MaxIndex
-    //
+    //                       y ←MinValueY
+    //                       y 
+    //            ←--Width---→                     
+    //          ↑ ┌──────────┐ ←MinDisplayValueY
+    //          | |          |                     
+    //   Height | | PlotArea |                     
+    //          | |          |                      
+    // xxxxxxxx ↓ └──────────┘xxxxxxxxxxxxxxxx ←MaxDisplayValueY
+    // ↑          ↑          y               ↑                      
+    // ┊          ┊          y ←MaxValueY    ┊            
+    // ┊          ┊          ↑               ┊  
+    // MinIndex   ┊          MaxDisplayIndex ┊  
+    //            MinDisplayIndex            MaxIndex
+
 
     #region Properties
     //      ----------

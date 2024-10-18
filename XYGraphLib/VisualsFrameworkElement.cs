@@ -9,7 +9,7 @@ using System.Windows;
 namespace XYGraphLib {
 
   /// <summary>
-  /// Frameworkelement with Visuals Collection. Is used by inheriting classe wanting to render directly
+  /// FrameworkElement with Visuals Collection. Is used by inheriting classes wanting to render directly
   /// to the DrawingContext, which is not supported for FrameworkElements.
   /// </summary>
   public class VisualsFrameworkElement: FrameworkElement {

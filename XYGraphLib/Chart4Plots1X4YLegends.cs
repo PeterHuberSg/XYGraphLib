@@ -17,17 +17,17 @@ This software is distributed without any warranty.
 **************************************************************************************/
 // Chart4Plots1X4YLegends displays 4 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).
 // 
-// +-------------------------+-------------------+
-// | PlotArea0               | LegendScrollerY0  |
-// + ----------------------- + ----------------- +
-// | PlotArea1               | LegendScrollerY1  |
-// + ----------------------- + ----------------- +
-// | PlotArea2               | LegendScrollerY2  |
-// + ----------------------- + ----------------- +
-// | PlotArea3               | LegendScrollerY3  |
-// +-------------------------+-------------------+
-// |XLegendScroller          |Total Zoom Buttons |
-// +-------------------------+-------------------+
+// ┌─────────────────────────┬───────────────────┐
+// │ PlotArea0               │ LegendScrollerY0  │
+// ├─────────────────────────┼───────────────────┤
+// │ PlotArea1               │ LegendScrollerY1  │
+// ├─────────────────────────┼───────────────────┤
+// │ PlotArea2               │ LegendScrollerY2  │
+// ├─────────────────────────┼───────────────────┤
+// │ PlotArea3               │ LegendScrollerY3  │
+// ├─────────────────────────┼───────────────────┤
+// │XLegendScroller          │Total Zoom Buttons │
+// └─────────────────────────┴───────────────────┘
 //
 //
 // Usage:
@@ -183,12 +183,12 @@ namespace XYGraphLib {
     DependencyProperty.Register("LegendScrollerX", typeof(LegendScrollerX), typeof(Chart4Plots1X4YLegends));
     #endregion
 
-    
+
     #region Constructor
     //      -----------
 
     /// <summary>
-    /// Default Constructor
+    /// Only WPF Editor from Visual Studio should use this constructor
     /// </summary>
     public Chart4Plots1X4YLegends(): 
       this(
@@ -204,6 +204,41 @@ namespace XYGraphLib {
     { }
 
 
+    /// <summary>
+    /// Constructor supporting XYGraph with plugged in components
+    /// </summary>
+    public Chart4Plots1X4YLegends(
+      SerieSetting[]? serieSettings,
+      PlotArea plotArea0,
+      PlotArea plotArea1,
+      PlotArea plotArea2,
+      PlotArea plotArea3,
+      LegendScrollerX legendScrollerX,
+      LegendScrollerY legendScrollerY0,
+      LegendScrollerY legendScrollerY1,
+      LegendScrollerY legendScrollerY2,
+      LegendScrollerY legendScrollerY3,
+      int heightRatio0 = 1,
+      int heightRatio1 = 1,
+      int heightRatio2 = 1,
+      int heightRatio3 = 1): 
+      this(
+        plotArea0,
+        plotArea1,
+        plotArea2,
+        plotArea3,
+        legendScrollerX,
+        legendScrollerY0,
+        legendScrollerY1,
+        legendScrollerY2,
+        legendScrollerY3,
+        heightRatio0,
+        heightRatio1,
+        heightRatio2,
+        heightRatio3, serieSettings) 
+    { }
+
+
     readonly double heightRatio0;
     readonly double heightRatio1;
     readonly double heightRatio2;
@@ -213,7 +248,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Constructor supporting XYGraph with plugged in components
     /// </summary>
-    public Chart4Plots1X4YLegends(
+    private Chart4Plots1X4YLegends(
       PlotArea newPlotArea0,
       PlotArea newPlotArea1,
       PlotArea newPlotArea2,
@@ -226,7 +261,8 @@ namespace XYGraphLib {
       int newHeightRatio0 = 1,
       int newHeightRatio1 = 1,
       int newHeightRatio2 = 1,
-      int newHeightRatio3 = 1) 
+      int newHeightRatio3 = 1,
+      SerieSetting[]? serieSettings = null) : base(serieSettings) 
     {
       PlotArea0 = plotArea0 = Add(newPlotArea0);
       PlotArea1 = plotArea1 = Add(newPlotArea1);
@@ -282,7 +318,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] newSerieSettings){
+    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, Func<TRecord, double[]>[] valueGetters) {
       plotArea0.ClearRenderers();
       plotArea1.ClearRenderers();
       plotArea2.ClearRenderers();
@@ -295,21 +331,17 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData<TRecord>(newRecords, newSerieSettings);
+      base.FillData<TRecord>(newRecords, valueGetters);
 
-      for (int serieIndex = 0; serieIndex < newSerieSettings.Length; serieIndex++) {
-        Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, newSerieSettings[serieIndex]);
+      for (int serieIndex = 0; serieIndex<SerieSettings!.Length; serieIndex++) {
+        Renderer? renderer = CreateGraphRenderer(serieIndex, SerieSettings[serieIndex]);
         if (renderer!=null) {
-          if (newSerieSettings[serieIndex].Group==0) {
-            AddRenderer(renderer, plotArea0, legendScrollerX, legendScrollerY0);
-          } else if (newSerieSettings[serieIndex].Group==1) {
-            AddRenderer(renderer, plotArea1, legendScrollerX, legendScrollerY1);
-          } else if (newSerieSettings[serieIndex].Group==2) {
-            AddRenderer(renderer, plotArea2, legendScrollerX, legendScrollerY2);
-          } else if (newSerieSettings[serieIndex].Group==3) {
-            AddRenderer(renderer, plotArea3, legendScrollerX, legendScrollerY3);
-          } else {
-            throw new Exception("Only group 0 to 3 are supported. SerieSettings[" + serieIndex + "]: " + newSerieSettings[serieIndex]);
+          switch (SerieSettings[serieIndex].Group) {
+          case 0: AddRenderer(renderer, plotArea0, legendScrollerX, legendScrollerY0); break;
+          case 1: AddRenderer(renderer, plotArea1, legendScrollerX, legendScrollerY1); break;
+          case 2: AddRenderer(renderer, plotArea2, legendScrollerX, legendScrollerY2); break;
+          case 3: AddRenderer(renderer, plotArea3, legendScrollerX, legendScrollerY3); break;
+          default: throw new Exception($"Only group 0 to 3 are supported. SerieSettings[{serieIndex}]: {SerieSettings[serieIndex]}");
           }
         }
       }
@@ -324,14 +356,12 @@ namespace XYGraphLib {
     /// <param name="group">0: highest plot area ... 3: lowest plot area</param>
     public void AddNotes(IEnumerable<ChartNote> chartNotes, FontDefinition[] fontDefinitions, int group) {
       RendererNotes rendererNotes = CreateNotesRenderer(chartNotes, fontDefinitions);
-      if (group==0) {
-        AddRenderer(rendererNotes, plotArea0, legendScrollerX, legendScrollerY0);
-      } else if (group==1) {
-        AddRenderer(rendererNotes, plotArea1, legendScrollerX, legendScrollerY1);
-      } else if (group==2) {
-        AddRenderer(rendererNotes, plotArea2, legendScrollerX, legendScrollerY2);
-      } else if (group==3) {
-        AddRenderer(rendererNotes, plotArea3, legendScrollerX, legendScrollerY3);
+      switch (group) {
+      case 0: AddRenderer(rendererNotes, plotArea0, legendScrollerX, legendScrollerY0); break;
+      case 1: AddRenderer(rendererNotes, plotArea1, legendScrollerX, legendScrollerY1); break;
+      case 2: AddRenderer(rendererNotes, plotArea2, legendScrollerX, legendScrollerY2); break;
+      case 3: AddRenderer(rendererNotes, plotArea3, legendScrollerX, legendScrollerY3); break;
+      default: throw new Exception($"Only group 0 to 3 are supported. group: {group}");
       }
     }
 

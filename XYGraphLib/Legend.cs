@@ -33,25 +33,25 @@ namespace XYGraphLib {
   public abstract class Legend: CustomControlBase {
     //
     //LegendX:
-    //            +------------------------------------+
-    // -100       | 100             150            200 |     500
-    //            +------------------------------------+
-    // :MinValue   :DisplayValue                    :        MaxValue
-    //              DisplayValue + DisplayValueRange:
+    //            ┌────────────────────────────────────┐
+    // -100       │ 100             150            200 │     500
+    //            └────────────────────────────────────┘
+    // ↑MinValue   ↑DisplayValue                    ↑        ↑MaxValue
+    //              DisplayValue + DisplayValueRange┊
     // 
     //
     //LegendY:
-    //    100'...MinValue
-    //       '
-    // +-----'+
-    // |  200'| DisplayValue
-    // |     '|
-    // |  150'|
-    // |     '|
-    // |  100'| DisplayValue + DisplayValueRange
-    // +-----'+
-    //       '
-    //   -100'..MaxValue
+    //    100←┄┄MinValue
+    //       
+    // ┌──────┐
+    // │  200 │←DisplayValue
+    // │      │
+    // │  150 │
+    // │      │
+    // │  100 │←DisplayValue + DisplayValueRange
+    // └──────┘
+    //        
+    //   -100←┄┄MaxValue
 
     #region Properties
     //      ----------
