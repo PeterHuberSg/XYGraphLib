@@ -204,41 +204,6 @@ namespace XYGraphLib {
     { }
 
 
-    /// <summary>
-    /// Constructor supporting XYGraph with plugged in components
-    /// </summary>
-    public Chart4Plots1X4YLegends(
-      SerieSetting[]? serieSettings,
-      PlotArea plotArea0,
-      PlotArea plotArea1,
-      PlotArea plotArea2,
-      PlotArea plotArea3,
-      LegendScrollerX legendScrollerX,
-      LegendScrollerY legendScrollerY0,
-      LegendScrollerY legendScrollerY1,
-      LegendScrollerY legendScrollerY2,
-      LegendScrollerY legendScrollerY3,
-      int heightRatio0 = 1,
-      int heightRatio1 = 1,
-      int heightRatio2 = 1,
-      int heightRatio3 = 1): 
-      this(
-        plotArea0,
-        plotArea1,
-        plotArea2,
-        plotArea3,
-        legendScrollerX,
-        legendScrollerY0,
-        legendScrollerY1,
-        legendScrollerY2,
-        legendScrollerY3,
-        heightRatio0,
-        heightRatio1,
-        heightRatio2,
-        heightRatio3, serieSettings) 
-    { }
-
-
     readonly double heightRatio0;
     readonly double heightRatio1;
     readonly double heightRatio2;
@@ -248,7 +213,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Constructor supporting XYGraph with plugged in components
     /// </summary>
-    private Chart4Plots1X4YLegends(
+    public Chart4Plots1X4YLegends(
       PlotArea newPlotArea0,
       PlotArea newPlotArea1,
       PlotArea newPlotArea2,
@@ -261,8 +226,7 @@ namespace XYGraphLib {
       int newHeightRatio0 = 1,
       int newHeightRatio1 = 1,
       int newHeightRatio2 = 1,
-      int newHeightRatio3 = 1,
-      SerieSetting[]? serieSettings = null) : base(serieSettings) 
+      int newHeightRatio3 = 1) : base() 
     {
       PlotArea0 = plotArea0 = Add(newPlotArea0);
       PlotArea1 = plotArea1 = Add(newPlotArea1);
@@ -318,8 +282,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, Func<TRecord, double[]>[] valueGetters) {
-      plotArea0.ClearRenderers();
+    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] serieSettings) {       plotArea0.ClearRenderers();
       plotArea1.ClearRenderers();
       plotArea2.ClearRenderers();
       plotArea3.ClearRenderers();
@@ -331,17 +294,17 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData<TRecord>(newRecords, valueGetters);
+      base.FillData<TRecord>(newRecords, serieSettings);
 
-      for (int serieIndex = 0; serieIndex<SerieSettings!.Length; serieIndex++) {
-        Renderer? renderer = CreateGraphRenderer(serieIndex, SerieSettings[serieIndex]);
+      for (int serieIndex = 0; serieIndex<serieSettings!.Length; serieIndex++) {
+        Renderer? renderer = CreateGraphRenderer(serieIndex, serieSettings[serieIndex]);
         if (renderer!=null) {
-          switch (SerieSettings[serieIndex].Group) {
+          switch (serieSettings[serieIndex].Group) {
           case 0: AddRenderer(renderer, plotArea0, legendScrollerX, legendScrollerY0); break;
           case 1: AddRenderer(renderer, plotArea1, legendScrollerX, legendScrollerY1); break;
           case 2: AddRenderer(renderer, plotArea2, legendScrollerX, legendScrollerY2); break;
           case 3: AddRenderer(renderer, plotArea3, legendScrollerX, legendScrollerY3); break;
-          default: throw new Exception($"Only group 0 to 3 are supported. SerieSettings[{serieIndex}]: {SerieSettings[serieIndex]}");
+          default: throw new Exception($"Only group 0 to 3 are supported. SerieSettings[{serieIndex}]: {serieSettings[serieIndex]}");
           }
         }
       }

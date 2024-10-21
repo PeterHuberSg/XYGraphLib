@@ -111,13 +111,8 @@ namespace XYGraphLib {
     /// <summary>
     /// Constructor supporting Chart1Plot1X1YLegend with plugged in components
     /// </summary>
-    public Chart1Plot1X1YLegend(SerieSetting[] serieSettings, PlotArea PlotArea, LegendScrollerX LegendScrollerX,
-      LegendScrollerY LegendScrollerY) : this(PlotArea, LegendScrollerX, LegendScrollerY, serieSettings) {
-    }
-
-
-    private Chart1Plot1X1YLegend(PlotArea newPlotArea, LegendScrollerX newLegendScrollerX, 
-      LegendScrollerY newLegendScrollerY, SerieSetting[]? serieSettings = null) : base(serieSettings) 
+    public Chart1Plot1X1YLegend(PlotArea newPlotArea, LegendScrollerX newLegendScrollerX, 
+      LegendScrollerY newLegendScrollerY) : base() 
     {
       PlotArea = plotArea = Add(newPlotArea);
 
@@ -143,22 +138,22 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, Func<TRecord, double[]>[] valueGetters){
+    public override void FillData<TRecord>(IEnumerable<TRecord> records, SerieSetting<TRecord>[] serieSettings) {
       plotArea.ClearRenderers();
       legendScrollerX.Reset();
       legendScrollerY.Reset();
 
       addGridLineRenderers();
 
-      base.FillData(newRecords, valueGetters);//ensures that SerieSettings is not null
+      base.FillData(records, serieSettings);//ensures that serieSettings is not null
 
-      for (int serieIndex = 0; serieIndex < SerieSettings!.Length; serieIndex++) {
-        Renderer? renderer = CreateGraphRenderer(serieIndex, SerieSettings[serieIndex]);
+      for (int serieIndex = 0; serieIndex < serieSettings!.Length; serieIndex++) {
+        Renderer? renderer = CreateGraphRenderer(serieIndex, serieSettings[serieIndex]);
         if (renderer!=null) {
-          if (SerieSettings[serieIndex].Group==0) {
+          if (serieSettings[serieIndex].Group==0) {
             AddRenderer(renderer, plotArea, legendScrollerX, legendScrollerY);
           } else {
-            throw new Exception("Only group 0 is supported. SerieSettings[" + serieIndex + "]: " + SerieSettings[serieIndex]);
+            throw new Exception("Only group 0 is supported. SerieSettings[" + serieIndex + "]: " + serieSettings[serieIndex]);
           }
         }
       }

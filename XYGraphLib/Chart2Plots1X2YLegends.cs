@@ -138,17 +138,9 @@ namespace XYGraphLib {
     /// <summary>
     /// Constructor supporting XYGraph with plugged in components
     /// </summary>
-    public Chart2Plots1X2YLegends(SerieSetting[] serieSettings, PlotArea plotAreaUpper, PlotArea plotAreaLower,
-      LegendScrollerX legendScrollerX, LegendScrollerY legendScrollerYUpper, LegendScrollerY legendScrollerYLower) : 
-        this(plotAreaUpper, plotAreaLower, legendScrollerX, legendScrollerYUpper, legendScrollerYLower, serieSettings) {}
-
-
-    /// <summary>
-    /// Constructor supporting XYGraph with plugged in components
-    /// </summary>
-    private Chart2Plots1X2YLegends(PlotArea newPlotAreaUpper, PlotArea newPlotAreaLower, 
-    LegendScrollerX newLegendScrollerX, LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower,
-    SerieSetting[]? serieSettings = null) : base(serieSettings) 
+    public Chart2Plots1X2YLegends(PlotArea newPlotAreaUpper, PlotArea newPlotAreaLower, 
+    LegendScrollerX newLegendScrollerX, LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower) : 
+      base() 
     {
       PlotAreaUpper = plotAreaUpper = Add(newPlotAreaUpper);
       PlotAreaLower = plotAreaLower = Add(newPlotAreaLower);
@@ -181,7 +173,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, Func<TRecord, double[]>[] valueGetters){
+    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] serieSettings) {
       plotAreaUpper.ClearRenderers();
       plotAreaLower.ClearRenderers();
       legendScrollerX.Reset();
@@ -190,17 +182,17 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData(newRecords, valueGetters);//ensures that SerieSettings is not null
+      base.FillData(newRecords, serieSettings);//ensures that SerieSettings is not null
 
-      for (int serieIndex = 0; serieIndex < SerieSettings!.Length; serieIndex++) {
-        Renderer? renderer = CreateGraphRenderer(serieIndex, SerieSettings[serieIndex]);
+      for (int serieIndex = 0; serieIndex < serieSettings!.Length; serieIndex++) {
+        Renderer? renderer = CreateGraphRenderer(serieIndex, serieSettings[serieIndex]);
         if (renderer!=null) {
-          if (SerieSettings[serieIndex].Group==0) {
+          if (serieSettings[serieIndex].Group==0) {
             AddRenderer(renderer, plotAreaUpper, legendScrollerX, legendScrollerYUpper);
-          } else if (SerieSettings[serieIndex].Group==1) {
+          } else if (serieSettings[serieIndex].Group==1) {
             AddRenderer(renderer, plotAreaLower, legendScrollerX, legendScrollerYLower);
           } else {
-            throw new Exception("Only group 0 and 1 are supported. SerieSettings[" + serieIndex + "]: " + SerieSettings[serieIndex]);
+            throw new Exception("Only group 0 and 1 are supported. SerieSettings[" + serieIndex + "]: " + serieSettings[serieIndex]);
           }
         }
       }
