@@ -73,15 +73,16 @@ namespace XYGraphLib {
       Brush? fillBrush = null,
       string? name = null,
       string? unit = null,
-      int group = 0){
-      Getter = newGetter;
-      SerieStyle = newSerieStyle;
-      Group = newGroup;
+      int group = 0)
+    {
+      Getter = getter;
+      SerieStyle = serieStyle;
+      Group = group;
       Name = name;
       Unit = unit;
-      StrokeBrush = newStrokeBrush;
-      StrokeThickness = newStrokeThickness;
-      FillBrush = newFillBrush; 
+      StrokeBrush = strokeBrush;
+      StrokeThickness = strokeThickness;
+      FillBrush = fillBrush; 
     }
 
 

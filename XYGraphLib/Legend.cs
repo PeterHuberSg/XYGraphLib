@@ -49,7 +49,7 @@ using CustomControlBaseLib;
 namespace XYGraphLib {
 
   /// <summary>
-  /// Displays a legend next to a PlotArea. The legend has labels displaying the value the pixel location corresponds to. 
+  /// Displays a legend next to a PlotArea. The legend has labels displaying the value a pixel at this location corresponds to. 
   /// DisplayValue and DisplayValueRange control the value range displayed. MinValue and MaxValue indicate the smallest and 
   /// largest values the legend might have to display after scrolling. This information is needed to chose a number 
   /// formatting which is correct from Min- to MaxValue.</br>

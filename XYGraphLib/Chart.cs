@@ -257,7 +257,6 @@ namespace XYGraphLib {
 
       InvalidateMeasure(); //InvalidateVisual() does not force Measure()
         recordIndex++;
-      }
       
       InvalidateMeasure(); //It seems InvalidateVisual() does not force Measure()
       InvalidateVisual();
@@ -271,9 +270,9 @@ namespace XYGraphLib {
     //      ---------
 
     bool isArea2Expected = false;
-    Brush? areaLinestrokeBrush;
+    Brush? areaLineStrokeBrush;
     double areaLineStrokeThickness;
-    Brush? areaLinefillBrush;
+    Brush? areaLineFillBrush;
     double[,]? areaLine1DataSerie;
 
 

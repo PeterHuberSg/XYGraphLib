@@ -86,7 +86,6 @@ namespace XYGraphLib {
       MinValue = 0;
       MaxValue = legend.LegendStrings.Count;
 
-      /////////////////////////////
       topLine = new Line {
         HorizontalAlignment = HorizontalAlignment.Left,
         VerticalAlignment = VerticalAlignment.Top,
@@ -116,6 +115,7 @@ namespace XYGraphLib {
     Line topLine;
     Line middleLine;
     Line bottomLine;
+
 
     protected override void OnButtonScrollbarCreated() {
       ScrollBar.Orientation = Orientation.Horizontal;
@@ -178,31 +178,6 @@ namespace XYGraphLib {
       ZoomOutButton.ArrangeBorderPadding(arrangeRect, 0, scrollbarY, ScrollBarHeight, ScrollBarHeight);
       ScrollBar.ArrangeBorderPadding(arrangeRect, ScrollBarHeight, scrollbarY, Math.Max(0,  arrangeRect.Size.Width-2*ScrollBarHeight), ScrollBarHeight);
       ZoomInButton.ArrangeBorderPadding(arrangeRect, arrangeRect.Width-ScrollBarHeight, scrollbarY, ScrollBarHeight, ScrollBarHeight);
-
-      //////////////////////////////
-      //topLine.X1 = 0;
-      //topLine.Y1 = arrangeRect.Size.Height/2;
-      //topLine.X2 = arrangeRect.Size.Width;
-      //topLine.Y2 = arrangeRect.Size.Height/2;
-      //topLine.Arrange(arrangeRect);
-      //topLine.X1 = 0;
-      //topLine.Y1 = legendY;
-      //topLine.X2 = arrangeRect.Size.Width;
-      //topLine.Y2 = legendY;
-      //topLine.Arrange(arrangeRect);
-
-      //middleLine.X1 = 0;
-      //middleLine.Y1 = scrollbarY;
-      //middleLine.X2 = arrangeRect.Size.Width;
-      //middleLine.Y2 = scrollbarY;
-      //middleLine.Arrange(arrangeRect);
-
-      //bottomLine.X1 = 0;
-      //bottomLine.Y1 = scrollbarY + ScrollBarHeight;
-      //bottomLine.X2 = arrangeRect.Size.Width;
-      //bottomLine.Y2 = scrollbarY + ScrollBarHeight;
-      //bottomLine.Arrange(arrangeRect);
-
 
       //if (IsSizingHeightToExpandableContent()) {
       //  return new Size(arrangeRect.Size.Width, legendHeight + scrollHeight);
