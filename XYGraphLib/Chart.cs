@@ -210,11 +210,11 @@ namespace XYGraphLib {
       string? xUnit,
       Func<TRecord, string>? stringGetter) 
     {
-      DataSeries = new double[newSerieSettings.Length][,];
-      serieStyle = new SerieStyleEnum[newSerieSettings.Length];
+      DataSeries = new double[serieSettings.Length][,];
+      serieStyle = new SerieStyleEnum[serieSettings.Length];
       XName = xName;
       XUnit = xUnit;
-      int recordsCount = newRecords.Count();
+      int recordsCount = records.Count();
       double[]? dataExtracted = null;
       serieSettings[0].Getter(records.First(), 0, ref dataExtracted);
       int dimensionCount = dataExtracted.Length;
@@ -256,9 +256,6 @@ namespace XYGraphLib {
       }
 
       InvalidateMeasure(); //InvalidateVisual() does not force Measure()
-        recordIndex++;
-      
-      InvalidateMeasure(); //It seems InvalidateVisual() does not force Measure()
       InvalidateVisual();
       IsEnabled = true;
     }
@@ -320,7 +317,7 @@ namespace XYGraphLib {
 
       switch (serieSetting.SerieStyle) {
       case SerieStyleEnum.line:
-        return new Renderer1Line(strokeBrush, serieSetting.StrokeThickness, fillBrush, DataSeries![serieIndex], serieSetting.Name, 
+        return new Renderer1Line(strokeBrush, serieSetting.StrokeThickness, fillBrush, new double[][,] { DataSeries![serieIndex] }, serieSetting.Name, 
           serieSetting.Unit);
 
       case SerieStyleEnum.area1:
