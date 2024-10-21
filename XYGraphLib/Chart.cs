@@ -15,6 +15,53 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
+
+// 
+// ┌─────────────┬─────────┐
+// │             │Legend   │
+// │ PlotArea    │Scroller │
+// │             │Y        │
+// ├─────────────┼─────────┤              
+// │Legend       │  100 %  │ ← Total Reset ZoomButton
+// │Scroller     ├────┬────┤              
+// │X            │ +  │ -  │ ← Total ZoomButtons, they zoom in and out for X and Y simultaneously
+// └─────────────┴────┴────┘
+// 
+// PlotArea: where line graphic gets painted
+// LegendScroller: can be used to zoom in & out and scroll, displays also the legend and 
+//                 ZoomButtons for that axis
+// Total ZoomButtons: allow to zoom in and out both for x and y axis at the same time.
+// 
+// 
+// A chart can hold several PlotAreas and LegendScrollers at the same time. XYGraphLib provides
+// some preconfigured charts:
+// Chart1Plot1X1YLegend: 1 PlotArea, 1 LegendScrollerX, 1 LegendScrollerY. See sample above
+//
+// Chart2Plots1X2YLegends:
+// ┌────────────────┬────────────────────┐
+// │ PlotArea0      │ LegendScrollerY0   │
+// ├────────────────┼────────────────────┤
+// │ PlotArea1      │ LegendScrollerY1   │
+// ├────────────────┼────────────────────┤
+// │LegendScrollerX │ Total Zoom Buttons │
+// └────────────────┴────────────────────┘
+//
+// Chart4Plots1X4YLegends:
+// ┌────────────────┬────────────────────┐
+// │ PlotArea0      │ LegendScrollerY0   │
+// ├────────────────┼────────────────────┤
+// │ PlotArea1      │ LegendScrollerY1   │
+// ├────────────────┼────────────────────┤
+// │ PlotArea2      │ LegendScrollerY2   │
+// ├────────────────┼────────────────────┤
+// │ PlotArea3      │ LegendScrollerY3   │
+// ├────────────────┼────────────────────┤
+// │XLegendScroller │ Total Zoom Buttons │
+// └────────────────┴────────────────────┘
+//
+//you can create your own combination by inheriting from Chart
+
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,8 +100,8 @@ namespace XYGraphLib {
     #endregion
 
 
-    #region Add to control methods for Constructor
-    //      --------------------------------------
+    #region Add control methods for Constructor
+    //      -----------------------------------
 
     protected readonly List<PlotArea> PlotAreas = new();
     protected readonly List<LegendScrollerY> LegendScrollerYs = new();
@@ -104,7 +151,7 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Add PlotArea to Control
+    /// Add ZoomButtons to Control
     /// </summary>
     protected void AddZoomButtons() {
       Brush strokeBrush = Brushes.DarkSlateGray;
@@ -136,71 +183,87 @@ namespace XYGraphLib {
     #region Fill Data
     //      ---------
 
+    /*----------------------------------------------------------------------------------------------------------
+    A line chart can display data as they are produced in a measurement. A measurement is taken at one point of 
+    time and might cover several values. FillData() takes IEnumerable<TRecord> newRecords, which gives easy 
+    access to all values at one particular time. A line graph displays only one value of each measurement, for 
+    example one line for the first values and another line for the second values. FillData() stores all first 
+    values together in DataSeries as an array, then all second values in another array to make the life easier of 
+    LegendX and Renderers.
+
+    IEnumerable<TRecord> newRecords => double[][,]? DataSeries
+    ----------------------------------------------------------------------------------------------------------*/
+
     protected double[][,]? DataSeries;
     SerieStyleEnum[]? serieStyle;
+    protected string? XName;
+    protected string? XUnit;
 
 
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public virtual void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] newSerieSettings) {
+    public virtual void FillData<TRecord>(
+      IEnumerable<TRecord> records,
+      SerieSetting<TRecord>[] serieSettings,
+      string? xName,
+      string? xUnit,
+      Func<TRecord, string>? stringGetter) 
+    {
       DataSeries = new double[newSerieSettings.Length][,];
       serieStyle = new SerieStyleEnum[newSerieSettings.Length];
-      //Groups = new int[newSerieSettings.Length];
+      XName = xName;
+      XUnit = xUnit;
       int recordsCount = newRecords.Count();
-      double[] firstDataPoint = newSerieSettings[0].Getter(newRecords.First());
-      int dimensionCount = firstDataPoint.Length;
+      double[]? dataExtracted = null;
+      serieSettings[0].Getter(records.First(), 0, ref dataExtracted);
+      int dimensionCount = dataExtracted.Length;
       for (int dataSeriesIndex = 0; dataSeriesIndex < DataSeries.Length; dataSeriesIndex++) {
         DataSeries[dataSeriesIndex] = new double[recordsCount, dimensionCount];
-        serieStyle[dataSeriesIndex] = newSerieSettings[dataSeriesIndex].SerieStyle;
-        //Groups[dataSeriesIndex] = newSerieSettings[dataSeriesIndex].Group;
+        serieStyle[dataSeriesIndex] = serieSettings[dataSeriesIndex].SerieStyle;
       }
 
       int recordIndex = 0;
-      foreach (TRecord record in newRecords) {
-        for (int dataSerieIndex = 0; dataSerieIndex < newSerieSettings.Length; dataSerieIndex++) {
-          SerieSetting<TRecord> serieSetting = newSerieSettings[dataSerieIndex];
-          double[] dataPoint = serieSetting.Getter(record);
-          for (int dimensionIndex = 0; dimensionIndex < dataPoint.Length; dimensionIndex++) {
-            DataSeries[dataSerieIndex][recordIndex, dimensionIndex] = dataPoint[dimensionIndex];
+      foreach (TRecord record in records) {
+        for (int dataSerieIndex = 0; dataSerieIndex<serieSettings.Length; dataSerieIndex++) {
+          SerieSetting<TRecord> serieSetting = serieSettings[dataSerieIndex];
+          serieSetting.Getter(record, dataSerieIndex, ref dataExtracted);
+          for (int dimensionIndex = 0; dimensionIndex < dataExtracted.Length; dimensionIndex++) {
+            DataSeries[dataSerieIndex][recordIndex, dimensionIndex] = dataExtracted[dimensionIndex];
           }
         }
         recordIndex++;
       }
 
+      //handle x legends with strings
+      //the code is here and not in the loop above because LegendXString is seldom used
+      var legendXString = LegendScrollerXs[0].Legend as LegendXString;
+      if (stringGetter is null) {
+        if (legendXString is not null)  
+        throw new ArgumentException("When a LegendXString is used, the stringGetter argument in FillData() cannot be null.");
+
+      } else { 
+        if (legendXString is null) throw new NotSupportedException(
+          "stringGetter should only be defined when LegendScrollerXs[0].Legend is a LegendXString, but it was " +
+          $"a '{LegendScrollerXs[0].Legend.GetType().Name}'.");
+
+        var legendXStrings = new string[recordsCount];
+        recordIndex = 0;
+        foreach (TRecord record in records) {
+          legendXStrings[recordIndex++] = stringGetter(record);
+        }
+        legendXString.LegendStrings = legendXStrings;
+      }
+
       InvalidateMeasure(); //InvalidateVisual() does not force Measure()
+        recordIndex++;
+      }
+      
+      InvalidateMeasure(); //It seems InvalidateVisual() does not force Measure()
       InvalidateVisual();
       IsEnabled = true;
     }
 
-    ///// <summary>
-    ///// Updates graphic with new data series 
-    ///// </summary>
-    //public virtual void FillData<TRecord>(IEnumerable<TRecord> records, Func<TRecord, double[]>[] valueReaders) {
-    //  if (SerieSettings is null) throw new Exception("FillData() needs serieSettings which must be provided in the constructor.)");
-      
-    //  int recordsCount = records.Count();
-    //  double[] firstDataPoint = valueReaders[0](records.First());
-    //  int dimensionCount = firstDataPoint.Length;
-    //  for (int dataSeriesIndex = 0; dataSeriesIndex < DataSeries!.Length; dataSeriesIndex++) {
-    //    DataSeries[dataSeriesIndex] = new double[recordsCount, dimensionCount];
-    //  }
-
-    //  int recordIndex = 0;
-    //  foreach (TRecord record in records) {
-    //    for (int dataSerieIndex = 0; dataSerieIndex < SerieSettings.Length; dataSerieIndex++) {
-    //      double[] dataPoint = valueReaders[dataSerieIndex](record);
-    //      for (int dimensionIndex = 0; dimensionIndex < dataPoint.Length; dimensionIndex++) {
-    //        DataSeries[dataSerieIndex][recordIndex, dimensionIndex] = dataPoint[dimensionIndex];
-    //      }
-    //    }
-    //    recordIndex++;
-    //  }
-
-    //  InvalidateMeasure(); //InvalidateVisual() does not force Measure()
-    //  InvalidateVisual();
-    //  IsEnabled = true;
-    //}
     #endregion
 
 
@@ -208,9 +271,9 @@ namespace XYGraphLib {
     //      ---------
 
     bool isArea2Expected = false;
-    Brush? areaLineStrokeBrush;
+    Brush? areaLinestrokeBrush;
     double areaLineStrokeThickness;
-    Brush? areaLineFillBrush;
+    Brush? areaLinefillBrush;
     double[,]? areaLine1DataSerie;
 
 
@@ -222,9 +285,9 @@ namespace XYGraphLib {
       if (isArea2Expected && serieSetting.SerieStyle!=SerieStyleEnum.area2) {
         throw new Exception($"SerieStyle[{serieIndex}] '{serieSetting.SerieStyle}, {(int)serieSetting.SerieStyle}' should be area2 because the previous data series had style area1.");
       }
-
       //get stroke brush or default brush
       Brush strokeBrush;
+
       if (serieSetting.StrokeBrush is null) {
         //use default brushes
         strokeBrush = serieIndex switch {
@@ -236,7 +299,7 @@ namespace XYGraphLib {
           _ => Brushes.Red
         };
       } else {
-          strokeBrush = serieSetting.StrokeBrush;
+        strokeBrush = serieSetting.StrokeBrush;
       }
 
       //get fill brush or use transparent version of stroke brush
@@ -258,8 +321,8 @@ namespace XYGraphLib {
 
       switch (serieSetting.SerieStyle) {
       case SerieStyleEnum.line:
-        double[][,] lineDataSeries = {DataSeries![serieIndex] };
-        return new Renderer1Line(strokeBrush, serieSetting.StrokeThickness, fillBrush, lineDataSeries);
+        return new Renderer1Line(strokeBrush, serieSetting.StrokeThickness, fillBrush, DataSeries![serieIndex], serieSetting.Name, 
+          serieSetting.Unit);
 
       case SerieStyleEnum.area1:
         isArea2Expected = true;
@@ -273,10 +336,11 @@ namespace XYGraphLib {
         if (!isArea2Expected) {
           throw new Exception($"SerieStyle[{serieIndex}] '{serieSetting.SerieStyle}, {(int)serieSetting.SerieStyle}' should be preceded by serie with style area1.");
         }
+ 
         isArea2Expected = false;
-        //double[][,]()
         double[][,] areaLineDataSeries = { areaLine1DataSerie!, DataSeries![serieIndex] };
-        return new Renderer2Lines(areaLineStrokeBrush!, areaLineStrokeThickness, areaLineFillBrush!, areaLineDataSeries);
+        return new Renderer2Lines(areaLineStrokeBrush!, areaLineStrokeThickness, areaLineFillBrush!, areaLineDataSeries,
+          serieSetting.Name, serieSetting.Unit);
 
       default:
         throw new Exception($"SerieStyle[{serieIndex}] '{serieSetting.SerieStyle}, {(int)serieSetting.SerieStyle}' not supported.");

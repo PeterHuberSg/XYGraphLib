@@ -31,6 +31,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfTestbench;
 using System.Windows.Controls.Primitives;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace XYGraphLib {
@@ -264,24 +265,23 @@ namespace XYGraphLib {
 
       //setup line settings
       var seriesSettings = new SerieSetting<DataRecord>[selectSeriesCount];
-      var seriesBrushes = new Brush?[] { Brushes.Green, Brushes.Blue, Brushes.Gray, /*area2*/null };
       int seriesSettingsIndex = 0;
       for (int seriesUIIndex = 0; seriesUIIndex < seriesCountUI; seriesUIIndex++) {
         if (serieCheckBoxes[seriesUIIndex].IsChecked!.Value) {
-          int lambdaIndex = seriesSettingsIndex; //we need to create a new instance within the loop, otherwise the lambda expression will use the latest value of seriesSettingsIndex (i.e. max(seriesSettingsIndex)), see C# reference "Outer Variables"
+
+          seriesSettings[seriesSettingsIndex++] = seriesUIIndex switch {
+            0 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Green, 2, null, "Line1"),
+            1 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null, "Line2"),
+            2 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area1, Brushes.Gray, 1, null, "Area1"),
+            //3 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null!, 1, null, "Area2"),
+            _ => throw new NotSupportedException($"seriesUIIndex: {seriesUIIndex}"),
+          };
           if (seriesUIIndex==areaLineIndex) {
-            var areaBrush = seriesBrushes[seriesUIIndex]!;
-            seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.Values[lambdaIndex]],
-              SerieStyleEnum.area1, areaBrush, 1, null);
-            seriesSettingsIndex++;
-            int lambdaIndex2 = lambdaIndex+1;
-            seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.Values[lambdaIndex2]],
-              SerieStyleEnum.area2, areaBrush, 1, null);
-            seriesSettingsIndex++;
-          } else {
-            seriesSettings[seriesSettingsIndex] = new SerieSetting<DataRecord>(record => [record.Date.ToDouble(), record.Values[lambdaIndex]],
-              SerieStyleEnum.line, seriesBrushes[seriesUIIndex]!, 2, null);
-            seriesSettingsIndex++;
+            //area has 2 lines and needs 2 seriesSettings, but has inly one seriesUIIndex 
+            //the second line needs to be handled here so that the switch statement can set the first seriesSettings
+            //here the seriesSettingsIndex gets incremented after the assignment, which is not possible in the swtich statement
+            seriesSettings[seriesSettingsIndex++] = 
+              new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null!, 1, null, "Area1");
           }
         }
       }
@@ -298,7 +298,15 @@ namespace XYGraphLib {
         time = time.AddMinutes(minutes);
       }
 
-      chart1Plot1X1YLegendTraced.FillData<DataRecord>(dataRecords, seriesSettings);
+      chart1Plot1X1YLegendTraced.FillData<DataRecord>(dataRecords, seriesSettings, "Date");
+    }
+
+
+    private static void getSeriesData(DataRecord dataRecord, int index, [NotNull] ref double[]? dataExtracted) {
+      dataExtracted ??= new double[2];
+      dataExtracted[0] = dataRecord.Date.ToDouble();
+      dataExtracted[1] = dataRecord.Values[index];
     }
   }
 }
+

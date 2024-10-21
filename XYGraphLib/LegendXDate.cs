@@ -18,12 +18,22 @@ This software is distributed without any warranty.
 using System;
 using System.Windows;
 
+//              ┌─────────────────────┐
+//              │1.1.2000   1.2.2000  │ ← Legend
+//              └─────────────────────┘
+//              ↑                     ↑
+// 1.1.2000     1.2.2000   1.3.2000   1.4.2000   1.5.2000   1.6.2000
+// MinDate      DisplayDate           MaxDisplayDate        MaxDate
+// MinIndex     DisplayIndex                                MaxIndex
+//              ←---------------------→
+//                ↑ DisplayRangeIndex
+
 
 namespace XYGraphLib {
 
 
   /// <summary>
-  /// /// Displays the legend below the PlotArea with date values.
+  /// Displays the legend below the PlotArea with date values.
   /// </summary>
   public class LegendXDate: LegendX {
 
@@ -185,7 +195,7 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
         if (newLabelsCount>1) {
           totalWidth += (newLabelsCount - 1) * (timeSpanUnitConfig.FollowLabelWidth + spaceBetweenLabels) * 1.1;
         }
-        if (totalWidth>RenderWidthTracked || newTimeSpanUnit<0) {
+        if (totalWidth>RenderWidthTracked) {
           if (labelsCount==int.MinValue) {
             //seems even the first estimated step is already too big. Just use the values
             step = newStep;
@@ -200,6 +210,8 @@ TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
         step = newStep;
         firstLabelDate = newFirstLabelDate;
         labelsCount = newLabelsCount;
+        if (newTimeSpanUnit<=TimeSpanUnitEnum.second) break; //it's not possible to zoom deeper
+
         newTimeSpanUnit -= 1;
       }
       TimeSpanUnit = newTimeSpanUnit;

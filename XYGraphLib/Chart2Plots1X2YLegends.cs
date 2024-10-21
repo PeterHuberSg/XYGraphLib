@@ -15,15 +15,16 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
+
 // Chart2Plots1X2YLegends displays 2 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).
 // 
-// ┌─────────────────────────┬───────────────────┐
-// │ PlotArea0               │ LegendScrollerY0  │
-// ├─────────────────────────┼───────────────────┤
-// │ PlotArea1               │ LegendScrollerY1  │
-// ├─────────────────────────┼───────────────────┤
-// │XLegendScroller          │Total Zoom Buttons │
-// └─────────────────────────┴───────────────────┘
+// ┌────────────────┬───────────────────┐
+// │ PlotArea0      │ LegendScrollerY0  │
+// ├────────────────┼───────────────────┤
+// │ PlotArea1      │ LegendScrollerY1  │
+// ├────────────────┼───────────────────┤
+// │LegendScrollerX │Total Zoom Buttons │
+// └────────────────┴───────────────────┘
 //
 //
 // Usage:
@@ -173,7 +174,13 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] serieSettings) {
+    public override void FillData<TRecord>(
+      IEnumerable<TRecord> records,
+      SerieSetting<TRecord>[]serieSettings,
+      string? xName = null,
+      string? xUnit = null,
+      Func<TRecord, string>? stringGetter = null) 
+    {
       plotAreaUpper.ClearRenderers();
       plotAreaLower.ClearRenderers();
       legendScrollerX.Reset();
@@ -182,10 +189,11 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData(newRecords, serieSettings);//ensures that SerieSettings is not null
+      base.FillData<TRecord>(records, serieSettings, xName, xUnit, stringGetter);//ensures that SerieSettings is not null
 
-      for (int serieIndex = 0; serieIndex < serieSettings!.Length; serieIndex++) {
-        Renderer? renderer = CreateGraphRenderer(serieIndex, serieSettings[serieIndex]);
+
+      for (int serieIndex = 0; serieIndex<serieSettings.Length; serieIndex++) {
+        Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, serieSettings[serieIndex]);
         if (renderer!=null) {
           if (serieSettings[serieIndex].Group==0) {
             AddRenderer(renderer, plotAreaUpper, legendScrollerX, legendScrollerYUpper);

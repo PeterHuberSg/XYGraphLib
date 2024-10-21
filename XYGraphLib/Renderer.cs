@@ -115,11 +115,6 @@ namespace XYGraphLib {
     /// </summary>
     public void DisplayValueChanged(Legend legend) {
       int dimension = legend.Dimension;
-      //if (dimension==0) {
-      //  if (!(legend is LegendX)) throw new Exception("Dimension 0 should be controlled by a LegendX, but was " + typeof(Legend).Name);
-      //} else  if (dimension==1) {
-      //  if (!(legend is LegendY)) throw new Exception("Dimension 0 should be controlled by a LegendY, but was " + typeof(Legend).Name);
-      //}
       SetDisplayValueRange(dimension, legend.DisplayValue, legend.DisplayValue + legend.DisplayValueRange, legend);
     }
 
@@ -180,7 +175,7 @@ namespace XYGraphLib {
     protected Pen StrokePen;
 
 
-    public Renderer(System.Windows.Media.Brush? strokeBrush, double strokeThickness, int[] dimensionMap) {
+    public Renderer(Brush? strokeBrush, double strokeThickness, int[] dimensionMap) {
       RendererId = nextRendererId++;
       StrokePen = new Pen(strokeBrush, strokeThickness);
       DimensionMap = dimensionMap;
@@ -222,7 +217,7 @@ namespace XYGraphLib {
     /// and maxDisplayValueY.
     /// </summary>
     public Visual CreateVisual(double width, double height) {
-      DrawingVisual drawingVisual = new DrawingVisual();
+      DrawingVisual drawingVisual = new();
 
       bool areMinMaxDefined = !double.IsNaN(MinDisplayValues[0]) && !double.IsNaN(MaxDisplayValues[0]);
       if (MinDisplayValues.Length>1) {
@@ -244,11 +239,7 @@ namespace XYGraphLib {
         //if there is a DimensionX in DimensionMap, it must be the first entry per convention
         dimensionXIndex = 0;
         double differenceX = MaxDisplayValues[DimensionX] - MinDisplayValues[DimensionX];
-        if (differenceX==0) {
-          ScaleX = width;
-        } else {
-          ScaleX = width / differenceX;
-        }
+        ScaleX = differenceX==0 ? width : width / differenceX;
       } else {
         //DimensionX not used
         dimensionXIndex = int.MinValue;
@@ -264,11 +255,7 @@ namespace XYGraphLib {
       }
       if (dimensionYIndex>int.MinValue) {
         double differenceY = MaxDisplayValues[dimensionYIndex] - MinDisplayValues[dimensionYIndex];
-        if (differenceY==0) {
-          ScaleY = height;
-        } else {
-          ScaleY = height / differenceY;
-        }
+        ScaleY = differenceY==0 ? height : height / differenceY;
       } else {
         //DimensionY not used
         dimensionYIndex = int.MinValue;

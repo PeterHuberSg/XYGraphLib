@@ -15,19 +15,20 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
+
 // Chart4Plots1X4YLegends displays 4 graphics stacked vertically, each having his own yLegend (Value), but sharing 1 XLegend (Time).
 // 
-// ┌─────────────────────────┬───────────────────┐
-// │ PlotArea0               │ LegendScrollerY0  │
-// ├─────────────────────────┼───────────────────┤
-// │ PlotArea1               │ LegendScrollerY1  │
-// ├─────────────────────────┼───────────────────┤
-// │ PlotArea2               │ LegendScrollerY2  │
-// ├─────────────────────────┼───────────────────┤
-// │ PlotArea3               │ LegendScrollerY3  │
-// ├─────────────────────────┼───────────────────┤
-// │XLegendScroller          │Total Zoom Buttons │
-// └─────────────────────────┴───────────────────┘
+// ┌────────────────┬───────────────────┐
+// │ PlotArea0      │ LegendScrollerY0  │
+// ├────────────────┼───────────────────┤
+// │ PlotArea1      │ LegendScrollerY1  │
+// ├────────────────┼───────────────────┤
+// │ PlotArea2      │ LegendScrollerY2  │
+// ├────────────────┼───────────────────┤
+// │ PlotArea3      │ LegendScrollerY3  │
+// ├────────────────┼───────────────────┤
+// │XLegendScroller │Total Zoom Buttons │
+// └────────────────┴───────────────────┘
 //
 //
 // Usage:
@@ -282,7 +283,14 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> newRecords, SerieSetting<TRecord>[] serieSettings) {       plotArea0.ClearRenderers();
+    public override void FillData<TRecord>(
+      IEnumerable<TRecord> records,
+      SerieSetting<TRecord>[] serieSettings,
+      string? xName = null,
+      string? xUnit = null,
+      Func<TRecord, string>? stringGetter = null) 
+    {
+      plotArea0.ClearRenderers();
       plotArea1.ClearRenderers();
       plotArea2.ClearRenderers();
       plotArea3.ClearRenderers();
@@ -294,7 +302,7 @@ namespace XYGraphLib {
 
       addGridLineRenderers();
 
-      base.FillData<TRecord>(newRecords, serieSettings);
+      base.FillData<TRecord>(records, serieSettings, xName, xUnit, stringGetter);
 
       for (int serieIndex = 0; serieIndex<serieSettings!.Length; serieIndex++) {
         Renderer? renderer = CreateGraphRenderer(serieIndex, serieSettings[serieIndex]);

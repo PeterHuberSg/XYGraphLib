@@ -48,8 +48,10 @@ using CustomControlBaseLib;
 
 namespace XYGraphLib {
 
-
-  public class Chart1Plot1X1YLegend: Chart {
+  /// <summary>
+  /// Chart with 1 PlotArea, 1 XLegendScroller and 1 LegendScrollerY
+  /// </summary>
+  public class Chart1Plot1X1YLegend: Chart{
 
 
     #region Properties
@@ -138,16 +140,22 @@ namespace XYGraphLib {
     /// <summary>
     /// Updates graphic with new data series 
     /// </summary>
-    public override void FillData<TRecord>(IEnumerable<TRecord> records, SerieSetting<TRecord>[] serieSettings) {
+    public override void FillData<TRecord>(
+      IEnumerable<TRecord> records,
+      SerieSetting<TRecord>[] serieSettings,
+      string? xName = null,
+      string? xUnit = null,
+      Func<TRecord, string>? stringGetter = null) 
+    {
       plotArea.ClearRenderers();
       legendScrollerX.Reset();
       legendScrollerY.Reset();
 
       addGridLineRenderers();
 
-      base.FillData(records, serieSettings);//ensures that serieSettings is not null
+      base.FillData<TRecord>(records, serieSettings, xName, xUnit, stringGetter);
 
-      for (int serieIndex = 0; serieIndex < serieSettings!.Length; serieIndex++) {
+      for (int serieIndex = 0; serieIndex<serieSettings!.Length; serieIndex++) {
         Renderer? renderer = CreateGraphRenderer(serieIndex, serieSettings[serieIndex]);
         if (renderer!=null) {
           if (serieSettings[serieIndex].Group==0) {

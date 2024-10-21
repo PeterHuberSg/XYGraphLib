@@ -11,9 +11,9 @@ namespace XYGraphLib {
   public partial class LegendScrollerXWindow: Window {
 
 
-    ///// <summary>
-    ///// Creates and opens a new LegendScrollerXWindow
-    ///// </summary>
+    /// <summary>
+    /// Creates and opens a new LegendScrollerXWindow
+    /// </summary>
     public static void Show(Window ownerWindow) {
       new LegendScrollerXWindow { Owner = ownerWindow }.Show();
     }
@@ -170,7 +170,7 @@ namespace XYGraphLib {
         TestLegendXScroller.DisplayValue -= TestLegendXScroller.Legend.DisplayValueRange;
       }
 
-      if (labels==null) return null; //no test needed
+      if (labels==null) return null!; //no test needed
 
       //test to be executed before next values get applies
       return () => {

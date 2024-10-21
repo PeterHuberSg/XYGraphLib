@@ -40,7 +40,7 @@ namespace XYGraphLib {
     #region Constructor
     //      -----------
 
-    public RendererGridLineX(LegendScrollerY legendScrollerY, System.Windows.Media.Brush strokeBrush, double strokeThickness):
+    public RendererGridLineX(LegendScrollerY legendScrollerY, Brush strokeBrush, double strokeThickness):
       //gridlineX are parallel to horizontal x-line, but the distance between them is controlled by LegendY, therefore dimension Y
       base(strokeBrush, strokeThickness, DimensionMapY) 
     {
@@ -56,21 +56,21 @@ namespace XYGraphLib {
     /// Renders the horizontal x-grid-line to the drawingContext, one line for each label in YLegend.
     /// </summary>
     protected override void OnCreateVisual(DrawingContext drawingContext, double width, double height, DrawingVisual _) {
-      LegendY legendy = (LegendY)LegendScrollerY.Legend;
+      var legendY = (LegendY)LegendScrollerY.Legend;
       //grid-lines use only 1 dimension. Both for x and y grid-line, 
       double minDisplayValue = MinDisplayValues[0];
 
       // Create a GuidelineSet to get the lines exactly on a pixel
       GuidelineSet guidelines = new GuidelineSet();
       double halfPenWidth = StrokePen.Thickness / 2;
-      foreach (double lableValue in legendy.LabelValues!) {
-        double yPos = height - (ScaleY * (lableValue - minDisplayValue));
+      foreach (double labelValue in legendY.LabelValues!) {
+        double yPos = height - (ScaleY * (labelValue - minDisplayValue));
         guidelines.GuidelinesY.Add(yPos + halfPenWidth);
       }
 
       drawingContext.PushGuidelineSet(guidelines);
-      foreach (double lableValue in legendy.LabelValues) {
-        double yPos = height - (ScaleY * (lableValue - minDisplayValue));
+      foreach (double labelValue in legendY.LabelValues) {
+        double yPos = height - (ScaleY * (labelValue - minDisplayValue));
         drawingContext.DrawLine(StrokePen, new Point(0, yPos), new Point(width, yPos));
       }
       drawingContext.Pop();

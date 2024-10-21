@@ -46,8 +46,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Dummy constructor allowing public constructor to call TraceCreateStart() before constructor gets executed 
     /// </summary>
-    private LegendXTraced(DummyTraceClass dummyArgument):base() {
-    }
+    private LegendXTraced(DummyTraceClass dummyArgument):base() {}
     #endregion
 
 

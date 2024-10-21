@@ -9,8 +9,7 @@ namespace XYGraphLib {
   /// <summary>
   /// Version of XYGraph which traces WPF events 
   /// </summary>
-  public class Chart1Plot1X1YLegendTraced: Chart1Plot1X1YLegend, ITraceName {
-
+  public class Chart1Plot1XString1YLegendTraced: Chart1Plot1X1YLegend, ITraceName {
     #region ITraceName
     //      ----------
 
@@ -27,13 +26,13 @@ namespace XYGraphLib {
     /// <summary>
     /// Default Constructor
     /// </summary>
-    public Chart1Plot1X1YLegendTraced(): this("Graph1Plot1X1YLegend") {}
+    public Chart1Plot1XString1YLegendTraced() : this("Graph1Plot1XString1YLegend") { }
 
 
     /// <summary>
     /// Constructor supporting tracing of multiple XYGraphs with different names
     /// </summary>
-    public Chart1Plot1X1YLegendTraced(string traceName): this(TraceWPFEvents.TraceCreateStart(traceName)) {
+    public Chart1Plot1XString1YLegendTraced(string traceName) : this(TraceWPFEvents.TraceCreateStart(traceName)) {
       TraceName = traceName;
       TraceWPFEvents.TraceCreateEnd(traceName);
     }
@@ -44,10 +43,10 @@ namespace XYGraphLib {
     /// </summary>
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
     //Chart1Plot1X1YLegendTraced is private and the other constructors invoking it set Name already
-    private Chart1Plot1X1YLegendTraced(DummyTraceClass? _) : 
-      base(new PlotAreaTraced(), new LegendScrollerXTraced(new LegendXDateTraced()), new LegendScrollerYTraced()) {
+    private Chart1Plot1XString1YLegendTraced(DummyTraceClass? _) :
+      base(new PlotAreaTraced(), new LegendScrollerXStringTraced(), new LegendScrollerYTraced()) {
     }
-    #pragma warning restore CS8618 
+    #pragma warning restore CS8618
     #endregion
 
 
@@ -63,12 +62,12 @@ namespace XYGraphLib {
       return TraceWPFEvents.MeasureOverride(this, constraint, base.MeasureOverrideTraced);
     }
 
-    
+
     protected override Size ArrangeOverrideTraced(Size finalSize) {
       return TraceWPFEvents.ArrangeOverride(this, finalSize, base.ArrangeOverrideTraced);
     }
 
-    
+
     protected override void OnRenderTraced(DrawingContext drawingContext) {
       TraceWPFEvents.OnRender(this, drawingContext, base.OnRenderTraced);
     }

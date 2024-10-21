@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections;
+using XYGraphTestBench;
 
 
 namespace XYGraphLib {
@@ -27,11 +28,13 @@ namespace XYGraphLib {
       LegendXButton.Click += LegendXButton_Click;
       LegendXDateButton.Click += LegendXDateButton_Click;
       LegendScrollerXButton.Click += LegendScrollerXButton_Click;
+      LegendScrollerXStringButton.Click += LegendScrollerXStringButton_Click;
       LegendYButton.Click += LegendYButton_Click;
       LegendScrollerYButton.Click += LegendScrollerYButton_Click;
       Chart1Plot1X1YLegendButton.Click += Chart1Plot1X1YLegendButton_Click;
       Chart2Plots1X2YLegendsButton.Click += Chart2Plots1X2YLegendsButton_Click;
       Chart4Plots1X4YLegendsButton.Click += Chart4Plots1X4YLegendsButton_Click;
+      Chart1Plot1XString1YButton.Click += Chart1Plot1XString1YButton_Click;
 
       CustomControlSampleButton.Click += CustomControlSampleButton_Click;
       SizeBindingButton.Click += SizeBindingButton_Click;
@@ -41,12 +44,12 @@ namespace XYGraphLib {
       //add _ and a, b, c ... at the start of every Button Text to support Alt key
       IEnumerator logicalChildren = LogicalChildren;
       logicalChildren.MoveNext();
-      StackPanel stackpanel = logicalChildren.Current as StackPanel;
+      StackPanel stackPanel = (StackPanel)logicalChildren.Current;
       char buttonChar = 'a';
-      foreach (var item in stackpanel.Children) {
-        Button button = item as Button;
+      foreach (var item in stackPanel.Children) {
+        Button button = (Button)item;
         if (button!=null) {
-          string contentString = button.Content as string;
+          string contentString = (string)button.Content;
           if (contentString!=null) {
             if (buttonChar=='z'+1) {
               buttonChar = '0';
@@ -77,6 +80,11 @@ namespace XYGraphLib {
     }
 
 
+    void LegendScrollerXStringButton_Click(object sender, RoutedEventArgs e) {
+      LegendScrollerXStringWindow.Show(this);
+    }
+
+
     void LegendYButton_Click(object sender, RoutedEventArgs e) {
       LegendYWindow.Show(this);
     }
@@ -99,6 +107,11 @@ namespace XYGraphLib {
 
     void Chart4Plots1X4YLegendsButton_Click(object sender, RoutedEventArgs e) {
       Chart4Plots1X4YLegendsWindow.Show(this);
+    }
+
+
+    void Chart1Plot1XString1YButton_Click(object sender, RoutedEventArgs e) {
+      Chart1Plot1XString1YWindow.Show(this);
     }
 
 

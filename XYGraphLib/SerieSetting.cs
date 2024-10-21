@@ -16,6 +16,7 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 This software is distributed without any warranty. 
 **************************************************************************************/
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media;
 
 
@@ -32,70 +33,55 @@ namespace XYGraphLib {
 
 
   /// <summary>
+  /// Takes any dataRecord and returns the x and y values in dataExtracted. When GetterDoubleDouble() gets called
+  /// for the first time, dataExtracted can be null, but must return a properly sized array. 
+  /// </summary>
+  public delegate void GetterIndexDoubleDouble<TRecord>(TRecord dataRecord, int index, [NotNull] ref double[]? dataExtracted);
+
+
+  /// <summary>
   /// Stores the parameters of a LineGraph data serie
   /// </summary>
   public class SerieSetting<TRecord> {
-    public Func<TRecord, double[]> Getter { get; set; }
+    public GetterIndexDoubleDouble<TRecord> Getter { get; set; }
     public SerieStyleEnum SerieStyle { get; set; }
     public int Group { get; set; }
-    public Brush StrokeBrush { get; set; }
-    public double StrokeThickness { get{return strokeThickness;} set{strokeThickness = value;} }
-      double strokeThickness = 1;
+    /// <summary>
+    /// Name used in crosshair for y value
+    /// </summary>
+    public string? Name { get; set; }
+
+
+    /// <summary>
+    /// Measurement unit used in crosshair for y value
+    /// </summary>
+    public string? Unit { get; set; }
+    public Brush? StrokeBrush { get; set; }
+    public double StrokeThickness { get { return strokeThickness; } set { strokeThickness = value; } }
+    double strokeThickness = 1;
     public Brush? FillBrush { get; set; }
 
 
     /// <summary>
-    /// constructor without FillBrush, which will be null
+    /// Constructor
     /// </summary>
     public SerieSetting(
-      Func<TRecord, double[]> getter,
+      GetterIndexDoubleDouble<TRecord> getter,
       SerieStyleEnum serieStyle,
-      int group,
-      Brush strokeBrush,
-      double strokeThickness) :
-      this(getter, serieStyle, group, strokeBrush, strokeThickness, null) { }
-
-
-    /// <summary>
-    /// constructor without Group, which will be 0
-    /// </summary>
-    public SerieSetting(
-      Func<TRecord, double[]> getter,
-      SerieStyleEnum serieStyle,
-      Brush strokeBrush,
-      double strokeThickness,
-      Brush? fillBrush):
-      this(getter, serieStyle, 0, strokeBrush, strokeThickness, fillBrush) { }
-
-
-    /// <summary>
-    /// constructor without Group (=0) nor FillBrush (=null)
-    /// </summary>
-    public SerieSetting(
-      Func<TRecord, double[]> getter,
-      SerieStyleEnum serieStyle,
-      Brush strokeBrush,
-      double strokeThickness) :
-      this(getter, serieStyle, 0, strokeBrush, strokeThickness, null) { }
-
-
-    /// <summary>
-    /// constructor with all parameters
-    /// </summary>
-    public SerieSetting(
-      Func<TRecord, double[]> getter,
-      SerieStyleEnum serieStyle,
-      int group,
-      Brush strokeBrush,
-      double strokeThickness,
-      Brush? fillBrush) 
-    {
-      Getter = getter;
-      SerieStyle = serieStyle;
-      Group = group;
-      StrokeBrush = strokeBrush;
-      StrokeThickness = strokeThickness;
-      FillBrush = fillBrush; 
+      Brush? strokeBrush = null,
+      double strokeThickness = 1,
+      Brush? fillBrush = null,
+      string? name = null,
+      string? unit = null,
+      int group = 0){
+      Getter = newGetter;
+      SerieStyle = newSerieStyle;
+      Group = newGroup;
+      Name = name;
+      Unit = unit;
+      StrokeBrush = newStrokeBrush;
+      StrokeThickness = newStrokeThickness;
+      FillBrush = newFillBrush; 
     }
 
 

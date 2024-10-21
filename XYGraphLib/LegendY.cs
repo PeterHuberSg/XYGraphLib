@@ -15,40 +15,26 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
-/***************************************************************************************************************************
- * LegendY
- * =======
- * 
- * Displays the right or left legend for a PlotArea with a displayed value range of DisplayValue to DisplayValueRange. The values are 
- * displayed vertically (y-axis).
- * MinValue and MaxValue indicate the largest values the legend might have to display after scrolling. They are
- * used to calculate the required width during MeasureOverride().
- * 
- * ' 500' MaxValue
- * '    '                                     
- * +--------------------------+
- * |  30' ^ DisplayValueRange |
- * |  20' |                   | <- DisplayLegend                           
- * |  10' DisplayValue        |
- * +--------------------------+
- * '    '                                   
- * '-100' MinValue
- *    500'...MaxValue
- *       '
- * +-----'+
- * |  200'| DisplayValue + DisplayValueRange
- * |     '|
- * |  150'|
- * |     '|
- * |  100'| DisplayValue
- * +-----'+
- *       '
- *   -100'..MinValue * 
- * note that the values must be right aligned ==> there is some blank space before the displayed values 100-200. When the user
- * scrolls to -100, there is enough space to display it without changing the legend width. If the width of the legend would 
- * vary during scrolling, so would the width of the chart, which would be annoying for the user.
- * 
- ***************************************************************************************************************************/
+
+// Displays the vertical legend for a PlotArea. The values are always doubles.
+// MinValue and MaxValue indicate the largest values the legend might have to display after
+// scrolling. They are used to calculate the required width during MeasureOverride().
+// 
+//    500 ← MaxValue
+//       
+// ┌─────┐
+// │  100│ ← DisplayValue + DisplayValueRange
+// │     │
+// │   50│
+// │     │
+// │    0│ ← DisplayValue
+// └─────┘
+//       
+//   -100 ← MinValue * 
+//
+// Note that the values must be right aligned ==> there is some blank space before the displayed values 100-200. When the user
+// scrolls to -100, there is enough space to display it without changing the legend width. If the width of the legend would 
+// vary during scrolling, so would the width of the chart, which would be annoying for the user.
 
 
 using System;

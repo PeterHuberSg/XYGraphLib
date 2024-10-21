@@ -37,8 +37,9 @@ namespace XYGraphLib {
     readonly Brush? fillBrush;
 
 
-    public Renderer1Line(Brush strokeBrush, double strokeThickness, Brush? fillBrush, double[][,] dataSeries) :
-      base(strokeBrush, strokeThickness, DimensionMapXY, dataSeries) 
+    public Renderer1Line(Brush strokeBrush, double strokeThickness, Brush? fillBrush, double[][,] dataSeries,
+      string? yName, string? yUnit) :
+      base(strokeBrush, strokeThickness, DimensionMapXY, dataSeries, yName, yUnit) 
     {
       if (dataSeries.Length!=1) {
         throw new ArgumentException("Renderer1Line needs 1 DataSerie, but there were " + dataSeries.Length + ".");

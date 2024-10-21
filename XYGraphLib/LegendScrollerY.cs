@@ -20,11 +20,33 @@ using System.Windows;
 using System.Windows.Controls;
 using CustomControlBaseLib;
 
+//                                     Legend
+//                                      ↓
+//                                    ┌──┬───┐
+// DisplayValue + DisplayValueRange → │10│ + │ ← Zoom In Button
+//                                    │  ├───┤
+//                                    │  │Scr│
+//                                    │ 5│oll│
+//                                    │  │Bar│
+//                                    │  ├───┤
+//                     DisplayValue → │ 0│ - │ ← Zoom Out Button 
+//                                    └──┴───┘
+//
+//LegendScrollerY informs Renderers by raising the DisplayIndexRangeChanged event which data needs to be displayed
 
 namespace XYGraphLib {
 
-
+  /// <summary>
+  /// Displays an y axis legend (normally a double), Scrollbar and 2 ZoomButton. It can be used to select which data-samples 
+  /// should be displayed in a Renderer based on a value range, displayed in the legend. The user choses with the scrollbar 
+  /// which is the first sample to display (DisplayValue) and with the zoom buttons how many samples should be displayed 
+  /// (DisplayRangeIndex). LegendScroller calculates DisplayValue and DisplayValueRange based on MinValue and MaxValue and sets 
+  /// the Legend accordingly.
+  /// </summary>
   public class LegendScrollerY: LegendScroller {
+    /*
+
+    */
 
     #region Properties
     //      ----------
