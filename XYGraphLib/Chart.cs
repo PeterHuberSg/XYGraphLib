@@ -206,9 +206,9 @@ namespace XYGraphLib {
     public virtual void FillData<TRecord>(
       IEnumerable<TRecord> records,
       SerieSetting<TRecord>[] serieSettings,
-      string? xName,
-      string? xUnit,
-      Func<TRecord, string>? stringGetter) 
+      string? xName = null,
+      string? xUnit = null,
+      Func<TRecord, string>? stringGetter = null) 
     {
       DataSeries = new double[serieSettings.Length][,];
       serieStyle = new SerieStyleEnum[serieSettings.Length];
@@ -259,7 +259,6 @@ namespace XYGraphLib {
       InvalidateVisual();
       IsEnabled = true;
     }
-
     #endregion
 
 

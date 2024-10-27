@@ -156,21 +156,6 @@ namespace XYGraphLib {
       xLine.X2 = endX;
       xLine.Y2 = midY;
 
-      //const double borderOffset = 8;
-      //double availableWidth = size.Width - borderOffset;
-      //double availableHeight = size.Height - borderOffset;
-      //double startX = 0.2 * availableWidth;
-      //double midX = 0.5 * availableWidth;
-      //double endX   = 0.8 * availableWidth;
-      //double startY = 0.2 * availableHeight;
-      //double midY = 0.5 * availableHeight;
-      //double endY   = 0.8 * availableHeight;
-
-      //xLine.X1 = startX - borderOffset;
-      //xLine.Y1 = midY - borderOffset;
-      //xLine.X2 = endX - borderOffset;
-      //xLine.Y2 = midY - borderOffset;
-
       Brush brush;
       if (IsEnabled) {
         brush = StrokeBrush;
@@ -188,90 +173,12 @@ namespace XYGraphLib {
         yLine.X2 = midX;
         yLine.Y2 = endY;
 
-        //yLine.X1 = midX - borderOffset;
-        //yLine.Y1 = startY - borderOffset;
-        //yLine.X2 = midX - borderOffset;
-        //yLine.Y2 = endY - borderOffset;
         yLine.Stroke = StrokeBrush;
         yLine.StrokeThickness = availableWidth/10;
       } else {
         yLine.Visibility = Visibility.Collapsed;
       }
     }
-
-    //protected override void OnRender(DrawingContext drawingContext) {
-    //  base.OnRender(drawingContext);
-    //  if (double.IsNaN(RenderSize.Width) || double.IsNaN(RenderSize.Height)) return;
-
-    //  //double startX = 0.2 * RenderSize.Width * 2;
-    //  //double midX = 0.5 * RenderSize.Width * 2;
-    //  //double endX   = 0.8 * RenderSize.Width * 2;
-    //  //double startY = 0.2 * RenderSize.Height * 2;
-    //  //double midY = 0.5 * RenderSize.Height * 2;
-    //  //double endY   = 0.8 * RenderSize.Height * 2;
-
-    //  double startX = -0.5*RenderSize.Width;
-    //  double midX = 0.5 * RenderSize.Width;
-    //  double endX   = RenderSize.Width * 1.5;
-    //  double startY = -0.5*RenderSize.Height;
-    //  double midY = 0.5 * RenderSize.Height;
-    //  double endY   = RenderSize.Height * 1.5;
-    //  drawingContext.DrawLine(StrokePen, new Point(startX, midY), new Point(endX, midY));
-    //  if (IsZoomIn) {
-    //    drawingContext.DrawLine(StrokePen, new Point(midX, startY), new Point(midX, endY));
-    //  }
-    //}
-
-
-    //private void Redraw(Size size) {
-    //  Visuals.Clear();
-    //  if (double.IsNaN(size.Width) || double.IsNaN(Height)) return;
-    //  DrawingVisual drawingVisual = new DrawingVisual();
-    //  double startX = 0.2 * size.Width;
-    //  double midX = 0.5 * size.Width;
-    //  double endX   = 0.8 * size.Width;
-    //  double startY = 0.2 * size.Height;
-    //  double midY = 0.5 * size.Height;
-    //  double endY   = 0.8 * size.Height;
-    //  using (DrawingContext drawingContext = drawingVisual.RenderOpen()) {
-    //    drawingContext.DrawLine(StrokePen, new Point(startX, midY), new Point(endX, midY));
-    //    if (IsZoomIn) {
-    //      drawingContext.DrawLine(StrokePen, new Point(midX, startY), new Point(midX, endY));
-    //    }
-    //  }
-    //  Visuals.Add((drawingVisual));
-    //}
-
-
-    //bool isMouseClicked;
-    //private bool isPlus;
-
-    //protected override void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e) {
-    //  isMouseClicked = true;
-    //  base.OnMouseDown(e);
-    //}
-
-
-    //protected override void OnMouseEnter(System.Windows.Input.MouseEventArgs e) {
-    //  isMouseClicked = false;
-    //  base.OnMouseEnter(e);
-    //}
-
-    
-    //protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e) {
-    //  isMouseClicked = false;
-    //  base.OnMouseEnter(e);
-    //}
-
-
-    //protected override void OnMouseUp(System.Windows.Input.MouseButtonEventArgs e) {
-    //  if (isMouseClicked) {
-    //    isMouseClicked = false;
-    //    if (Click!=null) {
-    //      Click(this);
-    //    }
-    //  }
-    //}
     #endregion
   }
 }

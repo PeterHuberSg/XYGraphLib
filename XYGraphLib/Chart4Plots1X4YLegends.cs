@@ -227,7 +227,7 @@ namespace XYGraphLib {
       int newHeightRatio0 = 1,
       int newHeightRatio1 = 1,
       int newHeightRatio2 = 1,
-      int newHeightRatio3 = 1) : base() 
+      int newHeightRatio3 = 1) 
     {
       PlotArea0 = plotArea0 = Add(newPlotArea0);
       PlotArea1 = plotArea1 = Add(newPlotArea1);

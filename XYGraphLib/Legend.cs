@@ -259,17 +259,6 @@ namespace XYGraphLib {
       displayValueRangeTracked = DisplayValueRange = displayValueRangeInit;
       maxValueTracked = MaxValue = maxValueInit;
 
-      /*code version if init values are double.Max-/MinValues
-        -----------------------------------------------------
-        MinValue = minValueInit;
-        minValueTracked = minValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
-        DisplayValue = displayValueInit;
-        displayValueTracked = displayValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
-        DisplayValueRange = displayValueRangeInit;
-        displayValueRangeTracked = displayValueRangeInit==double.MaxValue ? double.MinValue : double.MaxValue;
-        MaxValue = maxValueInit;
-        maxValueTracked = maxValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
-      */
       LabelValues = labelValuesInit;
 
       resetLocalData();
@@ -506,10 +495,8 @@ namespace XYGraphLib {
       out double firstLabel) 
     {
       //find value of first label
-//      firstLabel = ((int)(DisplayValue/step.Value)) * step.Value;
       firstLabel = (Math.Ceiling(DisplayValue/step.Value)) * step.Value;
       if (firstLabel<DisplayValue) {
-#if DEBUG
         if ((DisplayValue-firstLabel)/DisplayValueRange<roundingError) {
           //this is most likely a rounding problem due to double arithmetic
           //move first label to DisplayValue so that it gets displayed. This is important, otherwise the first label will be missing
@@ -517,39 +504,34 @@ namespace XYGraphLib {
         } else {
           //example: DisplayValue:6, FirstLabel: 5. FirstLabel would come before first value. Take next label
           firstLabel += step.Value;
+#if DEBUG
           if (firstLabel<DisplayValue) {
             System.Diagnostics.Debugger.Break();
             throw new Exception("firstLabel " + firstLabel + " should be greater than DisplayValue " + DisplayValue + ".");
           }
-        }
-#else 
-          firstLabel += step.Value;
 #endif
+        }
       }
       //find value of last label
       double maxDisplayValue = DisplayValue + DisplayValueRange;
-//      double lastLabel = ((int)Math.Round(maxDisplayValue/step.Value, round6Digits)) * step.Value;
       double lastLabel = (Math.Floor(Math.Round(maxDisplayValue/step.Value, round6Digits))) * step.Value;
       //doubles have problems representing decimal point numbers correctly. Example:
       //(3*0.2)- 0.6 = 0.00000000000000011102230246251565
       //meaning (3*0.2) != 0.6 !!!
       //
-      //double lastLabel = Math.Round(((int)Math.Round(maxDisplayValue/step.Value, round6Digits)) * step.Value, -step.Exponent-1);
       if (lastLabel>maxDisplayValue) {
-#if DEBUG
         if ((lastLabel-maxDisplayValue)/DisplayValueRange<roundingError) {
           //this is most likely a rounding problem due to double arithmetic
           //even the values are slightly different, just leave them. Last grid line will not be shown, but would anyway hardly be visible
         } else {
           lastLabel -= step.Value;
+#if DEBUG
           if (lastLabel>maxDisplayValue) {
             System.Diagnostics.Debugger.Break();
             throw new Exception("lastLabel " + lastLabel + " should be smaller than maxDisplayValue " + maxDisplayValue + ".");
           }
-        }
-#else 
-          lastLabel -= step.Value;
 #endif
+        }
       }
 
       //calculate number of labels needed

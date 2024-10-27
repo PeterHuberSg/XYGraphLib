@@ -107,14 +107,14 @@ namespace XYGraphLib {
     /// Only WPF Editor from Visual Studio should use this constructor
     /// </summary>
     public Chart1Plot1X1YLegend(): 
-      this(new PlotArea(), new LegendScrollerX(), new LegendScrollerY()) { }
+      this(new PlotArea(null, null, null, null), new LegendScrollerX(), new LegendScrollerY()) { }
 
 
     /// <summary>
     /// Constructor supporting Chart1Plot1X1YLegend with plugged in components
     /// </summary>
     public Chart1Plot1X1YLegend(PlotArea newPlotArea, LegendScrollerX newLegendScrollerX, 
-      LegendScrollerY newLegendScrollerY) : base() 
+      LegendScrollerY newLegendScrollerY) 
     {
       PlotArea = plotArea = Add(newPlotArea);
 
@@ -173,7 +173,6 @@ namespace XYGraphLib {
     /// </summary>
     /// <param name="chartNotes">string to be displayed, font formatting and links to lists.</param>
     /// <param name="fontDefinitions">if null, chartNotes.FontDefinitionId must be 0. The Font information from this chart will be used </param>
-    /// <param name="IsAddToUpper">if false, the notes will be added to lower plot-area</param>
     protected void AddNotes(IEnumerable<ChartNote> chartNotes, FontDefinition[] fontDefinitions) {
       RendererNotes rendererNotes = CreateNotesRenderer(chartNotes, fontDefinitions);
       AddRenderer(rendererNotes, plotArea, legendScrollerX, legendScrollerY);

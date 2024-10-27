@@ -140,8 +140,7 @@ namespace XYGraphLib {
     /// Constructor supporting XYGraph with plugged in components
     /// </summary>
     public Chart2Plots1X2YLegends(PlotArea newPlotAreaUpper, PlotArea newPlotAreaLower, 
-    LegendScrollerX newLegendScrollerX, LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower) : 
-      base() 
+      LegendScrollerX newLegendScrollerX, LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower)
     {
       PlotAreaUpper = plotAreaUpper = Add(newPlotAreaUpper);
       PlotAreaLower = plotAreaLower = Add(newPlotAreaLower);

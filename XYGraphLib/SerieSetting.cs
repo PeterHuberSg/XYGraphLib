@@ -46,6 +46,8 @@ namespace XYGraphLib {
     public GetterIndexDoubleDouble<TRecord> Getter { get; set; }
     public SerieStyleEnum SerieStyle { get; set; }
     public int Group { get; set; }
+
+
     /// <summary>
     /// Name used in crosshair for y value
     /// </summary>

@@ -270,70 +270,6 @@ namespace XYGraphLib {
     #endregion
 
 
-    #region Public Methods
-    //      --------------
-
-    /// <summary>
-    /// Shrinks the value range displayed by square root of 10. Zooming in twice makes the range 10 times smaller.
-    /// </summary>
-    public void ZoomIn() {
-      if (CanZoomIn) {
-        DisplayValueRange /= ZoomFactor;
-      }
-    }
-
-
-    /// <summary>
-    /// Shrinks the value range displayed by square root of 10. Zooming out twice makes the range 10 times bigger. Once 
-    /// all data-records are displayed, no further zooming out is possible.
-    /// </summary>
-    public void ZoomOut() {
-      if (CanZoomOut) {
-        DisplayValueRange *= ZoomFactor;
-      }
-    }
-
-
-    /// <summary>
-    /// Zooms out as much as possible, i.e. shows all data
-    /// </summary>
-    public void ZoomReset() {
-      if (CanZoomOut) {
-        DisplayValue = MinValue;
-        DisplayValueRange = MaxValue;
-      }
-    }
-
-
-    bool areNewMinMax;
-
-    
-    /// <summary>
-    /// Removes all Renderers from LegendScroller and reinitialises data. This is useful when new data gets assigned to chart.
-    /// </summary>
-    public void Reset() {
-      areNewMinMax = true;
-      MinValue = minValueInit;
-      minValueTracked = minValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
-      DisplayValue = displayValueInit;
-      displayValueTracked = displayValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
-      DisplayValueRange = displayValueRangeInit;
-      displayValueRangeTracked = displayValueRangeInit==double.MaxValue ? double.MinValue : double.MaxValue;
-      MaxValue = maxValueInit;
-      maxValueTracked = maxValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
-
-      OnReset();
-      if (legend!=null) {
-        legend.Reset();
-      }
-    }
-
-
-    protected virtual void OnReset() {
-    }
-    #endregion
-
-
     #region Constructor
     //      -----------
 
@@ -436,6 +372,70 @@ namespace XYGraphLib {
     #endregion
 
 
+    #region Public Methods
+    //      --------------
+
+    /// <summary>
+    /// Shrinks the value range displayed by square root of 10. Zooming in twice makes the range 10 times smaller.
+    /// </summary>
+    public void ZoomIn() {
+      if (CanZoomIn) {
+        DisplayValueRange /= ZoomFactor;
+      }
+    }
+
+
+    /// <summary>
+    /// Shrinks the value range displayed by square root of 10. Zooming out twice makes the range 10 times bigger. Once 
+    /// all data-records are displayed, no further zooming out is possible.
+    /// </summary>
+    public void ZoomOut() {
+      if (CanZoomOut) {
+        DisplayValueRange *= ZoomFactor;
+      }
+    }
+
+
+    /// <summary>
+    /// Zooms out as much as possible, i.e. shows all data
+    /// </summary>
+    public void ZoomReset() {
+      if (CanZoomOut) {
+        DisplayValue = MinValue;
+        DisplayValueRange = MaxValue;
+      }
+    }
+
+
+    bool areNewMinMax;
+
+
+    /// <summary>
+    /// Removes all Renderers from LegendScroller and reinitialises data. This is useful when new data gets assigned to chart.
+    /// </summary>
+    public void Reset() {
+      areNewMinMax = true;
+      MinValue = minValueInit;
+      minValueTracked = minValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
+      DisplayValue = displayValueInit;
+      displayValueTracked = displayValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
+      DisplayValueRange = displayValueRangeInit;
+      displayValueRangeTracked = displayValueRangeInit==double.MaxValue ? double.MinValue : double.MaxValue;
+      MaxValue = maxValueInit;
+      maxValueTracked = maxValueInit==double.MaxValue ? double.MinValue : double.MaxValue;
+
+      OnReset();
+      if (legend!=null) {
+        legend.Reset();
+      }
+    }
+
+
+    protected virtual void OnReset() {
+    }
+    #endregion
+
+
     #region Local Methods
     //      -------------
 
@@ -453,8 +453,9 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Updates the scrollbar to their values. Inheritors should call 
-    /// CalculateScrollBarValues latest during Arrange()
+    /// Recalculates min, display, range and max values. Updates Scrollbars and Legends if any value has changed. Updates
+    /// if zoom buttons are enabled.
+    /// Inheritors should call CalculateScrollBarValues latest during Arrange()
     /// </summary>
     protected void CalculateScrollBarValues() {
       if (double.IsInfinity(MinValue) || double.IsInfinity(MaxValue) || double.IsInfinity(DisplayValue) || double.IsInfinity(DisplayValueRange)) {
@@ -559,7 +560,7 @@ namespace XYGraphLib {
       }
       isArranging = false;
       areNewMinMax = false;
-TraceWpf.Line(">>>>> LegendScroller.CalculateScrollBarValues(): Copy to legend.MinValue");
+TraceWpf.Line(">>>>> LegendScroller.CalculateScrollBarValues(): Copy to Legend");
       legend.MinValue = minValueTracked;
       legend.DisplayValue = displayValueTracked;
       legend.DisplayValueRange = displayValueRangeTracked;

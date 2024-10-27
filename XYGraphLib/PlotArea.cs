@@ -121,7 +121,9 @@ namespace XYGraphLib {
     /// <summary>
     /// This constructor allows to give the PlotArea a name straight away. This is helpful for WPF event tracing.
     /// </summary>
-    public PlotArea(string? plotAreaName = null, Pen? crosshairPen = null) {
+    public PlotArea(string? plotAreaName = null, Pen? crosshairPen = null, 
+      string? xName = null, string? xUnit = null) 
+    {
       if (plotAreaName!=null) {
         Name = plotAreaName;
       }
@@ -202,10 +204,7 @@ namespace XYGraphLib {
 
       RendererAdded?.Invoke(renderer);
 
-      //remember the renderers crosshair needs to display the x and y values at the cursor x location.
-      //if (renderer is RendererGridLineY rendererGridLineY) {
-      //  legendScrollerX = rendererGridLineY.LegendScrollerX;
-      //}
+      //setup references to the renderers crosshair needs to display the x and y values at the cursor x location.
       switch (renderer) {
       case RendererGridLineY rendererGridLineY: legendScrollerX = rendererGridLineY.LegendScrollerX; break;
       case RendererDataSeries rendererDataSeries: rendererDataSeriesList.Add(rendererDataSeries); break;
