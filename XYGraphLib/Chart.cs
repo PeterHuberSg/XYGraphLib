@@ -104,9 +104,8 @@ namespace XYGraphLib {
     //      -----------------------------------
 
     protected readonly List<PlotArea> PlotAreas = new();
-    protected readonly List<LegendScrollerY> LegendScrollerYs = new();
-    protected readonly List<LegendScrollerX> LegendScrollerXs = new();
     protected readonly List<IZoom> Zoomers = new();
+    LegendXString? legendXString = null;
 
 
     /// <summary>
@@ -119,29 +118,70 @@ namespace XYGraphLib {
     }
 
 
+    ///// <summary>
+    ///// Add LegendScrollerX to control
+    ///// </summary>
+    //protected LegendScrollerX Add(LegendScrollerX newLegendScrollerX) {
+    //  LegendScrollerXs.Add(newLegendScrollerX);
+    //  Zoomers.Add(newLegendScrollerX);
+    //  newLegendScrollerX.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+    //  AddChild(newLegendScrollerX);
+    //  return newLegendScrollerX;
+    //}
+
+
+    ///// <summary>
+    ///// Add LegendScrollerY to control
+    ///// </summary>
+    //protected LegendScrollerY Add(LegendScrollerY newLegendScrollerY) {
+    //  newLegendScrollerY.Add(this);
+    //  LegendScrollerYs.Add(newLegendScrollerY);
+    //  Zoomers.Add(newLegendScrollerY);
+    //  newLegendScrollerY.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+    //  newLegendScrollerY.ZoomStateChanged += legendScroller_ZoomStateChanged;
+    //  AddChild(newLegendScrollerY);
+    //  return newLegendScrollerY;
+    //}
+
+
     /// <summary>
-    /// Add LegendScrollerX to control
+    /// Add LegendScrollerX to Chart
     /// </summary>
-    protected LegendScrollerX Add(LegendScrollerX newLegendScrollerX) {
-      LegendScrollerXs.Add(newLegendScrollerX);
-      Zoomers.Add(newLegendScrollerX);
-      newLegendScrollerX.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-      newLegendScrollerX.ZoomStateChanged += legendScroller_ZoomStateChanged;
-      AddChild(newLegendScrollerX);
-      return newLegendScrollerX;
+    protected LegendScrollerX Add(LegendScrollerX legendScrollerX) {
+      add(legendScrollerX);
+      return legendScrollerX;
     }
 
 
     /// <summary>
-    /// Add LegendScrollerY to control
+    /// Add LegendScrollerY to Chart
     /// </summary>
-    protected LegendScrollerY Add(LegendScrollerY newLegendScrollerY) {
-      LegendScrollerYs.Add(newLegendScrollerY);
-      Zoomers.Add(newLegendScrollerY);
-      newLegendScrollerY.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-      newLegendScrollerY.ZoomStateChanged += legendScroller_ZoomStateChanged;
-      AddChild(newLegendScrollerY);
-      return newLegendScrollerY;
+    protected LegendScrollerY Add(LegendScrollerY legendScrollerY) {
+      add(legendScrollerY);
+      return legendScrollerY;
+    }
+
+
+    /// <summary>
+    /// Add LegendScroller to Chart
+    /// </summary>
+    LegendScroller add(LegendScroller legendScroller) {
+      legendScroller.Add(this);
+      Zoomers.Add(legendScroller);
+      AddChild(legendScroller);
+
+      switch (legendScroller) {
+      case LegendScrollerX legendScrollerX:
+        legendScrollerX.VerticalAlignment = VerticalAlignment.Top;
+        legendXString = legendScrollerX.Legend as LegendXString;
+        break;
+      case LegendScrollerY legendScrollerY:
+        legendScrollerY.HorizontalAlignment = HorizontalAlignment.Left;
+        break;
+      default: 
+        throw new NotSupportedException();
+      }
+      return legendScroller;
     }
 
 
@@ -237,15 +277,13 @@ namespace XYGraphLib {
 
       //handle x legends with strings
       //the code is here and not in the loop above because LegendXString is seldom used
-      var legendXString = LegendScrollerXs[0].Legend as LegendXString;
       if (stringGetter is null) {
         if (legendXString is not null)  
         throw new ArgumentException("When a LegendXString is used, the stringGetter argument in FillData() cannot be null.");
 
       } else { 
         if (legendXString is null) throw new NotSupportedException(
-          "stringGetter should only be defined when LegendScrollerXs[0].Legend is a LegendXString, but it was " +
-          $"a '{LegendScrollerXs[0].Legend.GetType().Name}'.");
+          "stringGetter should only be defined when LegendScrollerXs[0].Legend is a LegendXString.");
 
         var legendXStrings = new string[recordsCount];
         recordIndex = 0;
@@ -415,7 +453,7 @@ namespace XYGraphLib {
     }
 
 
-    private void legendScroller_ZoomStateChanged(object sender) {
+    internal void UpdateZoomState() {
       bool canZoomOut = false;
       bool canZoomIn = false;
       foreach (IZoom zoomer in Zoomers) {

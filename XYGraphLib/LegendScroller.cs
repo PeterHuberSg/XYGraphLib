@@ -249,16 +249,10 @@ namespace XYGraphLib {
         hasZoomStateChanged = true;
         ZoomOutButton.IsEnabled = newCanZoomOut;
       }
-      if (hasZoomStateChanged && ZoomStateChanged!=null) {
-        ZoomStateChanged(this);
+      if (hasZoomStateChanged && chart is not null) {
+        chart.UpdateZoomState();
       }
     }
-
-
-    /// <summary>
-    /// Raised when IsZoomActive changes
-    /// </summary>
-    public event Action<IZoom>? ZoomStateChanged;
 
 
     /// <summary>
@@ -317,11 +311,11 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Installs event handler for Renderer's DisplayRangeChanged and updates its own MinDate and MaxDate if the Renderer is a
+    /// Links renderer to Legend and updates its own MinDate and MaxDate if the Renderer is a
     /// RendererDataSeries and if the values from the Renderer are outside the present range.
     /// </summary>
     public void AddRenderer(Renderer renderer) {
-      Legend.DisplayValueChanged += renderer.DisplayValueChanged;
+      Legend.Add(renderer);
       if (renderer is RendererDataSeries rendererDataSeries) {
         if (MinValue > rendererDataSeries.MinValues[Dimension]) {
           MinValue = rendererDataSeries.MinValues[Dimension];
@@ -334,6 +328,14 @@ namespace XYGraphLib {
           //TraceWpf.Line(">>>>> LegendScroller.AddRenderer(): MaxValue: " + MaxValue.ToDateTime());
         }
       }
+    }
+
+
+    Chart? chart;
+
+
+    internal void Add(Chart chart) {
+      this.chart = chart;
     }
     #endregion
 
@@ -443,13 +445,6 @@ namespace XYGraphLib {
 
 
     bool isExceptionThrown = false; //prevents throwing exceptions repeatedly
-
-
-    /// <summary>
-    /// Ensures that the various Value properties are consistent. 
-    /// </summary>
-    protected void ValidateValues() {
-    }
 
 
     /// <summary>
@@ -566,8 +561,6 @@ TraceWpf.Line(">>>>> LegendScroller.CalculateScrollBarValues(): Copy to Legend")
       legend.DisplayValueRange = displayValueRangeTracked;
       legend.MaxValue = maxValueTracked;
     }
-
-
     #endregion
   }
 }

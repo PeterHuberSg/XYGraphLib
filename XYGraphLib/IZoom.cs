@@ -41,14 +41,14 @@ namespace XYGraphLib {
     #endregion
 
 
-    #region Events
-    //      ------
+    //#region Events
+    ////      ------
 
-    /// <summary>
-    /// Raised when CanZoomIn or CanZoomOut have changed
-    /// </summary>
-    event Action<IZoom> ZoomStateChanged;
-    #endregion
+    ///// <summary>
+    ///// Raised when CanZoomIn or CanZoomOut have changed
+    ///// </summary>
+    //event Action<IZoom> ZoomStateChanged;
+    //#endregion
 
 
     #region Methods

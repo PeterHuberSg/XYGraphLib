@@ -142,7 +142,7 @@ namespace XYGraphLib {
 
       MinDisplayValues[dimensionMapIndex] = min;
       MaxDisplayValues[dimensionMapIndex] = max;
-      RenderingRequested?.Invoke(this);
+      plotArea?.UpdateVisual(this);
     }
 
 
@@ -154,12 +154,6 @@ namespace XYGraphLib {
     public int RendererId { get; private set; }
 
 
-    /// <summary>
-    /// Raised if rendering is needed
-    /// </summary>
-    public event Action<Renderer>? RenderingRequested;
-
-    
     /// <summary>
     /// Rendering completed. Used for WPF event tracing
     /// </summary>
@@ -189,12 +183,20 @@ namespace XYGraphLib {
         MaxDisplayValues[dimensionIndex] = double.NaN;
       }
     }
+
+
+    PlotArea? plotArea;
+
+
+    internal void Add(PlotArea plotArea) {
+      this.plotArea = plotArea;
+    }
     #endregion
 
 
     #region Methods
     //      -------
-  
+
     /// <summary>
     /// Multiplier used to convert an x-value into an x-pixel;
     /// </summary>
@@ -224,12 +226,12 @@ namespace XYGraphLib {
         areMinMaxDefined = areMinMaxDefined && !double.IsNaN(MinDisplayValues[0]) && !double.IsNaN(MaxDisplayValues[0]);
       }
       if (!areMinMaxDefined || double.IsNaN(width) || double.IsNaN(height)  || width<=0 || height<=0) {
-        string message = "Renderer" + RendererId + "(): empty Visual returned";
+        string message = $"Renderer{RendererId}.CreateVisual(): empty Visual returned";
         if (DimensionX<MinDisplayValues.Length) {
-          message += ", MinDisplayValueX: " + MinDisplayValues[DimensionX] + ", MaxDisplayValueX: " + MaxDisplayValues[DimensionX];
+          message += $", MinDisplayValueX: {MinDisplayValues[DimensionX]}, MaxDisplayValueX: {MaxDisplayValues[DimensionX]}";
         }
         if (DimensionY<MinDisplayValues.Length) {
-          message += ", MinDisplayValueY: " + MinDisplayValues[DimensionY] + ", MaxDisplayValueY: " + MaxDisplayValues[DimensionY] + "";
+          message += $", MinDisplayValueY: {MinDisplayValues[DimensionY]}, MaxDisplayValueY: {MaxDisplayValues[DimensionY]}";
         }
         TraceWpf.Line(message);
         return drawingVisual; //return an empty Visual, not null
@@ -321,9 +323,9 @@ namespace XYGraphLib {
       string minMaxString = "";
       for (int dimensionMapIndex = 0; dimensionMapIndex < DimensionMap.Length; dimensionMapIndex++) {
         int dimension = DimensionMap[dimensionMapIndex];
-        minMaxString = minMaxString + Environment.NewLine + "DimensionMap[" + dimensionMapIndex + "]: " + DimensionToString(dimension) + ";" +
-          "MinDisplay: " + MinDisplayValues[dimensionMapIndex] + "; " +
-          "MaxDisplay: " + MaxDisplayValues[dimensionMapIndex] + "; ";
+        minMaxString = minMaxString + Environment.NewLine + $"DimensionMap[{dimensionMapIndex}]: {DimensionToString(dimension)};" +
+          $"MinDisplay: {MinDisplayValues[dimensionMapIndex]}; " +
+          $"MaxDisplay: {MaxDisplayValues[dimensionMapIndex]}; ";
       }
       return "RendererId: " + RendererId + minMaxString;
     }
@@ -334,9 +336,9 @@ namespace XYGraphLib {
     /// </summary>
     public static string DimensionToString(int dimension) {
       if (dimension<3) {
-        return "Dimension" + ('X' + dimension) + ", " + dimension;
+        return $"Dimension{'X' + dimension}, " + dimension;
       } else {
-        return "Dimension" + ('A' + dimension-3) + ", " + dimension;
+        return $"Dimension{'A' + dimension-3}, " + dimension;
       }
     }
     #endregion

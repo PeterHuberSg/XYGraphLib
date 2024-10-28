@@ -16,8 +16,10 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 This software is distributed without any warranty. 
 **************************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 using CustomControlBaseLib;
 
@@ -234,14 +236,10 @@ namespace XYGraphLib {
     //      -------------------------
 
     /// <summary>
-    /// Reset Legend properties and removes all event listeners from DisplayValueChanged.
+    /// Reset Legend properties and removes all renderers.
     /// </summary>
     public void Reset() {
-      if (DisplayValueChanged!=null) {
-        foreach (Action<Legend> eventHandler in DisplayValueChanged.GetInvocationList()) {
-          DisplayValueChanged -= eventHandler;
-        }
-      }
+      renderers.Clear();
 
       //The original and the tracked value get assigned NaN. We use the strange behavior of doubles that
       //comparing 2 NaN-values is always false, even they have actually the same value. In the code, we 
@@ -266,15 +264,16 @@ namespace XYGraphLib {
     }
 
 
-    protected virtual void OnReset() {
+    readonly List<Renderer> renderers = new();
+
+
+    internal void Add(Renderer renderer) {
+      renderers.Add(renderer);
     }
 
 
-    /// <summary>
-    /// Raised when DisplayValue or DisplayValue Range has changed, but only once new legend values are calculated during
-    /// rendering
-    /// </summary>
-    public event Action<Legend>? DisplayValueChanged;
+    protected virtual void OnReset() {
+    }
     #endregion
 
 
@@ -473,8 +472,10 @@ namespace XYGraphLib {
             isRightAligned: IsWriteRightAligned, angle: LegendAngle);
         }
 
-        if (haveDisplayValuesChanged && DisplayValueChanged!=null) {
-          DisplayValueChanged(this);
+        if (haveDisplayValuesChanged) {
+          foreach (var renderer in renderers) {
+            renderer.DisplayValueChanged(this);
+          }
         }
       }
     }

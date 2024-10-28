@@ -138,13 +138,13 @@ namespace XYGraphLib {
       string minMaxString = "";
       for (int dimensionMapIndex = 0; dimensionMapIndex < DimensionMap.Length; dimensionMapIndex++) {
         int dimension = DimensionMap[dimensionMapIndex];
-        minMaxString = minMaxString + Environment.NewLine + "DimensionMap[" + dimensionMapIndex + "]: " + DimensionToString(dimension) + ";" +
-          "Min: " + MinValues[dimensionMapIndex] + "; " +
-          "MinDisplay: " + MinDisplayValues[dimensionMapIndex] + "; " +
-          "MaxDisplay: " + MaxDisplayValues[dimensionMapIndex] + "; " +
-          "Max: " + MaxValues[dimensionMapIndex] + "; ";
+        minMaxString = minMaxString + Environment.NewLine + $"DimensionMap[{dimensionMapIndex}]: {DimensionToString(dimension)};" +
+          $"Min: {MinValues[dimensionMapIndex]}; " +
+          $"MinDisplay: {MinDisplayValues[dimensionMapIndex]}; " +
+          $"MaxDisplay: {MaxDisplayValues[dimensionMapIndex]}; " +
+          $"Max: {MaxValues[dimensionMapIndex]}; ";
       }
-      return "RendererId: " + RendererId + minMaxString;
+      return $"RendererId: {RendererId}" + minMaxString;
     }
     #endregion
   }

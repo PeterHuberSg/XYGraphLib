@@ -196,7 +196,7 @@ namespace XYGraphLib {
     public void AddRenderer(Renderer renderer) {
       TraceWpf.Line("PlotArea.AddRenderer()");
       renderers.Add(renderer);
-      renderer.RenderingRequested += renderer_RenderingRequested;
+      renderer.Add(this);
       //When a new renderer gets added, first the legends have to be calculated again, which might change the width of the legend and
       //in consequence also the width of the Plot-area
       isRendererAdded = true;
@@ -216,15 +216,15 @@ namespace XYGraphLib {
     /// <summary>
     /// Replaces the old Visual created by this Renderer with a new one
     /// </summary>
-    void renderer_RenderingRequested(Renderer renderer) {
+    internal void UpdateVisual(Renderer renderer) {
       if (Visuals.Count<=firstRendererVisual) {
-        TraceWpf.Line("PlotArea.RenderingRequested(" + renderer.RendererId + "): delayed Visual");
+        TraceWpf.Line($"PlotArea.UpdateVisual(RendererID:{ renderer.RendererId}): delayed Visual");
         //Background not added yet => onRender will get executed later, which will add the visuals for the Renderer;
         //nothing to do now
       } else {
-        TraceWpf.Line("PlotArea.RenderingRequested(" + renderer.RendererId + "): Visual updated");
+        TraceWpf.Line($"PlotArea.UpdateVisual(RendererID:{renderer.RendererId}): Visual updated");
         int rendererIndex = renderers.IndexOf(renderer);
-        if (rendererIndex==-1) throw new Exception("RenderingRequested: renderer '" + renderer + "' not found in renderers (Count: " + renderers.Count + ").");
+        if (rendererIndex==-1) throw new Exception($"UpdateVisual: renderer '{renderer}' not found in renderers (Count: " + renderers.Count + ").");
 
         int visualIndex = firstRendererVisual + rendererIndex;
         Visuals.RemoveAt(visualIndex);
