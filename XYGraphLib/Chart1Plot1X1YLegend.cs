@@ -117,16 +117,8 @@ namespace XYGraphLib {
       LegendScrollerY newLegendScrollerY) 
     {
       PlotArea = plotArea = Add(newPlotArea);
-
       LegendScrollerY = legendScrollerY = Add(newLegendScrollerY);
-      legendScrollerY.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
-
       LegendScrollerX = legendScrollerX = Add(newLegendScrollerX);
-
-      AddZoomButtons();
     }
     #endregion
 
@@ -161,7 +153,7 @@ namespace XYGraphLib {
           if (serieSettings[serieIndex].Group==0) {
             AddRenderer(renderer, plotArea, legendScrollerX, legendScrollerY);
           } else {
-            throw new Exception("Only group 0 is supported. SerieSettings[" + serieIndex + "]: " + serieSettings[serieIndex]);
+            throw new Exception($"Only group 0 is supported. SerieSettings[{serieIndex}]: {serieSettings[serieIndex]}");
           }
         }
       }

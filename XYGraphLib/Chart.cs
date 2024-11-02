@@ -82,9 +82,9 @@ namespace XYGraphLib {
     //      ------
 
     /// <summary>
-    /// Called when a renderer gets created. Useful for tracing WPF events
+    /// Called when a renderer gets created.
     /// </summary>
-    public event Action<Renderer>? RendererCreated;
+    public event Action<Renderer>? RendererCreated; // Also useful for tracing WPF events
     #endregion
 
 
@@ -95,6 +95,7 @@ namespace XYGraphLib {
     /// Constructor
     /// </summary>
     public Chart() {
+      addZoomButtons();
       IsEnabled = false;
     }
     #endregion
@@ -104,44 +105,18 @@ namespace XYGraphLib {
     //      -----------------------------------
 
     protected readonly List<PlotArea> PlotAreas = new();
-    protected readonly List<IZoom> Zoomers = new();
+    protected readonly List<LegendScroller> LegendScrollers = new();
     LegendXString? legendXString = null;
 
 
     /// <summary>
     /// Add PlotArea to Control
     /// </summary>
-    protected PlotArea Add(PlotArea newPlotArea) {
-      PlotAreas.Add(newPlotArea);
-      AddChild(newPlotArea);
-      return newPlotArea;
+    protected PlotArea Add(PlotArea plotArea) {
+      PlotAreas.Add(plotArea);
+      AddChild(plotArea);
+      return plotArea;
     }
-
-
-    ///// <summary>
-    ///// Add LegendScrollerX to control
-    ///// </summary>
-    //protected LegendScrollerX Add(LegendScrollerX newLegendScrollerX) {
-    //  LegendScrollerXs.Add(newLegendScrollerX);
-    //  Zoomers.Add(newLegendScrollerX);
-    //  newLegendScrollerX.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-    //  AddChild(newLegendScrollerX);
-    //  return newLegendScrollerX;
-    //}
-
-
-    ///// <summary>
-    ///// Add LegendScrollerY to control
-    ///// </summary>
-    //protected LegendScrollerY Add(LegendScrollerY newLegendScrollerY) {
-    //  newLegendScrollerY.Add(this);
-    //  LegendScrollerYs.Add(newLegendScrollerY);
-    //  Zoomers.Add(newLegendScrollerY);
-    //  newLegendScrollerY.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-    //  newLegendScrollerY.ZoomStateChanged += legendScroller_ZoomStateChanged;
-    //  AddChild(newLegendScrollerY);
-    //  return newLegendScrollerY;
-    //}
 
 
     /// <summary>
@@ -167,7 +142,7 @@ namespace XYGraphLib {
     /// </summary>
     LegendScroller add(LegendScroller legendScroller) {
       legendScroller.Add(this);
-      Zoomers.Add(legendScroller);
+      LegendScrollers.Add(legendScroller);
       AddChild(legendScroller);
 
       switch (legendScroller) {
@@ -177,6 +152,9 @@ namespace XYGraphLib {
         break;
       case LegendScrollerY legendScrollerY:
         legendScrollerY.HorizontalAlignment = HorizontalAlignment.Left;
+        legendScrollerY.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+        legendScrollerY.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
+        legendScrollerY.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
         break;
       default: 
         throw new NotSupportedException();
@@ -193,7 +171,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Add ZoomButtons to Control
     /// </summary>
-    protected void AddZoomButtons() {
+    private void addZoomButtons() {
       Brush strokeBrush = Brushes.DarkSlateGray;
       TotalZoomInButton = new ZoomButton(true, strokeBrush) {
         HorizontalAlignment = HorizontalAlignment.Center,
@@ -250,18 +228,41 @@ namespace XYGraphLib {
       string? xUnit = null,
       Func<TRecord, string>? stringGetter = null) 
     {
-      DataSeries = new double[serieSettings.Length][,];
-      serieStyle = new SerieStyleEnum[serieSettings.Length];
       XName = xName;
       XUnit = xUnit;
+
+      //////plotArea0.ClearRenderers();
+      //////plotArea1.ClearRenderers();
+      //////plotArea2.ClearRenderers();
+      //////plotArea3.ClearRenderers();
+      //////legendScrollerX.Reset();
+      //////legendScrollerY0.Reset();
+      //////legendScrollerY1.Reset();
+      //////legendScrollerY2.Reset();
+      //////legendScrollerY3.Reset();
+
+      //////addGridLineRenderers();
+
+      ////foreach (var plotArea in PlotAreas) plotArea.ClearRenderers();
+      ////foreach (var legendScroller in LegendScrollers) legendScroller.Reset();
+      //////addGridLineRenderers();
+
+      DataSeries = new double[serieSettings.Length][,];
+      serieStyle = new SerieStyleEnum[serieSettings.Length];
       int recordsCount = records.Count();
       double[]? dataExtracted = null;
       serieSettings[0].Getter(records.First(), 0, ref dataExtracted);
       int dimensionCount = dataExtracted.Length;
       for (int dataSeriesIndex = 0; dataSeriesIndex < DataSeries.Length; dataSeriesIndex++) {
         DataSeries[dataSeriesIndex] = new double[recordsCount, dimensionCount];
-        serieStyle[dataSeriesIndex] = serieSettings[dataSeriesIndex].SerieStyle;
+        var serieSetting = serieSettings[dataSeriesIndex];
+        serieStyle[dataSeriesIndex] = serieSetting.SerieStyle;
+        if (serieSetting.Group<0 || serieSetting.Group>=PlotAreas.Count)
+          throw new Exception($"Group has to be a value between 0 and {PlotAreas.Count-1} but was {serieSetting.Group}." + Environment.NewLine +
+            $"SerieSettings[{dataSeriesIndex}]: {serieSetting}");
+
       }
+
 
       int recordIndex = 0;
       foreach (TRecord record in records) {
@@ -274,6 +275,15 @@ namespace XYGraphLib {
         }
         recordIndex++;
       }
+
+      ////for (int serieIndex = 0; serieIndex<serieSettings!.Length; serieIndex++) {
+      ////  var serieSetting = serieSettings[serieIndex];
+      ////  Renderer? renderer = CreateGraphRenderer(serieIndex, serieSetting);
+      ////  if (renderer!=null) {
+      ////    AddRenderer(renderer, PlotAreas[serieSetting.Group], legendScrollerX, legendScrollerY0)
+      ////  }
+      ////}
+
 
       //handle x legends with strings
       //the code is here and not in the loop above because LegendXString is seldom used
@@ -422,7 +432,7 @@ namespace XYGraphLib {
     /// </summary>
     public void ZoomIn(){
       if (CanZoomIn) {
-        foreach (IZoom zoomer in Zoomers) {
+        foreach (IZoom zoomer in LegendScrollers) {
           zoomer.ZoomIn();
         }
       }
@@ -434,7 +444,7 @@ namespace XYGraphLib {
     /// </summary>
     public void ZoomOut(){
       if (CanZoomOut) {
-        foreach (IZoom zoomer in Zoomers) {
+        foreach (IZoom zoomer in LegendScrollers) {
           zoomer.ZoomOut();
         }
       }
@@ -446,7 +456,7 @@ namespace XYGraphLib {
     /// </summary>
     public void ZoomReset(){
       if (CanZoomOut) {
-        foreach (IZoom zoomer in Zoomers) {
+        foreach (IZoom zoomer in LegendScrollers) {
           zoomer.ZoomReset();
         }
       }
@@ -456,7 +466,7 @@ namespace XYGraphLib {
     internal void UpdateZoomState() {
       bool canZoomOut = false;
       bool canZoomIn = false;
-      foreach (IZoom zoomer in Zoomers) {
+      foreach (IZoom zoomer in LegendScrollers) {
         if (zoomer.CanZoomIn) {
           canZoomIn = true;
         }

@@ -94,6 +94,19 @@ namespace XYGraphLib {
 
 
     /// <summary>
+    /// Crosshair uses XName to name the x data value
+    /// </summary>
+    public readonly string? XName;
+
+
+    /// <summary>
+    /// Crosshair uses XUnit to display the x data value with a measurement unit
+    /// </summary>
+    public readonly string? XUnit;
+
+
+
+    /// <summary>
     /// Number of Renderers registered with PlotArea
     /// </summary>
     public int RendererCount { get { return renderers.Count; } }
@@ -128,8 +141,10 @@ namespace XYGraphLib {
         Name = plotAreaName;
       }
       crosshair = new Crosshair(crosshairPen);
-      ClipToBounds = true;
+      XName = xName;
+      XUnit = xUnit;
 
+      ClipToBounds = true;
 
       MouseEnter += PlotArea_MouseEnter;
       MouseMove += PlotArea_MouseMove;

@@ -235,28 +235,9 @@ namespace XYGraphLib {
       PlotArea3 = plotArea3 = Add(newPlotArea3);
 
       LegendScrollerY0 = legendScrollerY0 = Add(newLegendScrollerY0);
-      legendScrollerY0.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY0.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY0.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY0.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
-
       LegendScrollerY1 = legendScrollerY1 = Add(newLegendScrollerY1);
-      legendScrollerY1.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY1.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY1.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY1.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
-
       LegendScrollerY2 = legendScrollerY2 = Add(newLegendScrollerY2);
-      legendScrollerY2.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY2.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY2.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY2.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
-
       LegendScrollerY3 = legendScrollerY3 = Add(newLegendScrollerY3);
-      legendScrollerY3.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY3.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY3.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerY3.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
 
       LegendScrollerX = legendScrollerX = Add(newLegendScrollerX);
 
@@ -268,8 +249,6 @@ namespace XYGraphLib {
       heightRatio1 = newHeightRatio1 / totalHight;
       heightRatio2 = newHeightRatio2 / totalHight;
       heightRatio3 = newHeightRatio3 / totalHight;
-
-      AddZoomButtons();
     }
     #endregion
 

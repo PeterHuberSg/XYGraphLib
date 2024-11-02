@@ -146,20 +146,9 @@ namespace XYGraphLib {
       PlotAreaLower = plotAreaLower = Add(newPlotAreaLower);
 
       LegendScrollerYUpper = legendScrollerYUpper = Add(newLegendScrollerYUpper);
-      legendScrollerYUpper.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerYUpper.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-      legendScrollerYUpper.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerYUpper.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
-      
       LegendScrollerYLower = legendScrollerYLower = Add(newLegendScrollerYLower);
-      legendScrollerYLower.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerYLower.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-      legendScrollerYLower.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-      legendScrollerYLower.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
 
       LegendScrollerX = legendScrollerX = Add(newLegendScrollerX);
-
-      AddZoomButtons();
     }
     #endregion
 
