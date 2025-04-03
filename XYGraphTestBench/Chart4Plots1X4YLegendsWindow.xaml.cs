@@ -27,7 +27,6 @@ namespace XYGraphLib {
       TestChart4Plots1X4YLegendsTraced.PlotArea1.Background = Brushes.SeaShell;
       TestChart4Plots1X4YLegendsTraced.PlotArea2.Background = Brushes.Cornsilk;
       TestChart4Plots1X4YLegendsTraced.PlotArea3.Background = Brushes.Honeydew;
-      TraceWpf.Line(">>>>> Chart4Plots1X4YLegendsWindow.fillDataSeries()");
       fillDataSeries();
     }
 
@@ -68,15 +67,15 @@ namespace XYGraphLib {
       for (var groupIndex = 0; groupIndex < groupCount; groupIndex++) {
         seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line,
           new SolidColorBrush(Color.FromRgb(0xA0, 0xA0, 0xA0)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0xA0, 0xA0, 0xA0)), 
-          $"Plot{groupIndex}: Name with Unit" , "Unit with Name", groupIndex);
+          $"Plot{groupIndex}: Name with Unit", null, "Unit with Name", groupIndex);
         serieValues[serieIndex++] = random.NextDouble() * 100;
         seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, 
           new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0x80, 0x80, 0x80)),
-          $"Plot{groupIndex}: Name only", null, groupIndex);
+          $"Plot{groupIndex}: Name only", null, null, groupIndex);
         serieValues[serieIndex++] = random.NextDouble() * 100;
         seriesSettings[serieIndex] = new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, 
           new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0x00)), 2, new SolidColorBrush(Color.FromArgb(0x30, 0x00, 0x00, 0x00)),
-          null, $"Plot{groupIndex}: Unit only", groupIndex);
+          null, null, $"Plot{groupIndex}: Unit only", groupIndex);
         serieValues[serieIndex] = serieValues[serieIndex-1] + serieValues[serieIndex-2];
         serieIndex++;
       }
@@ -113,7 +112,7 @@ namespace XYGraphLib {
           : new ChartNote([time.ToDouble(), chartNoteIndex*10], chartNoteIndex.ToString(), chartNoteIndex%3);
         time = time.AddMinutes(20*minutes);
       }
-      TestChart4Plots1X4YLegendsTraced.AddNotes(chartNotes, fontDefinitions, 0);
+      TestChart4Plots1X4YLegendsTraced.AddNotes(chartNotes, fontDefinitions);
     }
 
 

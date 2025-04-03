@@ -38,16 +38,18 @@ namespace XYGraphLib {
     /// Constructor supporting tracing of multiple YLegends with different names
     /// </summary>
     public LegendYTraced(string traceName): this(TraceWPFEvents.TraceCreateStart(traceName)) {
-      TraceName = traceName;
+      Name = TraceName = traceName;
       TraceWPFEvents.TraceCreateEnd(traceName);
     }
 
-    
+
     /// <summary>
-    /// Dummy constructor allowing public constructor to call TraceCreateStart() before construtor gets executed 
+    /// Dummy constructor allowing public constructor to call TraceCreateStart() before constructor gets executed 
     /// </summary>
-    private LegendYTraced(DummyTraceClass dummyArgument):base() {
-    }
+    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
+    //LegendYTraced is private and the other constructors invoking it set Name already
+    private LegendYTraced(DummyTraceClass? _) {}
+    #pragma warning restore CS8618
     #endregion
 
 

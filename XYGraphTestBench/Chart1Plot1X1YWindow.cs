@@ -67,6 +67,9 @@ namespace XYGraphLib {
     readonly NumberScrollBar[] minNumberScrollBars = new NumberScrollBar[seriesCountUI];
     readonly NumberScrollBar[] maxNumberScrollBars = new NumberScrollBar[seriesCountUI];
 
+    readonly CheckBox isShowCrosshairCheckBox;
+    readonly CheckBox isShowValuesPanelCheckBox;
+
 
     public Chart1Plot1X1YWindow() {
       Title = "Test Chart1Plot1X1YLegend";
@@ -139,7 +142,10 @@ namespace XYGraphLib {
 
 
       //Row 1: Steps, Increment
-      stepsNumberScrollBar = new NumberScrollBar { Value = 3000, Minimum = 1, Maximum = 100000, SmallChange = 30, LargeChange = 300 };
+      //Todo: Uncomment
+      //stepsNumberScrollBar = new NumberScrollBar { Value = 3000, Minimum = 1, Maximum = 100000, SmallChange = 30, LargeChange = 300 };
+      stepsNumberScrollBar = new NumberScrollBar { Value = 11, Minimum = 1, Maximum = 100000, SmallChange = 30, LargeChange = 300 };
+
       stepsNumberScrollBar.ValueChanged += NumberScrollBar_ValueChanged;
       Label stepsLabel = new() { Content = "_Steps", Target = stepsNumberScrollBar };
 
@@ -163,6 +169,20 @@ namespace XYGraphLib {
 
       TextBlock lineAreaTextBlock = new() {Text = "Style: LineArea"};
       addToGrid(grid, row, 6, lineAreaTextBlock);
+
+      row++; column = 1;
+      isShowCrosshairCheckBox = new() { IsChecked = true, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Left };
+      isShowCrosshairCheckBox.Click += CheckBox_Click;
+      Label serieLabel = new() { Content = "Crosshair", Target = isShowCrosshairCheckBox };
+      addToGrid(grid, row, column++, serieLabel);
+      addToGrid(grid, row, column++, isShowCrosshairCheckBox);
+
+      column++;
+      isShowValuesPanelCheckBox = new() { IsChecked = true, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Left };
+      isShowValuesPanelCheckBox.Click += CheckBox_Click;
+      Label showValuesPanelLabel = new() { Content = "ValuesPanel", Target = isShowValuesPanelCheckBox };
+      addToGrid(grid, row, column++, showValuesPanelLabel);
+      addToGrid(grid, row, column++, isShowValuesPanelCheckBox);
 
       updateParameters();
     }
@@ -240,6 +260,11 @@ namespace XYGraphLib {
     /// whenever a setup parameter changes, regenerate the test data and refresh 
     /// </summary>
     private void updateParameters() {
+      foreach (var plotArea in chart1Plot1X1YLegendTraced.PlotAreasList) {
+        plotArea.IsShowCrosshair = isShowCrosshairCheckBox.IsChecked!.Value;
+        plotArea.IsShowValuesPanel = isShowValuesPanelCheckBox.IsChecked!.Value;
+      }
+
       DateTime time = startDateDatePicker.SelectedDate!.Value;
       double minutes = timeNumberScrollBar.Value;
       int stepsCount = (int)stepsNumberScrollBar.Value;
@@ -270,18 +295,17 @@ namespace XYGraphLib {
         if (serieCheckBoxes[seriesUIIndex].IsChecked!.Value) {
 
           seriesSettings[seriesSettingsIndex++] = seriesUIIndex switch {
-            0 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Green, 2, null, "Line1"),
-            1 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null, "Line2"),
-            2 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area1, Brushes.Gray, 1, null, "Area1"),
-            //3 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null!, 1, null, "Area2"),
+            0 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Green, 2, null, "Line1", "F1"),
+            1 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null, "Line2", "F2"),
+            2 => new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area1, Brushes.Gray, 1, null, "Area1", "F3"),
             _ => throw new NotSupportedException($"seriesUIIndex: {seriesUIIndex}"),
           };
           if (seriesUIIndex==areaLineIndex) {
-            //area has 2 lines and needs 2 seriesSettings, but has inly one seriesUIIndex 
+            //area has 2 lines and needs 2 seriesSettings, but has only one seriesUIIndex 
             //the second line needs to be handled here so that the switch statement can set the first seriesSettings
-            //here the seriesSettingsIndex gets incremented after the assignment, which is not possible in the swtich statement
+            //here the seriesSettingsIndex gets incremented after the assignment, which is not possible in the switch statement
             seriesSettings[seriesSettingsIndex++] = 
-              new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null!, 1, null, "Area1");
+              new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null!, 1, null, "Area2", "F0");
           }
         }
       }
@@ -298,7 +322,7 @@ namespace XYGraphLib {
         time = time.AddMinutes(minutes);
       }
 
-      chart1Plot1X1YLegendTraced.FillData<DataRecord>(dataRecords, seriesSettings, "Date");
+      chart1Plot1X1YLegendTraced.FillData<DataRecord>(dataRecords, seriesSettings, "Date", "HH:mm");
     }
 
 

@@ -555,7 +555,6 @@ namespace XYGraphLib {
       }
       isArranging = false;
       areNewMinMax = false;
-TraceWpf.Line(">>>>> LegendScroller.CalculateScrollBarValues(): Copy to Legend");
       legend.MinValue = minValueTracked;
       legend.DisplayValue = displayValueTracked;
       legend.DisplayValueRange = displayValueRangeTracked;

@@ -44,7 +44,36 @@ namespace XYGraphLib {
     #region Methods
     //      -------
 
-    public Visual CreateVisual(double xPos, double width, double height) {
+    public DrawingVisual CreateVisual(double width, double height) {
+      DrawingVisual drawingVisual = new();
+      using (DrawingContext drawingContext = drawingVisual.RenderOpen()) {
+        // Create a GuidelineSet to get the lines exactly on a pixel
+        //GuidelineSet guidelines = new GuidelineSet();
+        //double halfPenWidth = strokePen.Thickness / 2;
+        //foreach (double labelValue in legendY.LabelValues!) {
+        //  double yPos = height - (ScaleY * (labelValue - minDisplayValue));
+        //  guidelines.GuidelinesX.Add(xPos + halfPenWidth);
+        //}
+
+        //drawingContext.PushGuidelineSet(guidelines);
+        //foreach (double labelValue in legendY.LabelValues) {
+        //  double yPos = height - (ScaleY * (labelValue - minDisplayValue));
+        //  drawingContext.DrawLine(strokePen, new Point(0, yPos), new Point(width, yPos));
+        //}
+        //drawingContext.Pop();
+        GuidelineSet guidelines = new();
+        double halfPenWidth = strokePen.Thickness / 2;
+        guidelines.GuidelinesX.Add(0 + halfPenWidth);
+
+        drawingContext.PushGuidelineSet(guidelines);
+        drawingContext.DrawLine(strokePen, new Point(0, 0), new Point(0, height));
+        drawingContext.Pop();
+      }
+      return drawingVisual;
+    }
+
+    //todo:delete
+    public DrawingVisual CreateVisual(double xPos, double width, double height) {
       DrawingVisual drawingVisual = new();
       using (DrawingContext drawingContext = drawingVisual.RenderOpen()) {
         // Create a GuidelineSet to get the lines exactly on a pixel

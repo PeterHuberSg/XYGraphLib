@@ -43,10 +43,12 @@ namespace XYGraphLib {
 
 
     /// <summary>
-    /// Dummy constructor allowing public constructor to call TraceCreateStart() before construtor gets executed 
+    /// Dummy constructor allowing public constructor to call TraceCreateStart() before constructor gets executed 
     /// </summary>
-    private GridTraced(DummyTraceClass dummyArgument):base() {
-    }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
+    //GridTraced is private and the other constructors invoking it set Name already
+    private GridTraced(DummyTraceClass? _) { }
+    #pragma warning restore CS8618
     #endregion
 
 

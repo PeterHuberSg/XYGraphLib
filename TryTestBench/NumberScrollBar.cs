@@ -314,9 +314,7 @@ namespace TryTestBench {
       //routedEventArgs.RoutedEvent=RangeBase.ValueChangedEvent;
       //routedEventArgs.ClearUserInitiated();
       //UIElement.RaiseEventImpl(numberScrollBar, routedEventArgs);
-      if (numberScrollBar.ValueChanged!=null) {
-        numberScrollBar.ValueChanged(numberScrollBar, new ValueChangedEventArgs<double>((double)e.OldValue, newValue));
-      }
+      numberScrollBar.ValueChanged?.Invoke(numberScrollBar, new ValueChangedEventArgs<double>((double)e.OldValue, newValue));
     }
     #endregion
 

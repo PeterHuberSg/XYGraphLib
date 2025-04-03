@@ -166,7 +166,7 @@ namespace XYGraphLib {
     //      -----------
 
     static int nextRendererId = 0;
-    protected Pen StrokePen;
+    protected internal Pen StrokePen;
 
 
     public Renderer(Brush? strokeBrush, double strokeThickness, int[] dimensionMap) {

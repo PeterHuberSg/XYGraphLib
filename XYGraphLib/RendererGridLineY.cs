@@ -60,11 +60,11 @@ namespace XYGraphLib {
     /// </summary>
     protected override void OnCreateVisual(DrawingContext drawingContext, double width, double height, DrawingVisual _) {
       if (isFirstTime) {
-        if (LegendScrollerX.Legend is not LegendX && LegendScrollerX.Legend is not LegendXString)
-          throw new NotSupportedException($"RendererGridLineY works only with LegendX or LegendXString, but LegendScrollerX.Legend was {LegendScrollerX.Legend.GetType().Name}.");
+        if (LegendScrollerX.Legend is not LegendX)
+          throw new NotSupportedException($"RendererGridLineY works only with LegendX, but LegendScrollerX.Legend was {LegendScrollerX.Legend.GetType().Name}.");
         isFirstTime = false;
       }
-      Legend legendX = (Legend)LegendScrollerX.Legend;
+      var legendX = (LegendX)LegendScrollerX.Legend;
       //grid-lines use only 1 dimension. Both for x and y grid-line, 
       double minDisplayValue = MinDisplayValues[0];
 

@@ -13,7 +13,7 @@ namespace XYGraphLib {
   /// <summary>
   /// Version of XLegend which traces WPF events 
   /// </summary>
-  public class LegendXTraced: LegendX, ITraceName {
+  public class LegendXTraced: LegendXDouble, ITraceName {
 
     #region ITraceName
     //      ----------
@@ -46,7 +46,10 @@ namespace XYGraphLib {
     /// <summary>
     /// Dummy constructor allowing public constructor to call TraceCreateStart() before constructor gets executed 
     /// </summary>
-    private LegendXTraced(DummyTraceClass dummyArgument):base() {}
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
+    //LegendXTraced is private and the other constructors invoking it set Name already
+    private LegendXTraced(DummyTraceClass? _){}
+    #pragma warning restore CS8618
     #endregion
 
 

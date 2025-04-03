@@ -58,6 +58,12 @@ namespace XYGraphLib {
     /// Measurement unit used in crosshair for y value
     /// </summary>
     public string? Unit { get; set; }
+
+
+    /// <summary>
+    /// Formatting parameter for converting the double Y into displayable string (Y.ToString(Format))
+    /// </summary>
+    public string? Format { get; set; }
     public Brush? StrokeBrush { get; set; }
     public double StrokeThickness { get { return strokeThickness; } set { strokeThickness = value; } }
     double strokeThickness = 1;
@@ -74,6 +80,7 @@ namespace XYGraphLib {
       double strokeThickness = 1,
       Brush? fillBrush = null,
       string? name = null,
+      string? format = null,
       string? unit = null,
       int group = 0)
     {
@@ -81,6 +88,7 @@ namespace XYGraphLib {
       SerieStyle = serieStyle;
       Group = group;
       Name = name;
+      Format = format;
       Unit = unit;
       StrokeBrush = strokeBrush;
       StrokeThickness = strokeThickness;

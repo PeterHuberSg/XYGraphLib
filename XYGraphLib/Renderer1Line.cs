@@ -37,16 +37,13 @@ namespace XYGraphLib {
     readonly Brush? fillBrush;
 
 
-    public Renderer1Line(Brush strokeBrush, double strokeThickness, Brush? fillBrush, double[][,] dataSeries,
-      string? yName, string? yUnit) :
-      base(strokeBrush, strokeThickness, DimensionMapXY, dataSeries, yName, yUnit) 
+    public Renderer1Line(
+      Brush strokeBrush,
+      double strokeThickness,
+      Brush? fillBrush,
+      RendererDataSeries.YSerie ySerie) :
+      base(strokeBrush, strokeThickness, DimensionMapXY, new []{ySerie}) 
     {
-      if (dataSeries.Length!=1) {
-        throw new ArgumentException("Renderer1Line needs 1 DataSerie, but there were " + dataSeries.Length + ".");
-      }
-      if (dataSeries[0].GetLength(1)!=2) {
-        throw new ArgumentException("Renderer1Line needs 2 values per ValuePoint, but there were " + dataSeries[0].GetLength(1) + ".");
-      }
       this.fillBrush = fillBrush;
     }
     #endregion
@@ -65,29 +62,29 @@ namespace XYGraphLib {
       bool isFirstPoint = true;
       double minDisplayValueX = MinDisplayValues[DimensionX];
       double maxDisplayValueX = MaxDisplayValues[DimensionX];
-      double[,] dataSerie = DataSeries[0];
-      int dataSerieLength = dataSerie.GetLength(0);
+      double[,] xyValues = YSeries[0].Values;
+      int xyValuesLength = xyValues.GetLength(0);
       int firstDataPointIndex = 0;
-      if (IsDimensionSorted[DimensionX]) {
+      if (IsYSerieSorted[DimensionX]) {
         //search biggest valueX smaller than minDisplayValueX. First point must be outside drawing area to get a nice line.
-        for (int dataPointIndex = 0; dataPointIndex<dataSerieLength; dataPointIndex++) {
-          double valueX = dataSerie[dataPointIndex, DimensionX];
+        for (int dataPointIndex = 0; dataPointIndex<xyValuesLength; dataPointIndex++) {
+          double valueX = xyValues[dataPointIndex, DimensionX];
           if (valueX>minDisplayValueX) {
             firstDataPointIndex = dataPointIndex - 1;
             break;
           }
         }
       }
-      for (int dataPointIndex = firstDataPointIndex; dataPointIndex<dataSerieLength; dataPointIndex++) {
-        double valueX = dataSerie[dataPointIndex, DimensionX];
-        Point valuePoint = TranslateValueXYToPoint(dataSerie, dataPointIndex, width, height);
+      for (int dataPointIndex = firstDataPointIndex; dataPointIndex<xyValuesLength; dataPointIndex++) {
+        double valueX = xyValues[dataPointIndex, DimensionX];
+        Point valuePoint = TranslateValueXYToPoint(xyValues, dataPointIndex, width, height);
         if (isFirstPoint) {
           isFirstPoint = false;
           if (fillBrush==null) {
             //no fill colour, draw only line
             streamGeometryContext.BeginFigure(valuePoint, isFilled: false, isClosed: false);
           } else {
-            if (IsDimensionSorted[DimensionX]) {
+            if (IsYSerieSorted[DimensionX]) {
               //line is sorted and has a fill colour: area should fill to x-axis
               //draw borders Pen.Thickness outside of both axes to hide them from viewer
               //place first point at beginning of x-axis
@@ -105,8 +102,8 @@ namespace XYGraphLib {
         } else {
           streamGeometryContext.LineTo(valuePoint, isStroked: true, isSmoothJoin: false);
         }
-        if (IsDimensionSorted[DimensionX]) {
-          if (valueX>maxDisplayValueX || dataPointIndex==dataSerieLength-1) {
+        if (IsYSerieSorted[DimensionX]) {
+          if (valueX>maxDisplayValueX || dataPointIndex==xyValuesLength-1) {
             if (fillBrush!=null) {
               //line is sorted and has a fill colour: add last line leading back to x-axis
               //                streamGeometryContext.LineTo(new Point(valuePoint.X, height), isStroked : true, isSmoothJoin : false);

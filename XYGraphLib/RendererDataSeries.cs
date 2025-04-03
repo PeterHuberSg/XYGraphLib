@@ -19,11 +19,12 @@ using System;
 using System.Windows.Media;
 
 
+
 namespace XYGraphLib {
 
 
   /// <summary>
-  /// Creates a Visual for the PlotArea to display. Inherit from this class if dataserie(s) are linked to this Renderer.
+  /// Creates a Visual for the PlotArea to display. Inherit from this class if the this Renderer uses DataSerie(s).
   /// </summary>
   public abstract class RendererDataSeries: Renderer {
     //                       y ←MinValueY
@@ -39,6 +40,24 @@ namespace XYGraphLib {
     // ┊          ┊          ↑               ┊  
     // MinIndex   ┊          MaxDisplayIndex ┊  
     //            MinDisplayIndex            MaxIndex
+
+
+    /// <summary>
+    /// Data needed by Renderer to display one y value.
+    /// </summary>
+    /// <param name="Name">Name for Y value displayed in crosshair</param>
+    /// <param name="Format">Crosshair uses Format to convert the y data value to a string. Y is a double and the conversion is:
+    /// X.ToString(XFormat)</param>
+    /// <param name="Unit">Measurement unit for Y value displayed in crosshair</param>
+    /// <param name="Values">Values to be displayed by Renderer</param>
+    public readonly record struct YSerie(
+      string? Name,
+      string? Format,
+      string? Unit,
+      double[,] Values
+    );
+
+
 
 
     #region Properties
@@ -59,69 +78,79 @@ namespace XYGraphLib {
     /// <summary>
     /// If the values of one dimension are sorted ascending, the drawing speed can get optimised when displaying only a subset
     /// </summary>
-    public readonly bool[] IsDimensionSorted;
+    public readonly bool[] IsYSerieSorted;
 
 
     /// <summary>
-    /// DataSeries contains the data displayed by the Renderer.
+    /// YSeries contains the data displayed by the Renderer. YSerie.Values contains all the (x,y) values of 1 line.
+    /// A renderer displaying an area needs 2 border lines and therefore 2 YSeries.
     /// </summary>
-    protected readonly double[][,] DataSeries;
-
-
-    /// <summary>
-    /// Name for Y value displayed in crosshair
-    /// </summary>
-    protected readonly string? YName;
-
-
-    /// <summary>
-    /// Measurement unit for Y value displayed in crosshair
-    /// </summary>
-    protected readonly string? YUnit;
+    protected internal readonly YSerie[] YSeries;
     #endregion
 
 
     #region Constructor
     //      -----------
 
-    public RendererDataSeries(Brush strokeBrush, double strokeThickness, int[] dimensionMap, double[][,] dataSeries,
-      string? yName, string? yUnit) :
+    public RendererDataSeries(
+      Brush strokeBrush, 
+      double strokeThickness, 
+      int[] dimensionMap,
+      YSerie[] ySeries) :
       base(strokeBrush, strokeThickness, dimensionMap)
     {
-      YName = yName;
-      YUnit = yUnit;
-      int dimensionCount = DimensionMap.Length;
-      if (dimensionCount!=dataSeries[0].GetLength(1)) {
-        throw new Exception("Renderer was set up with " + dimensionCount + " dimensions. The DataPoints in the DataSeries should have the same number of values, but" + 
-        "the dataPoints in dataSeries[0] have " + dataSeries[0].GetLength(1) + " values.");
+      var ySeriesDimensionCount = ySeries[0].Values.GetLength(1);
+      var dimensionCount = DimensionMap.Length;
+      if (dimensionCount!=ySeriesDimensionCount) {
+        throw new Exception("Renderer was set up with " + DimensionMap.Length + " dimensions. The DataPoints in the DataSeries should have the same number of dimensions, but" + 
+        "the dataPoints in dataSeries[0] have " + ySeriesDimensionCount + " dimensions.");
       }
 
-      DataSeries = dataSeries;
+      YSeries = ySeries;
 
       //find min and max value within dataSeries and check if it is sorted
-      IsDimensionSorted = new bool[dimensionCount];
-      MinValues = new double[dimensionCount];
-      MaxValues = new double[dimensionCount];
-      for (int dimensionIndex = 0; dimensionIndex<IsDimensionSorted.Length; dimensionIndex++) {
-			  IsDimensionSorted[dimensionIndex] = true;
-        MinValues[dimensionIndex] = double.MaxValue;
-        MaxValues[dimensionIndex] = double.MinValue;
+      IsYSerieSorted = new bool[ySeriesDimensionCount];
+      MinValues = new double[ySeriesDimensionCount];
+      MaxValues = new double[ySeriesDimensionCount];
+      for (int serieIndex = 0; serieIndex<IsYSerieSorted.Length; serieIndex++) {
+			  IsYSerieSorted[serieIndex] = true;
+        MinValues[serieIndex] = double.MaxValue;
+        MaxValues[serieIndex] = double.MinValue;
       }
 
-      foreach (double[,] dataSerie in dataSeries){
-        int dataSerieLength = dataSerie.GetLength(0);
-        for (int dataPointIndex = 0; dataPointIndex < dataSerieLength; dataPointIndex++) {
-          for (int dimensionIndex = 0; dimensionIndex < dimensionCount; dimensionIndex++) {
-            if (MinValues[dimensionIndex]>dataSerie[dataPointIndex, dimensionIndex]) {
-              MinValues[dimensionIndex] = dataSerie[dataPointIndex, dimensionIndex];
+      //foreach (double[,] dataSerie in dataSeries){
+      //  int dataSerieLength = dataSerie.GetLength(0);
+      //  for (int dataPointIndex = 0; dataPointIndex < dataSerieLength; dataPointIndex++) {
+      //    for (int dimensionIndex = 0; dimensionIndex < dimensionCount; dimensionIndex++) {
+      //      if (MinValues[dimensionIndex]>dataSerie[dataPointIndex, dimensionIndex]) {
+      //        MinValues[dimensionIndex] = dataSerie[dataPointIndex, dimensionIndex];
+      //      }
+      //      if (MaxValues[dimensionIndex]<dataSerie[dataPointIndex, dimensionIndex]) {
+      //        MaxValues[dimensionIndex] = dataSerie[dataPointIndex, dimensionIndex];
+      //      }
+      //      if (dataPointIndex>0 && IsDimensionSorted[dimensionIndex]) {
+      //        if (dataSerie[dataPointIndex-1, dimensionIndex]>dataSerie[dataPointIndex, dimensionIndex]) {
+      //          //this value is smaller than the previous, i.e. the values are not sorted ascending
+      //          IsDimensionSorted[dimensionIndex] = false;
+      //        }
+      //      }
+      //    }
+      //  }
+      //}
+      foreach (var ySerie in ySeries) {
+        var valuesLength = ySerie.Values.GetLength(0);
+        for (int dataPointIndex = 0; dataPointIndex<valuesLength; dataPointIndex++) {
+          for (int dimensionIndex = 0; dimensionIndex<ySeriesDimensionCount; dimensionIndex++) {
+            if (MinValues[dimensionIndex]>ySerie.Values[dataPointIndex, dimensionIndex]) {
+              MinValues[dimensionIndex] = ySerie.Values[dataPointIndex, dimensionIndex];
             }
-            if (MaxValues[dimensionIndex]<dataSerie[dataPointIndex, dimensionIndex]) {
-              MaxValues[dimensionIndex] = dataSerie[dataPointIndex, dimensionIndex];
+            if (MaxValues[dimensionIndex]<ySerie.Values[dataPointIndex, dimensionIndex]) {
+              MaxValues[dimensionIndex] = ySerie.Values[dataPointIndex, dimensionIndex];
             }
-            if (dataPointIndex>0 && IsDimensionSorted[dimensionIndex]) {
-              if (dataSerie[dataPointIndex-1, dimensionIndex]>dataSerie[dataPointIndex, dimensionIndex]) {
+            if (dataPointIndex>0 && IsYSerieSorted[dimensionIndex]) {
+              if (ySerie.Values[dataPointIndex-1, dimensionIndex]>ySerie.Values[dataPointIndex, dimensionIndex]) {
                 //this value is smaller than the previous, i.e. the values are not sorted ascending
-                IsDimensionSorted[dimensionIndex] = false;
+                IsYSerieSorted[dimensionIndex] = false;
               }
             }
           }

@@ -33,7 +33,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Default Constructor with special LegendX
     /// </summary>
-    public LegendScrollerXTraced(LegendX newLegendX) : this("XLegendScroller", newLegendX) { }
+    public LegendScrollerXTraced(LegendX legendX): this("XLegendScroller", legendX) { }
 
 
     /// <summary>
@@ -48,7 +48,7 @@ namespace XYGraphLib {
     /// <summary>
     /// Constructor supporting tracing of multiple XLegendScrollers with different names and special LegendX
     /// </summary>
-    public LegendScrollerXTraced(string traceName, LegendX newLegendX): this(TraceWPFEvents.TraceCreateStart(traceName), newLegendX) {
+    public LegendScrollerXTraced(string traceName, LegendX legendX): this(TraceWPFEvents.TraceCreateStart(traceName), legendX) {
       TraceName = traceName;
       TraceWPFEvents.TraceCreateEnd(traceName);
     }
@@ -57,7 +57,10 @@ namespace XYGraphLib {
     /// <summary>
     /// Dummy constructor allowing public constructor to call TraceCreateStart() before constructor gets executed 
     /// </summary>
-    private LegendScrollerXTraced(DummyTraceClass dummyArgument, LegendX newLegendX):base(newLegendX) {}
+    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
+    //LegendScrollerXTraced is private and the other constructors invoking it set Name already
+    private LegendScrollerXTraced(DummyTraceClass? _, LegendX legendX):base(legendX) {}
+    #pragma warning restore CS8618
     #endregion
 
 

@@ -40,6 +40,8 @@ This software is distributed without any warranty.
 
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using CustomControlBaseLib;
@@ -58,71 +60,25 @@ namespace XYGraphLib {
     /// <summary>
     /// Upper plotArea
     /// </summary>
-    public PlotArea PlotAreaUpper {
-      get { return (PlotArea)GetValue(PlotAreaUpperProperty); }
-      private set { SetValue(PlotAreaUpperProperty, value); }
-    }
-    readonly PlotArea plotAreaUpper; //local copy for faster access
-
-    // DependencyProperty definition for PlotAreaUpper
-    public static readonly DependencyProperty PlotAreaUpperProperty = 
-    DependencyProperty.Register("PlotAreaUpper", typeof(PlotArea), typeof(Chart2Plots1X2YLegends));
+    public readonly PlotArea PlotAreaUpper;
 
 
     /// <summary>
     /// Lower plotArea
     /// </summary>
-    public PlotArea PlotAreaLower {
-      get { return (PlotArea)GetValue(PlotAreaLowerProperty); }
-      private set { SetValue(PlotAreaLowerProperty, value); }
-    }
-    readonly PlotArea plotAreaLower; //local copy for faster access
-
-    // DependencyProperty definition for PlotAreaLower
-    public static readonly DependencyProperty PlotAreaLowerProperty = 
-    DependencyProperty.Register("PlotAreaLower", typeof(PlotArea), typeof(Chart2Plots1X2YLegends));
+    public readonly PlotArea PlotAreaLower ;
 
     
     /// <summary>
     /// YLegend Scroller for upper plotArea
     /// </summary>
-    public LegendScrollerY LegendScrollerYUpper {
-      get { return (LegendScrollerY)GetValue(LegendScrollerYUpperProperty); }
-      private set { SetValue(LegendScrollerYUpperProperty, value); }
-    }
-    readonly LegendScrollerY legendScrollerYUpper; //local copy for faster access
-
-    // DependencyProperty definition for LegendScrollerYUpper
-    public static readonly DependencyProperty LegendScrollerYUpperProperty = 
-    DependencyProperty.Register("LegendScrollerYUpper", typeof(LegendScrollerY), typeof(Chart2Plots1X2YLegends));
+    public readonly LegendScrollerY LegendScrollerYUpper;
 
 
     /// <summary>
     /// YLegend Scroller for lower plotArea
     /// </summary>
-    public LegendScrollerY LegendScrollerYLower {
-      get { return (LegendScrollerY)GetValue(LegendScrollerYLowerProperty); }
-      private set { SetValue(LegendScrollerYLowerProperty, value); }
-    }
-    readonly LegendScrollerY legendScrollerYLower; //local copy for faster access
-
-    // DependencyProperty definition for LegendScrollerYLower
-    public static readonly DependencyProperty LegendScrollerYLowerProperty = 
-    DependencyProperty.Register("LegendScrollerYLower", typeof(LegendScrollerY), typeof(Chart2Plots1X2YLegends));
-
-
-    /// <summary>
-    /// XLegend Scroller for upper plotArea
-    /// </summary>
-    public LegendScrollerX LegendScrollerX {
-      get { return (LegendScrollerX)GetValue(LegendScrollerXProperty); }
-      private set { SetValue(LegendScrollerXProperty, value); }
-    }
-    readonly LegendScrollerX legendScrollerX; //local copy for faster access
-
-    // DependencyProperty definition for XLegendScroller
-    public static readonly DependencyProperty LegendScrollerXProperty = 
-    DependencyProperty.Register("LegendScrollerX", typeof(LegendScrollerX), typeof(Chart2Plots1X2YLegends));
+    public readonly LegendScrollerY LegendScrollerYLower;
     #endregion
 
 
@@ -133,95 +89,19 @@ namespace XYGraphLib {
     /// Only WPF Editor from Visual Studio should use this constructor
     /// </summary>
     public Chart2Plots1X2YLegends(): 
-      this(new PlotArea(), new PlotArea(), new LegendScrollerX(), new LegendScrollerY(), new LegendScrollerY()) { }
+      this(new LegendScrollerX(), new PlotArea(new LegendScrollerY()), new PlotArea(new LegendScrollerY())) { }
 
 
     /// <summary>
     /// Constructor supporting XYGraph with plugged in components
     /// </summary>
-    public Chart2Plots1X2YLegends(PlotArea newPlotAreaUpper, PlotArea newPlotAreaLower, 
-      LegendScrollerX newLegendScrollerX, LegendScrollerY newLegendScrollerYUpper, LegendScrollerY newLegendScrollerYLower)
+    public Chart2Plots1X2YLegends(LegendScrollerX legendScrollerX, PlotArea plotAreaUpper, PlotArea plotAreaLower):
+      base(legendScrollerX, plotAreaUpper, plotAreaLower)  
     {
-      PlotAreaUpper = plotAreaUpper = Add(newPlotAreaUpper);
-      PlotAreaLower = plotAreaLower = Add(newPlotAreaLower);
-
-      LegendScrollerYUpper = legendScrollerYUpper = Add(newLegendScrollerYUpper);
-      LegendScrollerYLower = legendScrollerYLower = Add(newLegendScrollerYLower);
-
-      LegendScrollerX = legendScrollerX = Add(newLegendScrollerX);
-    }
-    #endregion
-
-    
-    #region Fill Data
-    //      ---------
-
-    public int MainSerieIndex = int.MinValue;
-
-
-    /// <summary>
-    /// Updates graphic with new data series 
-    /// </summary>
-    public override void FillData<TRecord>(
-      IEnumerable<TRecord> records,
-      SerieSetting<TRecord>[]serieSettings,
-      string? xName = null,
-      string? xUnit = null,
-      Func<TRecord, string>? stringGetter = null) 
-    {
-      plotAreaUpper.ClearRenderers();
-      plotAreaLower.ClearRenderers();
-      legendScrollerX.Reset();
-      legendScrollerYUpper.Reset();
-      legendScrollerYLower.Reset();
-
-      addGridLineRenderers();
-
-      base.FillData<TRecord>(records, serieSettings, xName, xUnit, stringGetter);//ensures that SerieSettings is not null
-
-
-      for (int serieIndex = 0; serieIndex<serieSettings.Length; serieIndex++) {
-        Renderer? renderer = CreateGraphRenderer<TRecord>(serieIndex, serieSettings[serieIndex]);
-        if (renderer!=null) {
-          if (serieSettings[serieIndex].Group==0) {
-            AddRenderer(renderer, plotAreaUpper, legendScrollerX, legendScrollerYUpper);
-          } else if (serieSettings[serieIndex].Group==1) {
-            AddRenderer(renderer, plotAreaLower, legendScrollerX, legendScrollerYLower);
-          } else {
-            throw new Exception("Only group 0 and 1 are supported. SerieSettings[" + serieIndex + "]: " + serieSettings[serieIndex]);
-          }
-        }
-      }
-    }
-
-
-    /// <summary>
-    /// Add strings in chart
-    /// </summary>
-    /// <param name="chartNotes">string to be displayed, font formatting and links to lists.</param>
-    /// <param name="fontDefinitions">if null, chartNotes.FontDefinitionId must be 0. The Font information from this chart will be used </param>
-    /// <param name="IsAddToUpper">if false, the notes will be added to lower plot-area</param>
-    public void AddNotes(IEnumerable<ChartNote> chartNotes, FontDefinition[] fontDefinitions, bool IsAddToUpper) {
-      RendererNotes rendererNotes = CreateNotesRenderer(chartNotes, fontDefinitions);
-      if (IsAddToUpper) {
-        AddRenderer(rendererNotes, plotAreaUpper, legendScrollerX, legendScrollerYUpper);
-      } else {
-        AddRenderer(rendererNotes, plotAreaLower, legendScrollerX, legendScrollerYLower);
-      }
-    }
-
-
-    private void addGridLineRenderers() {
-      //x-grid-lines are controlled by y-legends and y-grid-lines are controlled by x-legends
-
-      //link RendererGridLineXUpper with legendScrollerYUpper
-      AddRenderer(new RendererGridLineX(legendScrollerYUpper, Brushes.DarkGray, 1), plotAreaUpper, null, legendScrollerYUpper);
-      //link RendererGridLineYUpper with legendScrollerX
-      AddRenderer(new RendererGridLineY(legendScrollerX, Brushes.DarkGray, 1), plotAreaUpper, legendScrollerX, null);
-      //link RendererGridLineXLower with legendScrollerYLower
-      AddRenderer(new RendererGridLineX(legendScrollerYLower, Brushes.DarkGray, 1), plotAreaLower, null, legendScrollerYLower);
-      //link RendererGridLineYLower with legendScrollerX
-      AddRenderer(new RendererGridLineY(legendScrollerX, Brushes.DarkGray, 1), plotAreaLower, legendScrollerX, null);
+      PlotAreaUpper = plotAreaUpper;
+      PlotAreaLower = plotAreaLower;
+      LegendScrollerYUpper = PlotAreaUpper.LegendScrollerY;
+      LegendScrollerYLower = PlotAreaLower.LegendScrollerY;
     }
     #endregion
 
@@ -229,84 +109,86 @@ namespace XYGraphLib {
     #region Layout
     //      ------
 
-    //double xLegendHeight = double.NegativeInfinity;
-    //double zoomButtonSize = double.NegativeInfinity;
-
-
     const double plotAreaRatio = 0.7;
 
 
     protected override Size MeasureContentOverride(Size constraint) {
-       if (plotAreaUpper.RendererCount==0) {
-#if DEBUG
-         if (plotAreaLower.RendererCount!=0) {
-           throw new Exception("plotArea1 is supposed to be in sync with plotArea0");
-         }
-#endif
-        //empty graphic. Add at least the grid lines
-        addGridLineRenderers();
-      }
-
+      //Debug.WriteLine("");
+      //Debug.WriteLine($"-Chart2.MeasureContentOverride({constraint})");
       TotalZoom100Button!.Measure(new Size(constraint.Width, constraint.Height));
       double totalZoom100ButtonWidth = TotalZoom100Button.DesiredSize.Width;
       double totalZoom100ButtonHeight = TotalZoom100Button.DesiredSize.Height;
-      legendScrollerX.Legend.MinHeight = totalZoom100ButtonHeight;
+      LegendScrollerX.Legend.MinHeight = totalZoom100ButtonHeight;
 
-      legendScrollerX.Measure(constraint);
+      LegendScrollerX.Measure(constraint);
       double zoomButtonDimension = TotalZoomOutButton!.Width = TotalZoomOutButton.Height = TotalZoomInButton!.Height = TotalZoomInButton.Width = 
-        legendScrollerX.ScrollBarHeight;
+        LegendScrollerX.ScrollBarHeight;
 
-      double legendHeight = Math.Min(constraint.Height, Math.Max(legendScrollerX.DesiredSize.Height, totalZoom100ButtonHeight + zoomButtonDimension));
-      double plotArea0Height = (constraint.Height - legendHeight) * plotAreaRatio;
-      double plotArea1Height = (constraint.Height - legendHeight) * (1-plotAreaRatio);
-      legendScrollerYUpper.Measure(new Size(constraint.Width, plotArea0Height));
-      legendScrollerYLower.Measure(new Size(constraint.Width, plotArea1Height));
-      double legendScrollerYMaxWidth = Math.Max(legendScrollerYUpper.DesiredSize.Width, legendScrollerYLower.DesiredSize.Width);
+      double legendXHeight = Math.Min(constraint.Height, Math.Max(LegendScrollerX.DesiredSize.Height, totalZoom100ButtonHeight + zoomButtonDimension));
+      double plotArea0Height = (constraint.Height - legendXHeight) * plotAreaRatio;
+      double plotArea1Height = (constraint.Height - legendXHeight) * (1-plotAreaRatio);
+      LegendScrollerYUpper.Measure(new Size(constraint.Width, plotArea0Height));
+      LegendScrollerYLower.Measure(new Size(constraint.Width, plotArea1Height));
+      double legendScrollerYMaxWidth = Math.Max(LegendScrollerYUpper.DesiredSize.Width, LegendScrollerYLower.DesiredSize.Width);
+      //Debug.WriteLine($"-legendScrollerYMaxWidth: {legendScrollerYMaxWidth:N0} = Max(UpperDesiredWidth: {LegendScrollerYUpper.DesiredSize.Width:N0}, Lower.DesiredWidth: {LegendScrollerYLower.DesiredSize.Width:N0})");
 
       double legendWidth = Math.Min(constraint.Width, Math.Max(legendScrollerYMaxWidth, totalZoom100ButtonWidth));
+      //Debug.WriteLine($"-legendWidth: {legendWidth:N0}");
       double plotAreaWidth = constraint.Width-legendWidth;
-      plotAreaUpper.Measure(new Size(plotAreaWidth, plotArea0Height));
-      plotAreaLower.Measure(new Size(plotAreaWidth, plotArea1Height));
+      PlotAreaUpper.Measure(new Size(plotAreaWidth, plotArea0Height));
+      PlotAreaLower.Measure(new Size(plotAreaWidth, plotArea1Height));
 
       TotalZoomInButton.Measure(new Size(TotalZoomInButton.Width, TotalZoomInButton.Height));
       TotalZoomOutButton.Measure(new Size(TotalZoomOutButton.Width, TotalZoomOutButton.Height));
 
       //always remeasure xLegend because in the beginning it is given the whole width of Chart2Plots1X2YLegends
-      legendScrollerX.Measure(new Size(plotAreaWidth, legendHeight));
+      LegendScrollerX.Measure(new Size(plotAreaWidth, legendXHeight));
+
+      //////////allow Chart to measure its own controls
+      ////////base.MeasureChartControls(constraint);
 
 
       Size returnedSize = constraint;
       if (double.IsInfinity(constraint.Height)) {
-        returnedSize.Height = legendScrollerX.DesiredSize.Height + legendScrollerYUpper.DesiredSize.Height + legendScrollerYLower.DesiredSize.Height;
+        returnedSize.Height = LegendScrollerX.DesiredSize.Height + LegendScrollerYUpper.DesiredSize.Height + LegendScrollerYLower.DesiredSize.Height;
       }
       if (double.IsInfinity(constraint.Width)) {
-        returnedSize.Width = legendScrollerX.DesiredSize.Width + legendScrollerYMaxWidth;
+        returnedSize.Width = LegendScrollerX.DesiredSize.Width + legendScrollerYMaxWidth;
       }
+      //Debug.WriteLine($"-return {returnedSize.Width:N0}, {returnedSize.Height:N0}");
       return returnedSize;
     }
 
 
     protected override Size ArrangeContentOverride(Rect arrangeRect) {
+      //Debug.WriteLine("");
+      //Debug.WriteLine($".Chart2.ArrangeContentOverride(Width: {arrangeRect.Width:N0}, Height: {arrangeRect.Height:N0})");
       double legendWidth = Math.Min(arrangeRect.Width, 
-        Math.Max(Math.Max(legendScrollerYUpper.DesiredSize.Width, legendScrollerYLower.DesiredSize.Width), TotalZoom100Button!.DesiredSize.Width));
+        Math.Max(Math.Max(LegendScrollerYUpper.DesiredSize.Width, LegendScrollerYLower.DesiredSize.Width), TotalZoom100Button!.DesiredSize.Width));
+      //Debug.WriteLine($".legendWidth: {legendWidth:N0} = Min(arrangeWidth: {arrangeRect.Width}, Max(UpperDesiredWidth: {LegendScrollerYUpper.DesiredSize.Width:N0}, Lower.DesiredWidth: {LegendScrollerYLower.DesiredSize.Width:N0}, ZoomButton.DesiredWidth: {TotalZoom100Button!.DesiredSize.Width:N0}))");
       double remainingWidth = arrangeRect.Width - legendWidth;
-      double legendHeight = Math.Min(arrangeRect.Height, 
-        Math.Max(legendScrollerX.DesiredSize.Height, TotalZoom100Button.DesiredSize.Height + TotalZoomOutButton!.DesiredSize.Height));
-      double remainingHeight = arrangeRect.Height - legendHeight;
+      double legendXHeight = Math.Min(arrangeRect.Height, 
+        Math.Max(LegendScrollerX.DesiredSize.Height, TotalZoom100Button.DesiredSize.Height + TotalZoomOutButton!.DesiredSize.Height));
+      double remainingHeight = arrangeRect.Height - legendXHeight;
       double plotArea0Height = remainingHeight * plotAreaRatio;
       double plotArea1Height = remainingHeight * (1-plotAreaRatio);
-      legendScrollerYUpper.ArrangeBorderPadding(arrangeRect, remainingWidth, 0,               legendWidth, plotArea0Height);
-      legendScrollerYLower.ArrangeBorderPadding(arrangeRect, remainingWidth, plotArea0Height, legendWidth, plotArea1Height);
-      legendScrollerX.ArrangeBorderPadding(arrangeRect, 0, remainingHeight, remainingWidth, legendHeight);
+      LegendScrollerYUpper.ArrangeBorderPadding(arrangeRect, remainingWidth, 0,               legendWidth, plotArea0Height);
+      LegendScrollerYLower.ArrangeBorderPadding(arrangeRect, remainingWidth, plotArea0Height, legendWidth, plotArea1Height);
+      LegendScrollerX.ArrangeBorderPadding(arrangeRect, 0, remainingHeight, remainingWidth, legendXHeight);
       //arrange plot-area after scrollers, which might change the values plot-area has to display
-      plotAreaUpper.ArrangeBorderPadding(arrangeRect, 0, 0,               remainingWidth, plotArea0Height);
-      plotAreaLower.ArrangeBorderPadding(arrangeRect, 0, plotArea0Height, remainingWidth, plotArea1Height);
+      PlotAreaUpper.ArrangeBorderPadding(arrangeRect, 0, 0,               remainingWidth, plotArea0Height);
+      PlotAreaLower.ArrangeBorderPadding(arrangeRect, 0, plotArea0Height, remainingWidth, plotArea1Height);
       TotalZoom100Button.ArrangeBorderPadding(arrangeRect, remainingWidth, remainingHeight, legendWidth, TotalZoom100Button.DesiredSize.Height);
 
       double zoomInOutY = remainingHeight + TotalZoom100Button.DesiredSize.Height;
       TotalZoomOutButton.ArrangeBorderPadding(arrangeRect, remainingWidth, zoomInOutY, 
         TotalZoomOutButton.DesiredSize.Width, TotalZoomOutButton.DesiredSize.Height);
       TotalZoomInButton!.ArrangeBorderPadding(arrangeRect, arrangeRect.Width - TotalZoomInButton!.DesiredSize.Width, zoomInOutY, TotalZoomInButton.DesiredSize.Width, TotalZoomInButton.DesiredSize.Height);
+      //Debug.WriteLine($".return {arrangeRect.Width:N0}, {arrangeRect.Height:N0}");
+
+      //////////allow Chart to arrange its own controls
+      ////////base.ArrangeChartControls(arrangeRect);
+
       return arrangeRect.Size;
     }
     #endregion

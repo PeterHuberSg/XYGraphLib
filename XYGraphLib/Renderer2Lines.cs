@@ -37,16 +37,13 @@ namespace XYGraphLib {
     readonly Brush fillBrush;
 
 
-    public Renderer2Lines(Brush strokeBrush, double strokeThickness, Brush areaLineFillBrush, double[][,] dataSeries,
-      string? yName, string? yUnit)
-      : base(strokeBrush, strokeThickness, DimensionMapXY, dataSeries, yName, yUnit) 
+    public Renderer2Lines(
+      Brush strokeBrush, 
+      double strokeThickness, 
+      Brush areaLineFillBrush,
+      RendererDataSeries.YSerie[] ySeries): 
+        base(strokeBrush, strokeThickness, DimensionMapXY, ySeries) 
     {
-      if (dataSeries.Length!=2) {
-        throw new ArgumentException("Renderer2Lines needs 2 DataSeries, but there were " + dataSeries.Length + ".");
-      }
-      if (dataSeries[0].GetLength(1)!=2) {
-        throw new ArgumentException("Renderer2Lines needs 2 values per ValuePoint, but there were " + dataSeries[0].GetLength(1) + ".");
-      }
       fillBrush = areaLineFillBrush;
     }
     #endregion
@@ -70,13 +67,13 @@ namespace XYGraphLib {
       double maxDisplayValueX = MaxDisplayValues[DimensionX];
 
       //draw upperLine values from MinDisplayValueX to MaxDisplayValueX
-      double[,] dataSerie = DataSeries[upperLine];
-      int dataSerieLength = dataSerie.GetLength(0);
+      double[,] xYs = YSeries[upperLine].Values;
+      int dataSerieLength = xYs.GetLength(0);
       int firstDataPointIndex = 0;
-      if (IsDimensionSorted[DimensionX]) {
+      if (IsYSerieSorted[DimensionX]) {
         //search biggest valueX smaller than minDisplayValueX. First point must be outside drawing area to get a nice line.
         for (int dataPointIndex = 0; dataPointIndex<dataSerieLength; dataPointIndex++) {
-          double valueX = dataSerie[dataPointIndex, DimensionX];
+          double valueX = xYs[dataPointIndex, DimensionX];
           if (valueX>minDisplayValueX) {
             firstDataPointIndex = dataPointIndex - 1;
             break;
@@ -85,9 +82,9 @@ namespace XYGraphLib {
       }
       int lastDataPointIndex = dataSerieLength-1;
       for (int dataPointIndex = firstDataPointIndex; dataPointIndex<dataSerieLength; dataPointIndex++) {
-        double valueX = dataSerie[dataPointIndex, DimensionX];
-        drawPoint(streamGeometryContext, dataSerie, dataPointIndex, width, height, ref isFirstPoint);
-        if (IsDimensionSorted[DimensionX]) {
+        double valueX = xYs[dataPointIndex, DimensionX];
+        drawPoint(streamGeometryContext, xYs, dataPointIndex, width, height, ref isFirstPoint);
+        if (IsYSerieSorted[DimensionX]) {
           if (valueX>maxDisplayValueX) {
             lastDataPointIndex = dataPointIndex;//It would be possible just to use lastDataPointIndex-1 in next for loop. But using
                                                 //lastDataPointIndex makes for clearer code.
@@ -97,12 +94,12 @@ namespace XYGraphLib {
       }
 
       //draw lowerLine values reversed from MaxDisplayValueX to MinDisplayValueX
-      dataSerie = DataSeries[lowerLine];
+      xYs = YSeries[lowerLine].Values;
       for (int dataPointIndex = lastDataPointIndex; dataPointIndex>=firstDataPointIndex; dataPointIndex--) {
         if (dataPointIndex<0 || dataPointIndex>=dataSerieLength) {
           System.Diagnostics.Debugger.Break();
         }
-        drawPoint(streamGeometryContext, dataSerie, dataPointIndex, width, height, ref isFirstPoint);
+        drawPoint(streamGeometryContext, xYs, dataPointIndex, width, height, ref isFirstPoint);
       }
       streamGeometry.Freeze();
       drawingContext.DrawGeometry(fillBrush, StrokePen, streamGeometry);

@@ -22,6 +22,7 @@
     <Button Name="Chart2Plots1X2YLegendsButton" Content="Chart2Plots1X2YLegends"/>
     <Button Name="Chart4Plots1X4YLegendsButton" Content="Chart4Plots1X4YLegends"/>
     <Button Name="Chart1Plot1XString1YButton" Content="Chart1Plot1XString1Y"/>
+    <Button Name="ValuesPanelButton" Content="ValuesPanel"/>
     <Button Visibility="Hidden" Content="Hidden"/>
     <Button Name="CustomControlSampleButton" Content="Custom Control Sample"/>
     <Button Name="SizeBindingButton" Content="SizeBinding"/>

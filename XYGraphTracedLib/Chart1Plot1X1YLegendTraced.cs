@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using WpfTestbench;
 using System;
+using System.Collections.Generic;
 
 
 namespace XYGraphLib {
@@ -44,15 +45,29 @@ namespace XYGraphLib {
     /// </summary>
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
     //Chart1Plot1X1YLegendTraced is private and the other constructors invoking it set Name already
-    private Chart1Plot1X1YLegendTraced(DummyTraceClass? _) : 
-      base(new PlotAreaTraced(), new LegendScrollerXTraced(new LegendXDateTraced()), new LegendScrollerYTraced()) {
-    }
-    #pragma warning restore CS8618 
+    private Chart1Plot1X1YLegendTraced(DummyTraceClass? _):
+      base(new LegendScrollerXTraced("LegendScrollerX", new LegendXDateTraced()), new PlotAreaTraced("PlotArea", new LegendScrollerYTraced()))
+    {}
+#pragma warning restore CS8618
     #endregion
 
 
     #region Event Tracing
     //      -------------
+
+    public override void FillData<TRecord>(
+      IEnumerable<TRecord> records, 
+      SerieSetting<TRecord>[] serieSettings,
+      string? xName = null,
+      string? xFormat = null,
+      string? xUnit = null, 
+      Func<TRecord, string>? stringGetter = null) 
+    {
+      TraceWPFEvents.TraceLineStart($"{Name}.FillData()");
+      base.FillData(records, serieSettings, xName, xFormat, xUnit, stringGetter);
+      TraceWPFEvents.TraceLineEnd($"{Name}.FillData()");
+    }
+
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e) {
       TraceWPFEvents.OnPropertyChanged(this, e, base.OnPropertyChanged);

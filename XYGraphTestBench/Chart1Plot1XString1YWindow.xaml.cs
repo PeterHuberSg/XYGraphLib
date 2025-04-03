@@ -27,9 +27,9 @@ namespace XYGraphTestBench {
   public partial class Chart1Plot1XString1YWindow: Window {
 
 
-    ///// <summary>
-    ///// Creates and opens a new Chart1Plot1XString1YWindow
-    ///// </summary>
+    /// <summary>
+    /// Creates and opens a new Chart1Plot1XString1YWindow
+    /// </summary>
     public static void Show(Window ownerWindow) {
       new Chart1Plot1XString1YWindow { Owner = ownerWindow }.Show();
     }
@@ -43,7 +43,7 @@ namespace XYGraphTestBench {
 
       legendXString = (LegendXString)TestChart1Plot1XString1YLegend.LegendScrollerX.Legend;
       NumberOfStringsNumberScrollBar.Value = legendXString.LegendStrings.Count;
-      MaxStringLenghtNumberScrollBar.Value = 10;//there is not property for this value
+      MaxStringLenghtNumberScrollBar.Value = 10;//there is no property for this value
 
       updateParameters();
       NumberOfStringsNumberScrollBar.ValueChanged += NumberScrollBar_ValueChanged;
@@ -80,7 +80,7 @@ namespace XYGraphTestBench {
       }
       TestChart1Plot1XString1YLegend.FillData(x_labelLength_labels, 
         [new SerieSetting<(double x, double y, string label)>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, null, "Y")],
-        "String Name", "String Unit", getSeriesLabel);
+        "String Name", null, "String Unit", getSeriesLabel);
     }
 
 

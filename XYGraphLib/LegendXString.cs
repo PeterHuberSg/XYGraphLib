@@ -15,6 +15,34 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 
 This software is distributed without any warranty. 
 **************************************************************************************/
+
+// Displays a horizontal legend consisting of strings instead of numbers for a PlotArea. LegendXString inherits
+// from Legend which has parameters for MinValue, DisplayValue, DisplayValueRange and MaxValue, which are 
+// doubles.  
+// 
+// Legend:
+//            ┌────────────────────────────────────┐
+//    0       │ 10              15             20  │     30
+//    ↑       └────────────────────────────────────┘      ↑
+// MinValue     ↑DisplayValue                   ↑        MaxValue
+//              DisplayValue + DisplayValueRange│
+//
+// LegendXString stores for each x Value one string in legendStrings. LegendXString writes only integers into the
+// Legend value properties, which are indices into legendStrings.
+//
+// MinValue     =  0 => Legend[ 0]:  0 => legendStrings[ 0]: "zero"
+// DisplayValue = 10 => Legend[10]: 10 => legendStrings[10]: "ten"
+// MaxValue     = 30 => Legend[30]: 30 => legendStrings[30]: "thirty"
+//
+// LegendXString:
+//            ┌────────────────────────────────────┐
+//    zero    │ ten             fifteen    twenty  │    thirty
+//    ↑       └────────────────────────────────────┘      ↑
+//    0         10              15             20        30
+//    ↑                                                   ↑
+// MinValue     ↑DisplayValue                   ↑        MaxValue
+//              DisplayValue + DisplayValueRange│
+
 using CustomControlBaseLib;
 using System;
 using System.Collections.Generic;
@@ -26,7 +54,7 @@ namespace XYGraphLib {
   /// <summary>
   /// Displays the legend below the PlotArea with string values.
   /// </summary>
-  public class LegendXString: Legend {
+  public class LegendXString: LegendX {
 
 
     #region Properties
@@ -67,7 +95,6 @@ namespace XYGraphLib {
 
     public LegendXString(IReadOnlyList<string> strings) : base(Renderer.DimensionX, legendAngle: 90) {
       legendStrings = strings;
-      //LegendStringXs = new double[strings.Count];
     }
     #endregion
 

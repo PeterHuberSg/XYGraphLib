@@ -79,28 +79,28 @@
 //        SelectedIndex = 0;
 //      }
 //    }
-//    ///////// <summary>
-//    ///////// Can be used to set default colour from XAML
-//    ///////// </summary>
-//    //////public string SelectedColorName {
-//    //////  get { return (string)GetValue(SelectedColorNameProperty); }
-//    //////  set {
-//    //////    string valueLowercase = value.ToLowerInvariant();
-//    //////    for (int sampleIndex = 0; sampleIndex < Items.Count; sampleIndex++) {
-//    //////      var colorSamplePanel = (ColorSamplePanel)Items[sampleIndex];
-//    //////      if (colorSamplePanel.ColorName.ToLowerInvariant()==valueLowercase) {
-//    //////        SelectedIndex = sampleIndex;
-//    //////        SetValue(SelectedColorNameProperty, colorSamplePanel.ColorName); 
-//    //////        return;
-//    //////      }
-//    //////    }
-//    //////    throw new Exception("Unknown ColorName: " + value + ".");
-//    //////  }
-//    //////}
+//    /////// <summary>
+//    /////// Can be used to set default colour from XAML
+//    /////// </summary>
+//    ////public string SelectedColorName {
+//    ////  get { return (string)GetValue(SelectedColorNameProperty); }
+//    ////  set {
+//    ////    string valueLowercase = value.ToLowerInvariant();
+//    ////    for (int sampleIndex = 0; sampleIndex < Items.Count; sampleIndex++) {
+//    ////      var colorSamplePanel = (ColorSamplePanel)Items[sampleIndex];
+//    ////      if (colorSamplePanel.ColorName.ToLowerInvariant()==valueLowercase) {
+//    ////        SelectedIndex = sampleIndex;
+//    ////        SetValue(SelectedColorNameProperty, colorSamplePanel.ColorName); 
+//    ////        return;
+//    ////      }
+//    ////    }
+//    ////    throw new Exception("Unknown ColorName: " + value + ".");
+//    ////  }
+//    ////}
 
 
-//    //////public static readonly DependencyProperty SelectedColorNameProperty = 
-//    //////DependencyProperty.Register("SelectedColorName", typeof(string), typeof(ColorSamplePanel), new FrameworkPropertyMetadata("Green"));
+//    ////public static readonly DependencyProperty SelectedColorNameProperty = 
+//    ////DependencyProperty.Register("SelectedColorName", typeof(string), typeof(ColorSamplePanel), new FrameworkPropertyMetadata("Green"));
 
 
 //    public StandardColorComboBox() {
@@ -108,7 +108,7 @@
 //        SolidColorBrush? brush = brushPropertyInfo.GetValue(null, null) as SolidColorBrush;
 //        Items.Add(new ColorSamplePanel(brushPropertyInfo.Name, brush)); 
 //      }
-////////      TextSearch.SetTextPath(this, "ColorName");
+//////      TextSearch.SetTextPath(this, "ColorName");
 //      SelectedValuePath = "ColorBrush";
 //      SelectionChanged += standardColorComboBox_SelectionChanged;
 //    }

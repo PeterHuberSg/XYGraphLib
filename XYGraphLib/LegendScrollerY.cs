@@ -16,6 +16,8 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 This software is distributed without any warranty. 
 **************************************************************************************/
 using System;
+using System.Data;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using CustomControlBaseLib;
@@ -44,9 +46,6 @@ namespace XYGraphLib {
   /// the Legend accordingly.
   /// </summary>
   public class LegendScrollerY: LegendScroller {
-    /*
-
-    */
 
     #region Properties
     //      ----------
@@ -91,16 +90,20 @@ namespace XYGraphLib {
     //      ----------------
 
     protected override Size MeasureContentOverride(Size availableSize) {
+      //Debug.WriteLine($"--{Name}.MeasureContentOverride({availableSize})");
       CalculateScrollBarValues();
 
       ScrollBar.Measure(availableSize);
       ScrollBarWidth = ScrollBar.DesiredSize.Width;
-      Size buttonSize = new Size(ScrollBarWidth, ScrollBarWidth);
+      Size buttonSize = new (ScrollBarWidth, ScrollBarWidth);
       ZoomInButton.Measure(buttonSize);
       ZoomOutButton.Measure(buttonSize);
 
       double availableLegendWidth = Math.Max(0, availableSize.Width - ScrollBarWidth);
+      //Debug.WriteLine($"--availableLegendWidth {availableLegendWidth:N0} = Max(0, availableWidth {availableSize.Width:N0} - ScrollBarWidth {ScrollBarWidth:N0})");
       Legend.Measure(new Size(availableLegendWidth, availableSize.Height));
+      //Debug.WriteLine($"--LegendDesiredWidth {Legend.DesiredSize.Width:N0} = Legend.Measure(availableLegendWidth {availableLegendWidth:N0}, availableSizeHeight {availableSize.Height:N0})");
+      //Debug.WriteLine($"--return {Legend.DesiredSize.Width + ScrollBarWidth:N0} = LegendDesiredWidth {Legend.DesiredSize.Width:N0} + ScrollBarWidth {ScrollBarWidth:N0}, LegendDesiredHeight {Legend.DesiredSize.Height:N0})");
 
       //use scrollbarDockPanel or Legend to deal with infinite space.
       return new Size(Legend.DesiredSize.Width + ScrollBarWidth,  Legend.DesiredSize.Height);
@@ -108,12 +111,16 @@ namespace XYGraphLib {
 
 
     protected override Size ArrangeContentOverride(Rect arrangeRect) {
+      //Debug.WriteLine($"..{Name}.ArrangeContentOverride(Width: {arrangeRect.Width:N0}, Height: {arrangeRect.Height:N0})");
       CalculateScrollBarValues();
 
       double legendWidth = arrangeRect.Size.Width - ScrollBarWidth;
+      //Debug.WriteLine($"..legendWidth {legendWidth:N0} = arrangeRect.Width {arrangeRect.Size.Width:N0} - ScrollBarWidth {ScrollBarWidth:N0}");
       double legendX = 0;
+      //Debug.WriteLine($"..IsSizingWidthToExpandableContent: {IsSizingWidthToExpandableContent()}");
       if (IsSizingWidthToExpandableContent()) {
         //use all the height, but only the width needed
+        //Debug.WriteLine($"..legendWidth {Math.Min(legendWidth, Legend.DesiredSize.Width):N0} = Min(legendWidth: {legendWidth:N0}, Legend.DesiredWidth: {Legend.DesiredSize.Width:N0})");
         legendWidth = Math.Min(legendWidth, Legend.DesiredSize.Width);
       }
       double scrollbarX = legendWidth;
@@ -147,6 +154,7 @@ namespace XYGraphLib {
       //if (IsSizingHeightToExpandableContent()) {
       //  return new Size(arrangeRect.Size.Width, legendHeight + scrollHeight);
       //} else {
+      //Debug.WriteLine($"..return arrangeRect {arrangeRect.Size.Width:N0}, {arrangeRect.Size.Height:N0}");
       return arrangeRect.Size;
       //}
     }

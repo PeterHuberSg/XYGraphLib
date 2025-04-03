@@ -180,7 +180,7 @@ namespace XYGraphLib {
 
 
     private void verify(double[] labels) {
-      LegendX legend = (LegendX)TestLegendXScroller.Legend;
+      LegendXDouble legend = (LegendXDouble)TestLegendXScroller.Legend;
       if (labels.Length!=legend.LabelValues!.Length) {
         System.Diagnostics.Debugger.Break();
         throw new Exception("There should be " + labels.Length + " legends, but there were " + legend.LabelValues.Length + ".");

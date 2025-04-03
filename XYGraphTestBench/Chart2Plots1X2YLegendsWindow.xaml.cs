@@ -35,7 +35,6 @@ namespace XYGraphLib {
       InitializeComponent();
 
       TestChart2Plots1X2YLegendsTraced.PlotAreaLower.Background = Brushes.LightGoldenrodYellow;
-      TraceWpf.Line(">>>>> Chart2Plots1X2YLegendsWindow.fillDataSeries()");
       fillDataSeries();
     }
 
@@ -98,7 +97,7 @@ namespace XYGraphLib {
       seriesSettings = [
         new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Green, 2, null, "Plot1Line"),
         new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.line, Brushes.Blue, 2, new SolidColorBrush(fillColor),
-          "Plot2Line", null, 1),
+          "Plot2Line", null, null, 1),
         new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area1, Brushes.Gray, 1, null, "Plot1Area1"),
         new SerieSetting<DataRecord>(getSeriesData, SerieStyleEnum.area2, null, strokeThickness: 0, null, "Plot1Area2")];
 
@@ -130,7 +129,7 @@ namespace XYGraphLib {
           : new ChartNote([time.ToDouble(), chartNoteIndex*10], chartNoteIndex.ToString(), chartNoteIndex%3);
         time = time.AddMinutes(20*minutes);
       }
-      TestChart2Plots1X2YLegendsTraced.AddNotes(chartNotes, fontDefinitions, true);
+      TestChart2Plots1X2YLegendsTraced.AddNotes(chartNotes, fontDefinitions);
     }
 
 

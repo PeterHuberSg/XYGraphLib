@@ -16,6 +16,9 @@ the Creative Commons 0 license (details see COPYING.txt file, see also
 This software is distributed without any warranty. 
 **************************************************************************************/
 
+// One Chart can hold 1 or several vertically stacked PlotAreas. They all share the same LegendScrollerX, but each has its
+// own LegendScrollerY. The chart with one PlotArea looks like this:
+// Chart1Plot: 1 PlotArea, 1 LegendScrollerX, 1 LegendScrollerY. 
 // 
 // ┌─────────────┬─────────┐
 // │             │Legend   │
@@ -33,11 +36,10 @@ This software is distributed without any warranty.
 // Total ZoomButtons: allow to zoom in and out both for x and y axis at the same time.
 // 
 // 
-// A chart can hold several PlotAreas and LegendScrollers at the same time. XYGraphLib provides
+// A chart can hold several PlotAreas, each with its own LegendScrollerY, at the same time. XYGraphLib provides
 // some preconfigured charts:
-// Chart1Plot1X1YLegend: 1 PlotArea, 1 LegendScrollerX, 1 LegendScrollerY. See sample above
 //
-// Chart2Plots1X2YLegends:
+// Chart2Plots:
 // ┌────────────────┬────────────────────┐
 // │ PlotArea0      │ LegendScrollerY0   │
 // ├────────────────┼────────────────────┤
@@ -46,7 +48,7 @@ This software is distributed without any warranty.
 // │LegendScrollerX │ Total Zoom Buttons │
 // └────────────────┴────────────────────┘
 //
-// Chart4Plots1X4YLegends:
+// Chart4Plots:
 // ┌────────────────┬────────────────────┐
 // │ PlotArea0      │ LegendScrollerY0   │
 // ├────────────────┼────────────────────┤
@@ -64,6 +66,7 @@ This software is distributed without any warranty.
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -78,23 +81,47 @@ namespace XYGraphLib {
   public abstract class Chart: CustomControlBase, IZoom {
 
 
-    #region Events
-    //      ------
-
-    /// <summary>
-    /// Called when a renderer gets created.
-    /// </summary>
-    public event Action<Renderer>? RendererCreated; // Also useful for tracing WPF events
-    #endregion
-
-
     #region Constructor
     //      -----------
 
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    public Chart() {
+    public readonly LegendScrollerX LegendScrollerX;
+    public readonly LegendXString? LegendXString;
+    public IReadOnlyList<PlotArea> PlotAreasList => plotAreas;
+    readonly PlotArea[] plotAreas;
+    readonly LegendScrollerY[] legendScrollerYs;
+    readonly LegendScroller[] legendScrollersNew; //holds LegendScrollerX and Y, which is convenient for zooming
+
+
+    protected Chart(LegendScrollerX legendScrollerX, params PlotArea[] plotAreas) {
+      LegendScrollerX = legendScrollerX;
+      LegendXString = legendScrollerX.Legend as LegendXString;
+      legendScrollerX.Add(this);
+      legendScrollerX.VerticalAlignment = VerticalAlignment.Top;
+      AddChild(legendScrollerX);
+
+      this.plotAreas = plotAreas;
+      if (plotAreas.Length==0) throw new Exception("There must be at least 1 PlotArea.");
+
+      legendScrollerYs = new LegendScrollerY[plotAreas.Length];
+      legendScrollersNew = new LegendScroller[plotAreas.Length + 1];
+      var LegendScrollerYsIndex = 0;
+      var LegendScrollersIndex = 0;
+      legendScrollersNew[LegendScrollersIndex++] = legendScrollerX;
+      foreach (var plotArea in plotAreas) {
+        plotArea.LegendScrollerX = LegendScrollerX;
+        AddChild(plotArea);
+
+        var legendScrollerY = plotArea.LegendScrollerY;
+        legendScrollerYs[LegendScrollerYsIndex++] = legendScrollerY;
+        legendScrollersNew[LegendScrollersIndex++] = legendScrollerY;
+        legendScrollerY.Add(this);
+        legendScrollerY.HorizontalAlignment = HorizontalAlignment.Stretch;
+        legendScrollerY.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+        legendScrollerY.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
+        legendScrollerY.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
+        AddChild(legendScrollerY);
+      }
+
       addZoomButtons();
       IsEnabled = false;
     }
@@ -104,63 +131,98 @@ namespace XYGraphLib {
     #region Add control methods for Constructor
     //      -----------------------------------
 
-    protected readonly List<PlotArea> PlotAreas = new();
-    protected readonly List<LegendScroller> LegendScrollers = new();
-    LegendXString? legendXString = null;
+
+    ///// <summary>
+    ///// Add PlotArea to Control
+    ///// </summary>
+    //protected PlotArea Add(PlotArea plotArea) {
+    //  PlotAreas.Add(plotArea);
+    //  AddChild(plotArea);
+    //  return plotArea;
+    //}
+
+
+    ///// <summary>
+    ///// Add LegendScrollerX to Chart
+    ///// </summary>
+    //protected LegendScrollerX Add(LegendScrollerX legendScrollerX) {
+    //  add(legendScrollerX);
+    //  return legendScrollerX;
+    //}
+
+
+    ///// <summary>
+    ///// Add LegendScrollerY to Chart
+    ///// </summary>
+    //protected LegendScrollerY Add(LegendScrollerY legendScrollerY) {
+    //  add(legendScrollerY);
+    //  return legendScrollerY;
+    //}
+
+
+    ///// <summary>
+    ///// Add LegendScroller to Chart
+    ///// </summary>
+    //LegendScroller add(LegendScroller legendScroller) {
+    //  legendScroller.Add(this);
+    //  LegendScrollers.Add(legendScroller);
+    //  AddChild(legendScroller);
+
+    //  switch (legendScroller) {
+    //  case LegendScrollerX legendScrollerX:
+    //    legendScrollerX.VerticalAlignment = VerticalAlignment.Top;
+    //    legendXString = legendScrollerX.Legend as LegendXString;
+    //    break;
+    //  case LegendScrollerY legendScrollerY:
+    //    legendScrollerY.HorizontalAlignment = HorizontalAlignment.Left;
+    //    legendScrollerY.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+    //    legendScrollerY.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
+    //    legendScrollerY.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
+    //    break;
+    //  default: 
+    //    throw new NotSupportedException();
+    //  }
+    //  return legendScroller;
+    //}
 
 
     /// <summary>
-    /// Add PlotArea to Control
+    /// Add strings in chart
     /// </summary>
-    protected PlotArea Add(PlotArea plotArea) {
-      PlotAreas.Add(plotArea);
-      AddChild(plotArea);
-      return plotArea;
+    /// <param name="chartNotes">string to be displayed, font formatting and links to lists.</param>
+    /// <param name="fontDefinitions">if null, chartNotes.FontDefinitionId must be 0. The Font information from this chart will be used </param>
+    /// <param name="group">0: highest plot area ... 3: lowest plot area</param>
+    public void AddNotes(IEnumerable<ChartNote> chartNotes, FontDefinition[] fontDefinitions, int group = 0) {
+      RendererNotes rendererNotes = CreateNotesRenderer(chartNotes, fontDefinitions);
+      plotAreas[group].AddRenderer(rendererNotes);
     }
 
 
-    /// <summary>
-    /// Add LegendScrollerX to Chart
-    /// </summary>
-    protected LegendScrollerX Add(LegendScrollerX legendScrollerX) {
-      add(legendScrollerX);
-      return legendScrollerX;
-    }
+    /////////// <summary>
+    /////////// Displays ValuesPanel over Chart
+    /////////// </summary>
+    ////////public void Include(ValuesPanel valuesPanel) {
+    ////////  if (ValuesPanel==valuesPanel) return;
+
+    ////////  if (ValuesPanel is not null) throw new Exception("ValuesPanel was active for a different valuesPanel instead of null.");
+    ////////  ValuesPanel = valuesPanel;
+    ////////  base.AddChild(valuesPanel);
+    ////////  InvalidateMeasure();
+    ////////  InvalidateVisual();
+    ////////}
 
 
-    /// <summary>
-    /// Add LegendScrollerY to Chart
-    /// </summary>
-    protected LegendScrollerY Add(LegendScrollerY legendScrollerY) {
-      add(legendScrollerY);
-      return legendScrollerY;
-    }
+    /////////// <summary>
+    /////////// Does not display ValuesPanel over Chart
+    /////////// </summary>
+    ////////public void Exclude(ValuesPanel valuesPanel) {
+    ////////  if (ValuesPanel is null) return;
 
-
-    /// <summary>
-    /// Add LegendScroller to Chart
-    /// </summary>
-    LegendScroller add(LegendScroller legendScroller) {
-      legendScroller.Add(this);
-      LegendScrollers.Add(legendScroller);
-      AddChild(legendScroller);
-
-      switch (legendScroller) {
-      case LegendScrollerX legendScrollerX:
-        legendScrollerX.VerticalAlignment = VerticalAlignment.Top;
-        legendXString = legendScrollerX.Legend as LegendXString;
-        break;
-      case LegendScrollerY legendScrollerY:
-        legendScrollerY.HorizontalAlignment = HorizontalAlignment.Left;
-        legendScrollerY.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-        legendScrollerY.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-        legendScrollerY.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
-        break;
-      default: 
-        throw new NotSupportedException();
-      }
-      return legendScroller;
-    }
+    ////////  ValuesPanel = null;
+    ////////  base.RemoveChild(valuesPanel);
+    ////////  InvalidateMeasure();
+    ////////  InvalidateVisual();
+    ////////}
 
 
     protected ZoomButton? TotalZoomInButton;
@@ -213,8 +275,9 @@ namespace XYGraphLib {
     ----------------------------------------------------------------------------------------------------------*/
 
     protected double[][,]? DataSeries;
-    SerieStyleEnum[]? serieStyle;
+    SerieStyleEnum[]? serieStyles;
     protected string? XName;
+    protected string? XFormat;
     protected string? XUnit;
 
 
@@ -225,74 +288,76 @@ namespace XYGraphLib {
       IEnumerable<TRecord> records,
       SerieSetting<TRecord>[] serieSettings,
       string? xName = null,
+      string? xFormat = null,
       string? xUnit = null,
       Func<TRecord, string>? stringGetter = null) 
     {
       XName = xName;
+      XFormat = xFormat;
       XUnit = xUnit;
 
-      //////plotArea0.ClearRenderers();
-      //////plotArea1.ClearRenderers();
-      //////plotArea2.ClearRenderers();
-      //////plotArea3.ClearRenderers();
-      //////legendScrollerX.Reset();
-      //////legendScrollerY0.Reset();
-      //////legendScrollerY1.Reset();
-      //////legendScrollerY2.Reset();
-      //////legendScrollerY3.Reset();
+      //reset PlotAreas and LegendScrollers
+      foreach (var legendScroller in legendScrollersNew) legendScroller.Reset();
+      foreach (var plotArea in plotAreas) {
+        plotArea.ResetRenderers();
+        plotArea.XName = xName;
+        plotArea.XFormat = xFormat;
+        plotArea.XUnit = xUnit;
+      }
 
-      //////addGridLineRenderers();
-
-      ////foreach (var plotArea in PlotAreas) plotArea.ClearRenderers();
-      ////foreach (var legendScroller in LegendScrollers) legendScroller.Reset();
-      //////addGridLineRenderers();
-
+      //set up DataSeries and serieStyles
       DataSeries = new double[serieSettings.Length][,];
-      serieStyle = new SerieStyleEnum[serieSettings.Length];
+      serieStyles = new SerieStyleEnum[serieSettings.Length];
       int recordsCount = records.Count();
+      var XValues = new double[recordsCount];
       double[]? dataExtracted = null;
       serieSettings[0].Getter(records.First(), 0, ref dataExtracted);
       int dimensionCount = dataExtracted.Length;
       for (int dataSeriesIndex = 0; dataSeriesIndex < DataSeries.Length; dataSeriesIndex++) {
         DataSeries[dataSeriesIndex] = new double[recordsCount, dimensionCount];
         var serieSetting = serieSettings[dataSeriesIndex];
-        serieStyle[dataSeriesIndex] = serieSetting.SerieStyle;
-        if (serieSetting.Group<0 || serieSetting.Group>=PlotAreas.Count)
-          throw new Exception($"Group has to be a value between 0 and {PlotAreas.Count-1} but was {serieSetting.Group}." + Environment.NewLine +
+        serieStyles[dataSeriesIndex] = serieSetting.SerieStyle;
+        if (serieSetting.Group<0 || serieSetting.Group>=plotAreas.Length)
+          throw new Exception($"Group has to be a value between 0 and {plotAreas.Length-1} but was {serieSetting.Group}." + Environment.NewLine +
             $"SerieSettings[{dataSeriesIndex}]: {serieSetting}");
 
       }
 
-
+      //fill DataSeries with data
       int recordIndex = 0;
       foreach (TRecord record in records) {
         for (int dataSerieIndex = 0; dataSerieIndex<serieSettings.Length; dataSerieIndex++) {
           SerieSetting<TRecord> serieSetting = serieSettings[dataSerieIndex];
           serieSetting.Getter(record, dataSerieIndex, ref dataExtracted);
+          XValues[recordIndex] = dataExtracted[0]; 
           for (int dimensionIndex = 0; dimensionIndex < dataExtracted.Length; dimensionIndex++) {
             DataSeries[dataSerieIndex][recordIndex, dimensionIndex] = dataExtracted[dimensionIndex];
           }
         }
         recordIndex++;
       }
+      foreach (var plotArea in plotAreas) {
+        plotArea.XValues = XValues;
+      }
 
-      ////for (int serieIndex = 0; serieIndex<serieSettings!.Length; serieIndex++) {
-      ////  var serieSetting = serieSettings[serieIndex];
-      ////  Renderer? renderer = CreateGraphRenderer(serieIndex, serieSetting);
-      ////  if (renderer!=null) {
-      ////    AddRenderer(renderer, PlotAreas[serieSetting.Group], legendScrollerX, legendScrollerY0)
-      ////  }
-      ////}
-
+      //add graph renderers
+      for (int serieIndex = 0; serieIndex<serieSettings!.Length; serieIndex++) {
+        var serieSetting = serieSettings[serieIndex];
+        createGraphRenderer(serieIndex, serieSetting);//returns null for first serie when renderer is based on 2 series
+        //Renderer? renderer = createGraphRenderer(serieIndex, serieSetting);//returns null for first serie when renderer is based on 2 series
+        //if (renderer!=null) {
+        //  AddRenderer(renderer, PlotAreas[serieSetting.Group], LegendScrollerX, LegendScrollerYs[serieSetting.Group]);
+        //}
+      }
 
       //handle x legends with strings
       //the code is here and not in the loop above because LegendXString is seldom used
       if (stringGetter is null) {
-        if (legendXString is not null)  
+        if (LegendXString is not null)  
         throw new ArgumentException("When a LegendXString is used, the stringGetter argument in FillData() cannot be null.");
 
       } else { 
-        if (legendXString is null) throw new NotSupportedException(
+        if (LegendXString is null) throw new NotSupportedException(
           "stringGetter should only be defined when LegendScrollerXs[0].Legend is a LegendXString.");
 
         var legendXStrings = new string[recordsCount];
@@ -300,7 +365,7 @@ namespace XYGraphLib {
         foreach (TRecord record in records) {
           legendXStrings[recordIndex++] = stringGetter(record);
         }
-        legendXString.LegendStrings = legendXStrings;
+        LegendXString.LegendStrings = legendXStrings;
       }
 
       InvalidateMeasure(); //InvalidateVisual() does not force Measure()
@@ -317,13 +382,13 @@ namespace XYGraphLib {
     Brush? areaLineStrokeBrush;
     double areaLineStrokeThickness;
     Brush? areaLineFillBrush;
-    double[,]? areaLine1DataSerie;
+    RendererDataSeries.YSerie line1YSerie;
 
 
     /// <summary>
-    /// returns a new renderer based on serieSetting
+    /// creates 1 new renderer based on 1 or 2 serieSetting depending on serieSetting.SerieStyle
     /// </summary>
-    protected Renderer? CreateGraphRenderer<TRecord>(int serieIndex, SerieSetting<TRecord> serieSetting) {
+    private void createGraphRenderer<TRecord>(int serieIndex, SerieSetting<TRecord> serieSetting) {
 
       if (isArea2Expected && serieSetting.SerieStyle!=SerieStyleEnum.area2) {
         throw new Exception($"SerieStyle[{serieIndex}] '{serieSetting.SerieStyle}, {(int)serieSetting.SerieStyle}' should be area2 because the previous data series had style area1.");
@@ -362,32 +427,43 @@ namespace XYGraphLib {
         }
       }
 
+      Renderer renderer;
       switch (serieSetting.SerieStyle) {
       case SerieStyleEnum.line:
-        return new Renderer1Line(strokeBrush, serieSetting.StrokeThickness, fillBrush, new double[][,] { DataSeries![serieIndex] }, serieSetting.Name, 
-          serieSetting.Unit);
+        if (isArea2Expected) 
+          throw new Exception($"SerieStyle[{serieIndex}] '{serieSetting.SerieStyle}, {(int)serieSetting.SerieStyle}' cannot be preceded by serie with style area1.");
+
+        renderer = new Renderer1Line(strokeBrush, serieSetting.StrokeThickness, fillBrush, 
+          new RendererDataSeries.YSerie(serieSetting.Name, serieSetting.Format, serieSetting.Unit, DataSeries![serieIndex]));
+        break;
 
       case SerieStyleEnum.area1:
+        if (isArea2Expected) 
+          throw new Exception($"SerieStyle[{serieIndex}] '{serieSetting.SerieStyle}, {(int)serieSetting.SerieStyle}' cannot be preceded by serie with style area1.");
+        
         isArea2Expected = true;
         areaLineStrokeBrush = strokeBrush;
         areaLineStrokeThickness = serieSetting.StrokeThickness;
         areaLineFillBrush = fillBrush;
-        areaLine1DataSerie = DataSeries![serieIndex];
-        return null;
+        line1YSerie = new RendererDataSeries.YSerie(serieSetting.Name, serieSetting.Format, serieSetting.Unit, DataSeries![serieIndex]);
+        return;
 
       case SerieStyleEnum.area2:
-        if (!isArea2Expected) {
+        if (!isArea2Expected) 
           throw new Exception($"SerieStyle[{serieIndex}] '{serieSetting.SerieStyle}, {(int)serieSetting.SerieStyle}' should be preceded by serie with style area1.");
-        }
+        
  
         isArea2Expected = false;
-        double[][,] areaLineDataSeries = { areaLine1DataSerie!, DataSeries![serieIndex] };
-        return new Renderer2Lines(areaLineStrokeBrush!, areaLineStrokeThickness, areaLineFillBrush!, areaLineDataSeries,
-          serieSetting.Name, serieSetting.Unit);
+        RendererDataSeries.YSerie[] ySeries = {line1YSerie,
+          new RendererDataSeries.YSerie(serieSetting.Name, serieSetting.Format, serieSetting.Unit, DataSeries![serieIndex])};
+        renderer = new Renderer2Lines(areaLineStrokeBrush!, areaLineStrokeThickness, areaLineFillBrush!, ySeries);
+        break;
 
       default:
         throw new Exception($"SerieStyle[{serieIndex}] '{serieSetting.SerieStyle}, {(int)serieSetting.SerieStyle}' not supported.");
       }
+
+      plotAreas[serieSetting.Group].AddRenderer(renderer);
     }
 
 
@@ -397,12 +473,11 @@ namespace XYGraphLib {
     }
 
     
-    protected void AddRenderer(Renderer renderer, PlotArea plotArea, LegendScrollerX? legendScrollerX, LegendScrollerY? legendScrollerY) {
-      plotArea.AddRenderer(renderer);
-      legendScrollerX?.AddRenderer(renderer);
-      legendScrollerY?.AddRenderer(renderer);
-      RendererCreated?.Invoke(renderer);
-    }
+    //protected void AddRenderer(Renderer renderer, PlotArea plotArea, LegendScrollerX? legendScrollerX, LegendScrollerY? legendScrollerY) {
+    //  plotArea.AddRenderer(renderer);
+    //  //legendScrollerX?.AddRenderer(renderer);
+    //  //legendScrollerY?.AddRenderer(renderer);
+    //}
     #endregion
 
 
@@ -432,7 +507,7 @@ namespace XYGraphLib {
     /// </summary>
     public void ZoomIn(){
       if (CanZoomIn) {
-        foreach (IZoom zoomer in LegendScrollers) {
+        foreach (IZoom zoomer in legendScrollersNew) {
           zoomer.ZoomIn();
         }
       }
@@ -444,7 +519,7 @@ namespace XYGraphLib {
     /// </summary>
     public void ZoomOut(){
       if (CanZoomOut) {
-        foreach (IZoom zoomer in LegendScrollers) {
+        foreach (IZoom zoomer in legendScrollersNew) {
           zoomer.ZoomOut();
         }
       }
@@ -456,7 +531,7 @@ namespace XYGraphLib {
     /// </summary>
     public void ZoomReset(){
       if (CanZoomOut) {
-        foreach (IZoom zoomer in LegendScrollers) {
+        foreach (IZoom zoomer in legendScrollersNew) {
           zoomer.ZoomReset();
         }
       }
@@ -466,7 +541,7 @@ namespace XYGraphLib {
     internal void UpdateZoomState() {
       bool canZoomOut = false;
       bool canZoomIn = false;
-      foreach (IZoom zoomer in LegendScrollers) {
+      foreach (IZoom zoomer in legendScrollersNew) {
         if (zoomer.CanZoomIn) {
           canZoomIn = true;
         }
@@ -497,6 +572,29 @@ namespace XYGraphLib {
     void totalZoom100Button_Click(object sender, RoutedEventArgs e) {
       ZoomReset();
     }
-    #endregion  
+    #endregion
+
+
+    ////////#region ValuesPanel
+    //////////      -----------
+
+    /////////// <summary>
+    /////////// The ValuePanel displays next to the mouse pointer the x and y values for the mouse x position.
+    /////////// </summary>
+    ////////public ValuesPanel? ValuesPanel;
+
+
+    ////////protected void MeasureChartControls(Size constraint) {
+    ////////  System.Diagnostics.Debug.WriteLine($">>> ValuesPanel?.Measure(Size {constraint})");
+    ////////  ValuesPanel?.Measure(constraint);
+    ////////}
+
+
+    ////////protected void ArrangeChartControls(Rect arrangeRect) {
+    ////////  System.Diagnostics.Debug.WriteLine($">>> ValuesPanel?.Arrange {arrangeRect})");
+    ////////  ValuesPanel?.Arrange(arrangeRect);
+    ////////}
+
+    ////////#endregion
   }
 }

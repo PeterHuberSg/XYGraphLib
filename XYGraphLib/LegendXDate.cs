@@ -35,7 +35,7 @@ namespace XYGraphLib {
   /// <summary>
   /// Displays the legend below the PlotArea with date values.
   /// </summary>
-  public class LegendXDate: LegendX {
+  public class LegendXDate: LegendXDouble {
 
     #region Properties
     //      ----------
@@ -135,7 +135,6 @@ namespace XYGraphLib {
     //      ----------------
 
     protected override void OnProvideDefaultValues(out double displayValue, out double displayValueRange) {
-TraceWpf.Line(">>>>> LegendXDate.OnProvideDefaultValues()");
       DisplayDate = DateTime.Now.AddDays(-7);
       displayValue = DisplayDate.ToDouble();
       DisplayDateRange = TimeSpan.FromDays(1);
@@ -148,7 +147,7 @@ TraceWpf.Line(">>>>> LegendXDate.OnProvideDefaultValues()");
 
 
     protected override bool OnIsRecalculationNeeded(Size renderContentSize) {
-TraceWpf.Line(">>>>> LegendxDate.OnIsRecalculationNeeded()");
+      TraceWpf.Line("LegendXDate.OnIsRecalculationNeeded()");
       //check first if DisplayValue has changed, which most likely comes from LegendScroller
       bool hasDisplayDateChanged = false;
       if (displayValueTracked!=DisplayValue) {

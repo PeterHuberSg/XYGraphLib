@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using WpfTestbench;
 using System;
+using System.Collections.Generic;
 
 
 namespace XYGraphLib {
@@ -42,30 +43,34 @@ namespace XYGraphLib {
     /// </summary>
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
     //Chart4Plots1X4YLegendsTraced is private and the other constructors invoking it set Name already
-    private Chart4Plots1X4YLegendsTraced(DummyTraceClass? dummyArgument)
-      : base(
-          new PlotAreaTraced("PlotArea0"), 
-          new PlotAreaTraced("PlotArea1"),
-          new PlotAreaTraced("PlotArea2"),
-          new PlotAreaTraced("PlotArea3"), 
-          new LegendScrollerXTraced(new LegendXDateTraced()),
-          new LegendScrollerYTraced("YLegendScroller0"), 
-          new LegendScrollerYTraced("YLegendScroller1"),
-          new LegendScrollerYTraced("YLegendScroller2"),
-          new LegendScrollerYTraced("YLegendScroller3")
-          ) 
-    {}
-    #pragma warning restore CS8618 
-    //private Chart4Plots1X4YLegendsTraced(DummyTraceClass dummyArgument)
-    //  : base(new PlotAreaTraced("PlotArea0"), new PlotAreaTraced("PlotArea1"), new LegendScrollerXTraced(new LegendXDateTraced()), 
-    //  new LegendScrollerYTraced("YLegendScroller0"), new LegendScrollerYTraced("YLegendScroller1"), new GridTraced("ZoomGrid")) 
-    //{
-    //}
+    private Chart4Plots1X4YLegendsTraced(DummyTraceClass? _):
+    base(
+      new LegendScrollerXTraced(new LegendXDateTraced()),
+      new PlotAreaTraced("PlotArea0", new LegendScrollerYTraced("LegendScrollerY0")), 
+      new PlotAreaTraced("PlotArea1", new LegendScrollerYTraced("LegendScrollerY1")), 
+      new PlotAreaTraced("PlotArea2", new LegendScrollerYTraced("LegendScrollerY2")), 
+      new PlotAreaTraced("PlotArea3", new LegendScrollerYTraced("LegendScrollerY3"))) 
+    { }
+#pragma warning restore CS8618
     #endregion
 
 
     #region Event Tracing
     //      -------------
+
+    public override void FillData<TRecord>(
+      IEnumerable<TRecord> records, 
+      SerieSetting<TRecord>[] serieSettings,
+      string? xName = null,
+      string? xFormat = null,
+      string? xUnit = null, 
+      Func<TRecord, string>? stringGetter = null) 
+    {
+      TraceWPFEvents.TraceLineStart($"{Name}.FillData()");
+      base.FillData(records, serieSettings, xName, xFormat, xUnit, stringGetter);
+      TraceWPFEvents.TraceLineEnd($"{Name}.FillData()");
+    }
+
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e) {
       TraceWPFEvents.OnPropertyChanged(this, e, base.OnPropertyChanged);

@@ -76,7 +76,7 @@ namespace XYGraphLib {
 
 
     private void testChart() {
-      var chart = new Chart1Plot1X1YLegend(new PlotArea(), new LegendScrollerX(new LegendXDate()), new LegendScrollerY());
+      var chart = new Chart1Plot1X1YLegend(new LegendScrollerX(new LegendXDate()), new PlotArea(new LegendScrollerY()));
       MainGrid.Children.Add(chart);
     }
 

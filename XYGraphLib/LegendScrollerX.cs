@@ -69,14 +69,13 @@ namespace XYGraphLib {
     /// <summary>
     /// Default constructor, adding a LegendX for doubles
     /// </summary>
-    public LegendScrollerX(): this(new LegendX(Renderer.DimensionX)) {}
+    public LegendScrollerX(): this(new LegendXDouble()) {}
 
 
     /// <summary>
     /// Constructor using any x-axis legend
     /// </summary>
-    public LegendScrollerX(LegendX legend): base(legend) {
-    }
+    public LegendScrollerX(LegendX legendX): base(legendX) {}
 
 
     /// <summary>
@@ -86,35 +85,35 @@ namespace XYGraphLib {
       MinValue = 0;
       MaxValue = legend.LegendStrings.Count;
 
-      topLine = new Line {
-        HorizontalAlignment = HorizontalAlignment.Left,
-        VerticalAlignment = VerticalAlignment.Top,
-        Stretch = Stretch.None,
-        Stroke = Brushes.Yellow,
-        StrokeThickness = 3
-      };
-      AddChild(topLine);
-      middleLine = new Line {
-        HorizontalAlignment = HorizontalAlignment.Left,
-        VerticalAlignment = VerticalAlignment.Top,
-        Stretch = Stretch.None,
-        Stroke = Brushes.Orange,
-        StrokeThickness = 3
-      };
-      AddChild(middleLine);
-      bottomLine = new Line {
-        HorizontalAlignment = HorizontalAlignment.Left,
-        VerticalAlignment = VerticalAlignment.Top,
-        Stretch = Stretch.None,
-        Stroke = Brushes.Red,
-        StrokeThickness = 3
-      };
-      AddChild(bottomLine);
+      //topLine = new Line {
+      //  HorizontalAlignment = HorizontalAlignment.Left,
+      //  VerticalAlignment = VerticalAlignment.Top,
+      //  Stretch = Stretch.None,
+      //  Stroke = Brushes.Yellow,
+      //  StrokeThickness = 3
+      //};
+      //AddChild(topLine);
+      //middleLine = new Line {
+      //  HorizontalAlignment = HorizontalAlignment.Left,
+      //  VerticalAlignment = VerticalAlignment.Top,
+      //  Stretch = Stretch.None,
+      //  Stroke = Brushes.Orange,
+      //  StrokeThickness = 3
+      //};
+      //AddChild(middleLine);
+      //bottomLine = new Line {
+      //  HorizontalAlignment = HorizontalAlignment.Left,
+      //  VerticalAlignment = VerticalAlignment.Top,
+      //  Stretch = Stretch.None,
+      //  Stroke = Brushes.Red,
+      //  StrokeThickness = 3
+      //};
+      //AddChild(bottomLine);
 
     }
-    Line topLine;
-    Line middleLine;
-    Line bottomLine;
+    //Line? topLine;
+    //Line? middleLine;
+    //Line? bottomLine;
 
 
     protected override void OnButtonScrollbarCreated() {

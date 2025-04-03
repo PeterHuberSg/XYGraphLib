@@ -22,6 +22,7 @@ namespace XYGraphLib {
     /// </summary>
     internal readonly VisualCollection Visuals;
 
+
     /// <summary>
     /// Returns the number of Visuals in this VisualsFrameworkElement. Used by WPF for drawing.
     /// </summary>

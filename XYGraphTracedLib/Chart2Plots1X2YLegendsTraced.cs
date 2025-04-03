@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using WpfTestbench;
 using System;
+using System.Collections.Generic;
 
 
 namespace XYGraphLib {
@@ -42,20 +43,30 @@ namespace XYGraphLib {
     /// </summary>
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
     private Chart2Plots1X2YLegendsTraced(DummyTraceClass? _)
-      : base(new PlotAreaTraced("PlotArea0"), new PlotAreaTraced("PlotArea1"), new LegendScrollerXTraced(new LegendXDateTraced()),
-      new LegendScrollerYTraced("YLegendScroller0"), new LegendScrollerYTraced("YLegendScroller1")) {
+      : base(new LegendScrollerXTraced(new LegendXDateTraced()), 
+          new PlotAreaTraced("PlotAreaUpper", new LegendScrollerYTraced("LegendScrollerYUpper")), 
+          new PlotAreaTraced("PlotAreaLower", new LegendScrollerYTraced("LegendScrollerYLower"))) {
     }
-    #pragma warning restore CS8618 
-    //private Chart2Plots1X2YLegendsTraced(DummyTraceClass dummyArgument)
-    //  : base(new PlotAreaTraced("PlotArea0"), new PlotAreaTraced("PlotArea1"), new LegendScrollerXTraced(new LegendXDateTraced()), 
-    //  new LegendScrollerYTraced("YLegendScroller0"), new LegendScrollerYTraced("YLegendScroller1"), new GridTraced("ZoomGrid")) 
-    //{
-    //}
+    #pragma warning restore CS8618
     #endregion
 
 
     #region Event Tracing
     //      -------------
+
+    public override void FillData<TRecord>(
+      IEnumerable<TRecord> records, 
+      SerieSetting<TRecord>[] serieSettings,
+      string? xName = null,
+      string? xFormat = null,
+      string? xUnit = null, 
+      Func<TRecord, string>? stringGetter = null) 
+    {
+      TraceWPFEvents.TraceLineStart($"{Name}.FillData()");
+      base.FillData(records, serieSettings, xName, xFormat, xUnit, stringGetter);
+      TraceWPFEvents.TraceLineEnd($"{Name}.FillData()");
+    }
+
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e) {
       TraceWPFEvents.OnPropertyChanged(this, e, base.OnPropertyChanged);
