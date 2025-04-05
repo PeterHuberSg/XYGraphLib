@@ -74,14 +74,6 @@ namespace XYGraphLib {
     }
 
 
-
-    ///// <summary>
-    /////Returns the x pixel position of a label string, even if the label does not get displayed, because
-    ///// there is not enough space. Returns int.MinValue if the string is not needed for the graph based 
-    ///// on DisplayValue and DisplayValueRange.
-    ///// </summary>
-    //public double[] LegendStringXs { get; }
-
     public double MaxLegendHeight { get; private set; } = double.NaN;
     #endregion
 
@@ -238,128 +230,7 @@ namespace XYGraphLib {
         //draw very last label next to RenderWidth
         labelPoints![labelIndex] = new Point(RenderWidthTracked - FontFamily.Baseline*FontSize*0.8, 0);
       }
-      ////number of labels that can be displayed in window
-      //Array.Fill(LegendStringXs, int.MinValue);
-      ////var firstStringsIndex = (int)Math.Round(DisplayValue, 0);
-      //var stringsIndex = (int)DisplayValue;//first string that is needed for the label calculation, might be just
-      //                                     //outside of the graph
-      ////var stringIndexOffset = firstStringsIndex - DisplayValue;
-      //var stringIndexOffset = DisplayValue - stringsIndex;
-      //var stringXIncrement = RenderWidthTracked / DisplayValueRange;
-      //var maxLabelCount = RenderWidthTracked / FontFamily.LineSpacing*FontSize;
-
-      //if (maxLabelCount<=1) {
-      //  //only 1 or even only the part of a label can be displayed. Just display the very first value.
-      //  if (labelValues==null || labelValues.Length!=1) {
-      //    labelValues = new double[1];
-      //    labelStrings = new string[1];
-      //    labelPoints = new Point[1];
-      //  }
-      //  labelValues[0] = DisplayValue;
-      //  labelStrings![0] = LegendStrings[stringsIndex];
-      //  labelPoints![0] = new Point(0, 0);
-      //  return;
-      //}
-
-      ////calculate number of labels that need to be displayed
-      //if (DisplayValueRange<=maxLabelCount) {
-      //  //spread the labels, there is too much space available
-      //  var labelsCount = (int)DisplayValueRange;
-      //  if (labelValues==null || labelValues.Length!=labelsCount) {
-      //    labelValues = new double[labelsCount];
-      //    labelStrings = new string[labelsCount];
-      //    labelPoints = new Point[labelsCount];
-      //  }
-
-      //  double stringX;
-      //  if (stringIndexOffset<=precision) {
-      //    //DisplayValue is (close) to an integer, i.e. the Legend starts exactly with stringsIndex 
-      //    stringX = 0;
-      //  } else {
-      //    //DisplayValue is not close to an integer. The graph will display a value for stringsIndex, but
-      //    //the legend will only display a string for stringsIndex+1
-      //    stringX = -stringIndexOffset;
-      //    LegendStringXs[stringsIndex++] = stringX;
-      //    stringX += stringXIncrement;
-      //  }
-
-      //  //create labels
-      //  for (var labelIndex = 0; labelIndex<labelsCount; labelsCount++) {
-      //    labelValues[labelsCount] = stringsIndex++;
-      //    labelStrings![labelsCount] = LegendStrings[stringsIndex];
-      //    labelPoints![labelsCount] = new Point(stringX, 0);
-      //    stringX += stringXIncrement;
-      //  }
-
-      //  if (stringX + precision < RenderWidthTracked) {
-      //    //calculate one more x for first string outside the graph.
-      //    LegendStringXs[stringsIndex] = stringX;
-      //  }
-      //} else {
-      //  ////display only some labels, there is not enough space
-      //  //labelIncrement = displayLabelsCount/maxLabelCount;
-      //  //labelDistance = RenderWidthTracked / maxLabelCount;
-      //  //displayLabelsCount = maxLabelCount;
-      //}
-
-      //if (labelValues==null || labelValues.Length!=displayLabelsCount) {
-      //  labelValues = new double[displayLabelsCount];
-      //  labelStrings = new string[displayLabelsCount];
-      //  labelPoints = new Point[displayLabelsCount];
-      //}
-
-      //var labelValue = firstStringsIndex;
-      //for (int stringsIndex = 0; stringsIndex < firstStringsIndex; stringsIndex++) {
-      //  labelValues[stringsIndex] = labelValue++;
-      //  labelStrings![stringsIndex] = LegendStrings[stringsIndex];
-      //  labelPoints![stringsIndex] = new Point(0, 0);
-      //}
-
-      /*
-      //calculate labels
-      //double pixelPerValue = RenderWidthTracked / DisplayValueRange;
-      for (int labelIndex = 0; labelIndex < labelValues.Length; labelIndex++) {
-        //write label value
-        labelValues[labelIndex] = labelValue;
-
-        //calculate position
-        double xPosition = (labelValue-DisplayValue) * pixelPerValue;
-#if DEBUG
-        if (labelIndex>0) {
-          double labelDistance = xPosition-labelPoints[labelIndex-1].X;
-          double labelLength = LegendGlyphDrawer.GetLength(labelValue.ToString(numberFormat), FontSize);
-          if (labelDistance<labelLength) {
-            System.Diagnostics.Debugger.Break();
-            throw new Exception("label " + labelValue.ToString(numberFormat) + " needs " + labelLength +
-            " pixels, but there are only " + labelDistance + " pixels distance between 2 labels.");
-          }
-        }
-#endif
-        if (xPosition> RenderWidthTracked) {
-          if (xPosition<1.0001*RenderWidthTracked) {
-            //probably rounding error
-            xPosition = RenderWidthTracked;
-          } else {
-            //should not happen
-#if DEBUG
-            System.Diagnostics.Debugger.Break();
-            throw new Exception();
-#endif
-          }
-        }
-        labelPoints[labelIndex] = new Point(xPosition, 0);
-
-        //calculate label string
-        labelStrings[labelIndex] = labelValue.ToString(numberFormat);
-
-        //calculate next label
-        labelValue += step.Value;
-      }
-      */
     }
-
-
-
     #endregion
   }
 }

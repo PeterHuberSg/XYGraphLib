@@ -170,6 +170,12 @@ namespace XYGraphLib {
 
 
     /// <summary>
+    /// Copy of Chart.LegendXString.LegendStrings, 
+    /// </summary>
+    public string[]? LegendXStrings;
+
+
+    /// <summary>
     /// Number of Renderers registered with PlotArea
     /// </summary>
     public int RendererCount { get { return renderers.Count; } }
@@ -307,7 +313,12 @@ namespace XYGraphLib {
     private void updateValuesPanel(int existingValueIndex, Point mousePosition) {
       var rowIndex = 0;
       var date = new DateTime(((long)existingXValue)*10000);
-      rowValueStrings![rowIndex++] = XFormat is null ? date.ToString("dd.MM.yyyy" + Environment.NewLine + "hh:mm:ss") : date.ToString(XFormat);
+      if (LegendXStrings is null) {
+        rowValueStrings![rowIndex++] = XFormat is null ? date.ToString("dd.MM.yyyy" + Environment.NewLine + "hh:mm:ss") : date.ToString(XFormat);
+      } else {
+        rowValueStrings![rowIndex++] = LegendXStrings[existingValueIndex];
+      }
+
       foreach (var rendererDataSerie in rendererDataSeriesList) {
         foreach (var ySerie in rendererDataSerie.YSeries) {
           rowValueStrings[rowIndex++] = ySerie.Format is null

@@ -147,7 +147,6 @@ namespace XYGraphLib {
 
 
     protected override bool OnIsRecalculationNeeded(Size renderContentSize) {
-      TraceWpf.Line("LegendXDate.OnIsRecalculationNeeded()");
       //check first if DisplayValue has changed, which most likely comes from LegendScroller
       bool hasDisplayDateChanged = false;
       if (displayValueTracked!=DisplayValue) {

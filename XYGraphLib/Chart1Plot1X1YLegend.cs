@@ -124,9 +124,6 @@ namespace XYGraphLib {
       //always remeasure xLegend because in the beginning it is given the whole width of the chart
       LegendScrollerX.Measure(new Size(plotAreaWidth, legendHeight));
 
-      //////////allow Chart to measure its own controls
-      ////////base.MeasureChartControls(constraint);
-
       Size returnedSize = constraint;
       if (double.IsInfinity(constraint.Height)) {
         returnedSize.Height = LegendScrollerX.DesiredSize.Height + LegendScrollerY.DesiredSize.Height;
@@ -155,9 +152,6 @@ namespace XYGraphLib {
       TotalZoomOutButton.ArrangeBorderPadding(arrangeRect, remainingWidth, zoomInOutY, 
         TotalZoomOutButton.DesiredSize.Width, TotalZoomOutButton.DesiredSize.Height);
       TotalZoomInButton!.ArrangeBorderPadding(arrangeRect, arrangeRect.Width - TotalZoomInButton!.DesiredSize.Width, zoomInOutY, TotalZoomInButton.DesiredSize.Width, TotalZoomInButton.DesiredSize.Height);
-
-      //////////allow Chart to arrange its own controls
-      ////////base.ArrangeChartControls(arrangeRect);
 
       return arrangeRect.Size;
     }

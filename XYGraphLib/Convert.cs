@@ -667,10 +667,6 @@ namespace XYGraphLib {
         throw new ApplicationException(string.Format("Convert.Round(): can only round up to 28 digits, but was {0}.", digits));
       }
       if (double.IsNaN(value) || double.IsInfinity(value)) {
-      //////  || 
-      //////  value>MaxDoubleRound || value<-MaxDoubleRound ||
-      //////  (value>0 && value<DoubleRoundEpsilon) || (value<0 && value>-DoubleRoundEpsilon)) //
-      //////{
         return value;
       }
 

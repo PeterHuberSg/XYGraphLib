@@ -171,18 +171,5 @@ namespace XYGraphLib {
       }
     }
     #endregion
-
-
-    protected override Size MeasureOverride(Size constraint) {
-      var desired = base.MeasureOverride(constraint);//todo: remove
-      System.Diagnostics.Debug.WriteLine($"ValuesPanel Measure Given {constraint.Width:F0}, {constraint.Height:F0}; Desired {desired.Width:F0}, {desired.Height:F0}");
-      return desired;
-    }
-
-    protected override Size ArrangeOverride(Size arrangeSize) {
-      var used = base.ArrangeOverride(arrangeSize);
-      System.Diagnostics.Debug.WriteLine($"ValuesPanel ArrangeOverride Given {arrangeSize.Width:F0}, {arrangeSize.Height:F0}; Used {used.Width:F0}, {used.Height:F0}");
-      return used;
-    }
   }
 }

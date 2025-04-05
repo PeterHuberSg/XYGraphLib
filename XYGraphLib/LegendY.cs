@@ -105,7 +105,6 @@ namespace XYGraphLib {
 
 
     protected override Size OnLegendMeasurement(Size requiredSize) {
-      //Debug.WriteLine($"---{Name}.OnMeasurement({requiredSize.Width:N0}, {requiredSize.Height:N0})");
       if (requiredSize.Height==0) {
         //Legend was given infinite space and has converted it to 0 for the requestedSize. Request a bit more height.
         requiredSize.Height = minHeightInFonts*FontSize;//request at least minimum height
@@ -114,7 +113,6 @@ namespace XYGraphLib {
       }
 
       requiredSize.Width = calculateLegendWidth(requiredSize.Height);
-      //Debug.WriteLine($"---return {requiredSize.Width:N0}, {requiredSize.Height:N0})");
       return requiredSize;
     }
 
@@ -229,17 +227,13 @@ namespace XYGraphLib {
     //      -----------------
 
     protected override Size OnLegendArrange(Rect arrangeRect) {
-      //Debug.WriteLine($"...{Name}.OnArrange({arrangeRect.Width:N0}, {arrangeRect.Height:N0})");
       //calculate width and step again, since available height might be different during measure and arrange
       double calculatedWidth = calculateLegendWidth(arrangeRect.Height);
-      //Debug.WriteLine($"...IsSizingWidthToFixedContent: {IsSizingWidthToFixedContent()}");
       if (IsSizingWidthToFixedContent()) {
         //use all the height, but only the width needed
-        //Debug.WriteLine($"...return {calculatedWidth:N0}, {arrangeRect.Height:N0})");
         return new Size(calculatedWidth, arrangeRect.Height);
       } else {
         //use all available space
-        //Debug.WriteLine($"...return {arrangeRect:N0}, {arrangeRect.Height:N0})");
         return arrangeRect.Size;
       }
     }

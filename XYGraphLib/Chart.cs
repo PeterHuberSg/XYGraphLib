@@ -131,61 +131,6 @@ namespace XYGraphLib {
     #region Add control methods for Constructor
     //      -----------------------------------
 
-
-    ///// <summary>
-    ///// Add PlotArea to Control
-    ///// </summary>
-    //protected PlotArea Add(PlotArea plotArea) {
-    //  PlotAreas.Add(plotArea);
-    //  AddChild(plotArea);
-    //  return plotArea;
-    //}
-
-
-    ///// <summary>
-    ///// Add LegendScrollerX to Chart
-    ///// </summary>
-    //protected LegendScrollerX Add(LegendScrollerX legendScrollerX) {
-    //  add(legendScrollerX);
-    //  return legendScrollerX;
-    //}
-
-
-    ///// <summary>
-    ///// Add LegendScrollerY to Chart
-    ///// </summary>
-    //protected LegendScrollerY Add(LegendScrollerY legendScrollerY) {
-    //  add(legendScrollerY);
-    //  return legendScrollerY;
-    //}
-
-
-    ///// <summary>
-    ///// Add LegendScroller to Chart
-    ///// </summary>
-    //LegendScroller add(LegendScroller legendScroller) {
-    //  legendScroller.Add(this);
-    //  LegendScrollers.Add(legendScroller);
-    //  AddChild(legendScroller);
-
-    //  switch (legendScroller) {
-    //  case LegendScrollerX legendScrollerX:
-    //    legendScrollerX.VerticalAlignment = VerticalAlignment.Top;
-    //    legendXString = legendScrollerX.Legend as LegendXString;
-    //    break;
-    //  case LegendScrollerY legendScrollerY:
-    //    legendScrollerY.HorizontalAlignment = HorizontalAlignment.Left;
-    //    legendScrollerY.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-    //    legendScrollerY.Legend.HorizontalAlignment = HorizontalAlignment.Stretch;
-    //    legendScrollerY.Legend.HorizontalContentAlignment = HorizontalAlignment.Left;
-    //    break;
-    //  default: 
-    //    throw new NotSupportedException();
-    //  }
-    //  return legendScroller;
-    //}
-
-
     /// <summary>
     /// Add strings in chart
     /// </summary>
@@ -196,33 +141,6 @@ namespace XYGraphLib {
       RendererNotes rendererNotes = CreateNotesRenderer(chartNotes, fontDefinitions);
       plotAreas[group].AddRenderer(rendererNotes);
     }
-
-
-    /////////// <summary>
-    /////////// Displays ValuesPanel over Chart
-    /////////// </summary>
-    ////////public void Include(ValuesPanel valuesPanel) {
-    ////////  if (ValuesPanel==valuesPanel) return;
-
-    ////////  if (ValuesPanel is not null) throw new Exception("ValuesPanel was active for a different valuesPanel instead of null.");
-    ////////  ValuesPanel = valuesPanel;
-    ////////  base.AddChild(valuesPanel);
-    ////////  InvalidateMeasure();
-    ////////  InvalidateVisual();
-    ////////}
-
-
-    /////////// <summary>
-    /////////// Does not display ValuesPanel over Chart
-    /////////// </summary>
-    ////////public void Exclude(ValuesPanel valuesPanel) {
-    ////////  if (ValuesPanel is null) return;
-
-    ////////  ValuesPanel = null;
-    ////////  base.RemoveChild(valuesPanel);
-    ////////  InvalidateMeasure();
-    ////////  InvalidateVisual();
-    ////////}
 
 
     protected ZoomButton? TotalZoomInButton;
@@ -366,6 +284,9 @@ namespace XYGraphLib {
           legendXStrings[recordIndex++] = stringGetter(record);
         }
         LegendXString.LegendStrings = legendXStrings;
+        foreach (var plotArea in plotAreas) {
+          plotArea.LegendXStrings = legendXStrings;
+        }
       }
 
       InvalidateMeasure(); //InvalidateVisual() does not force Measure()
@@ -471,13 +392,6 @@ namespace XYGraphLib {
       RendererNotes rendererNotes = new(chartNotes, this, fontDefinitions);
       return rendererNotes;
     }
-
-    
-    //protected void AddRenderer(Renderer renderer, PlotArea plotArea, LegendScrollerX? legendScrollerX, LegendScrollerY? legendScrollerY) {
-    //  plotArea.AddRenderer(renderer);
-    //  //legendScrollerX?.AddRenderer(renderer);
-    //  //legendScrollerY?.AddRenderer(renderer);
-    //}
     #endregion
 
 
@@ -573,28 +487,5 @@ namespace XYGraphLib {
       ZoomReset();
     }
     #endregion
-
-
-    ////////#region ValuesPanel
-    //////////      -----------
-
-    /////////// <summary>
-    /////////// The ValuePanel displays next to the mouse pointer the x and y values for the mouse x position.
-    /////////// </summary>
-    ////////public ValuesPanel? ValuesPanel;
-
-
-    ////////protected void MeasureChartControls(Size constraint) {
-    ////////  System.Diagnostics.Debug.WriteLine($">>> ValuesPanel?.Measure(Size {constraint})");
-    ////////  ValuesPanel?.Measure(constraint);
-    ////////}
-
-
-    ////////protected void ArrangeChartControls(Rect arrangeRect) {
-    ////////  System.Diagnostics.Debug.WriteLine($">>> ValuesPanel?.Arrange {arrangeRect})");
-    ////////  ValuesPanel?.Arrange(arrangeRect);
-    ////////}
-
-    ////////#endregion
   }
 }

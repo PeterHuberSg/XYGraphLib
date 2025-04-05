@@ -113,8 +113,6 @@ namespace XYGraphLib {
 
 
     protected override Size MeasureContentOverride(Size constraint) {
-      //Debug.WriteLine("");
-      //Debug.WriteLine($"-Chart2.MeasureContentOverride({constraint})");
       TotalZoom100Button!.Measure(new Size(constraint.Width, constraint.Height));
       double totalZoom100ButtonWidth = TotalZoom100Button.DesiredSize.Width;
       double totalZoom100ButtonHeight = TotalZoom100Button.DesiredSize.Height;
@@ -130,10 +128,8 @@ namespace XYGraphLib {
       LegendScrollerYUpper.Measure(new Size(constraint.Width, plotArea0Height));
       LegendScrollerYLower.Measure(new Size(constraint.Width, plotArea1Height));
       double legendScrollerYMaxWidth = Math.Max(LegendScrollerYUpper.DesiredSize.Width, LegendScrollerYLower.DesiredSize.Width);
-      //Debug.WriteLine($"-legendScrollerYMaxWidth: {legendScrollerYMaxWidth:N0} = Max(UpperDesiredWidth: {LegendScrollerYUpper.DesiredSize.Width:N0}, Lower.DesiredWidth: {LegendScrollerYLower.DesiredSize.Width:N0})");
 
       double legendWidth = Math.Min(constraint.Width, Math.Max(legendScrollerYMaxWidth, totalZoom100ButtonWidth));
-      //Debug.WriteLine($"-legendWidth: {legendWidth:N0}");
       double plotAreaWidth = constraint.Width-legendWidth;
       PlotAreaUpper.Measure(new Size(plotAreaWidth, plotArea0Height));
       PlotAreaLower.Measure(new Size(plotAreaWidth, plotArea1Height));
@@ -144,10 +140,6 @@ namespace XYGraphLib {
       //always remeasure xLegend because in the beginning it is given the whole width of Chart2Plots1X2YLegends
       LegendScrollerX.Measure(new Size(plotAreaWidth, legendXHeight));
 
-      //////////allow Chart to measure its own controls
-      ////////base.MeasureChartControls(constraint);
-
-
       Size returnedSize = constraint;
       if (double.IsInfinity(constraint.Height)) {
         returnedSize.Height = LegendScrollerX.DesiredSize.Height + LegendScrollerYUpper.DesiredSize.Height + LegendScrollerYLower.DesiredSize.Height;
@@ -155,17 +147,13 @@ namespace XYGraphLib {
       if (double.IsInfinity(constraint.Width)) {
         returnedSize.Width = LegendScrollerX.DesiredSize.Width + legendScrollerYMaxWidth;
       }
-      //Debug.WriteLine($"-return {returnedSize.Width:N0}, {returnedSize.Height:N0}");
       return returnedSize;
     }
 
 
     protected override Size ArrangeContentOverride(Rect arrangeRect) {
-      //Debug.WriteLine("");
-      //Debug.WriteLine($".Chart2.ArrangeContentOverride(Width: {arrangeRect.Width:N0}, Height: {arrangeRect.Height:N0})");
       double legendWidth = Math.Min(arrangeRect.Width, 
         Math.Max(Math.Max(LegendScrollerYUpper.DesiredSize.Width, LegendScrollerYLower.DesiredSize.Width), TotalZoom100Button!.DesiredSize.Width));
-      //Debug.WriteLine($".legendWidth: {legendWidth:N0} = Min(arrangeWidth: {arrangeRect.Width}, Max(UpperDesiredWidth: {LegendScrollerYUpper.DesiredSize.Width:N0}, Lower.DesiredWidth: {LegendScrollerYLower.DesiredSize.Width:N0}, ZoomButton.DesiredWidth: {TotalZoom100Button!.DesiredSize.Width:N0}))");
       double remainingWidth = arrangeRect.Width - legendWidth;
       double legendXHeight = Math.Min(arrangeRect.Height, 
         Math.Max(LegendScrollerX.DesiredSize.Height, TotalZoom100Button.DesiredSize.Height + TotalZoomOutButton!.DesiredSize.Height));
@@ -184,10 +172,6 @@ namespace XYGraphLib {
       TotalZoomOutButton.ArrangeBorderPadding(arrangeRect, remainingWidth, zoomInOutY, 
         TotalZoomOutButton.DesiredSize.Width, TotalZoomOutButton.DesiredSize.Height);
       TotalZoomInButton!.ArrangeBorderPadding(arrangeRect, arrangeRect.Width - TotalZoomInButton!.DesiredSize.Width, zoomInOutY, TotalZoomInButton.DesiredSize.Width, TotalZoomInButton.DesiredSize.Height);
-      //Debug.WriteLine($".return {arrangeRect.Width:N0}, {arrangeRect.Height:N0}");
-
-      //////////allow Chart to arrange its own controls
-      ////////base.ArrangeChartControls(arrangeRect);
 
       return arrangeRect.Size;
     }
